@@ -96,7 +96,10 @@ namespace direct_wheel::config
             out << "    \"activeTorqueStrengthPct\": " << c.ffb.activeTorqueStrengthPct                << ",\n";
             out << "    \"constantForcePct\": "        << c.ffb.constantForcePct                       << ",\n";
             out << "    \"springForcePct\": "          << c.ffb.springForcePct                         << ",\n";
-            out << "    \"damperForcePct\": "          << c.ffb.damperForcePct                         << "\n";
+            out << "    \"damperForcePct\": "          << c.ffb.damperForcePct                         << ",\n";
+            out << "    \"frictionForcePct\": "        << c.ffb.frictionForcePct                       << ",\n";
+            out << "    \"sineForcePct\": "            << c.ffb.sineForcePct                           << ",\n";
+            out << "    \"joltForcePct\": "            << c.ffb.joltForcePct                           << "\n";
             out << "  },\n";
 
             out << "  \"handshake\": {\n";
@@ -246,6 +249,9 @@ namespace direct_wheel::config
             ExtractInt   (text, "ffb",      "constantForcePct",       c.ffb.constantForcePct);
             ExtractInt   (text, "ffb",      "springForcePct",         c.ffb.springForcePct);
             ExtractInt   (text, "ffb",      "damperForcePct",         c.ffb.damperForcePct);
+            ExtractInt   (text, "ffb",      "frictionForcePct",       c.ffb.frictionForcePct);
+            ExtractInt   (text, "ffb",      "sineForcePct",           c.ffb.sineForcePct);
+            ExtractInt   (text, "ffb",      "joltForcePct",           c.ffb.joltForcePct);
 
             // "handshake" is the current key. Older config.json files from
             // pre-rename installs used "hello" for the same field; read
@@ -393,6 +399,9 @@ namespace direct_wheel::config
     void SetConstantForcePct(int32_t v) { Mutate([&](Config& c){ c.ffb.constantForcePct = std::clamp(v, 0, 100); }); }
     void SetSpringForcePct(int32_t v)   { Mutate([&](Config& c){ c.ffb.springForcePct = std::clamp(v, 0, 100); }); }
     void SetDamperForcePct(int32_t v)   { Mutate([&](Config& c){ c.ffb.damperForcePct = std::clamp(v, 0, 100); }); }
+    void SetFrictionForcePct(int32_t v)  { Mutate([&](Config& c){ c.ffb.frictionForcePct = std::clamp(v, 0, 100); }); }
+    void SetSineForcePct(int32_t v)      { Mutate([&](Config& c){ c.ffb.sineForcePct = std::clamp(v, 0, 100); }); }
+    void SetJoltForcePct(int32_t v)      { Mutate([&](Config& c){ c.ffb.joltForcePct = std::clamp(v, 0, 100); }); }
 
     void SetHandshakePlayOnStart(bool v)    { Mutate([&](Config& c){ c.handshake.playOnStart = v; }); }
 

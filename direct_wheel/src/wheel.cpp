@@ -42,7 +42,13 @@ namespace direct_wheel::wheel
             IDirectInputEffect* pConstantEffect = nullptr;
             IDirectInputEffect* pSpringEffect = nullptr;
             IDirectInputEffect* pDamperEffect = nullptr;
+            IDirectInputEffect* pFrictionEffect = nullptr;
+            IDirectInputEffect* pSineEffect = nullptr;
             HWND hFFBWindow = nullptr;
+
+            // Jolt state: collision triggers a short high-magnitude pulse
+            std::atomic<float> joltMagnitude{0.f};
+            std::atomic<uint32_t> joltTicksLeft{0};
         };
 
         State& S() { static State s; return s; }
@@ -104,6 +110,20 @@ namespace direct_wheel::wheel
         {
             auto cfg = config::Current();
             float mul = cfg.ffb.damperForcePct / 100.0f;
+            return static_cast<int>(std::clamp(v, 0.0f, 1.0f) * mul * 10000.0f);
+        }
+
+        int ScaleFriction(float v)
+        {
+            auto cfg = config::Current();
+            float mul = cfg.ffb.frictionForcePct / 100.0f;
+            return static_cast<int>(std::clamp(v, 0.0f, 1.0f) * mul * 10000.0f);
+        }
+
+        int ScaleSine(float v)
+        {
+            auto cfg = config::Current();
+            float mul = cfg.ffb.sineForcePct / 100.0f;
             return static_cast<int>(std::clamp(v, 0.0f, 1.0f) * mul * 10000.0f);
         }
 
@@ -177,6 +197,37 @@ namespace direct_wheel::wheel
                 HRESULT hrd = st.pDamperEffect->Download();
                 HRESULT hrs = st.pDamperEffect->Start(1, 0);
                 log::InfoF("[direct_wheel] InitFFB: GUID_Damper created OK, Download=0x%08lX Start=0x%08lX",
+                           (unsigned long)hrd, (unsigned long)hrs);
+            }
+
+            // Friction Force
+            DICONDITION fric = {0};
+            diEffect.cbTypeSpecificParams = sizeof(DICONDITION);
+            diEffect.lpvTypeSpecificParams = &fric;
+            hr = st.pWheel->CreateEffect(GUID_Friction, &diEffect, &st.pFrictionEffect, nullptr);
+            if (FAILED(hr)) {
+                log::WarnF("[direct_wheel] InitFFB: GUID_Friction FAILED hr=0x%08lX", (unsigned long)hr);
+            } else {
+                HRESULT hrd = st.pFrictionEffect->Download();
+                HRESULT hrs = st.pFrictionEffect->Start(1, 0);
+                log::InfoF("[direct_wheel] InitFFB: GUID_Friction created OK, Download=0x%08lX Start=0x%08lX",
+                           (unsigned long)hrd, (unsigned long)hrs);
+            }
+
+            // Sine (periodic vibration for road surface)
+            DIPERIODIC sine = {0};
+            sine.dwMagnitude = 0;
+            sine.dwPeriod = 40000; // 40ms = 25Hz base vibration
+            diEffect.cbTypeSpecificParams = sizeof(DIPERIODIC);
+            diEffect.lpvTypeSpecificParams = &sine;
+            diEffect.dwDuration = INFINITE;
+            hr = st.pWheel->CreateEffect(GUID_Sine, &diEffect, &st.pSineEffect, nullptr);
+            if (FAILED(hr)) {
+                log::WarnF("[direct_wheel] InitFFB: GUID_Sine FAILED hr=0x%08lX", (unsigned long)hr);
+            } else {
+                HRESULT hrd = st.pSineEffect->Download();
+                HRESULT hrs = st.pSineEffect->Start(1, 0);
+                log::InfoF("[direct_wheel] InitFFB: GUID_Sine created OK, Download=0x%08lX Start=0x%08lX",
                            (unsigned long)hrd, (unsigned long)hrs);
             }
 
@@ -413,17 +464,66 @@ namespace direct_wheel::wheel
     void StopSpring() {
         if (S().pSpringEffect) S().pSpringEffect->Stop();
     }
+    void PlayFriction(float coefficient) {
+        auto& st = S();
+        if (!st.pFrictionEffect) return;
+        int val = ScaleFriction(coefficient);
+        DICONDITION cond = {0};
+        cond.lPositiveCoefficient = val;
+        cond.lNegativeCoefficient = val;
+        cond.dwPositiveSaturation = 10000;
+        cond.dwNegativeSaturation = 10000;
+        DIEFFECT eff = {0};
+        eff.dwSize = sizeof(DIEFFECT);
+        eff.cbTypeSpecificParams = sizeof(DICONDITION);
+        eff.lpvTypeSpecificParams = &cond;
+        HRESULT hr = st.pFrictionEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        if (FAILED(hr)) {
+            st.pWheel->Acquire();
+            st.pFrictionEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        }
+    }
+    void StopFriction() {
+        if (S().pFrictionEffect) S().pFrictionEffect->Stop();
+    }
+    void PlaySine(float magnitude) {
+        auto& st = S();
+        if (!st.pSineEffect) return;
+        DIPERIODIC sine = {0};
+        sine.dwMagnitude = static_cast<DWORD>(ScaleSine(magnitude));
+        sine.dwPeriod = 40000; // 25Hz vibration
+        DIEFFECT eff = {0};
+        eff.dwSize = sizeof(DIEFFECT);
+        eff.cbTypeSpecificParams = sizeof(DIPERIODIC);
+        eff.lpvTypeSpecificParams = &sine;
+        HRESULT hr = st.pSineEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        if (FAILED(hr)) {
+            st.pWheel->Acquire();
+            st.pSineEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        }
+    }
+    void StopSine() {
+        if (S().pSineEffect) S().pSineEffect->Stop();
+    }
     void PlayRoadSurface(float magnitude, int periodMs) {}
     void StopRoadSurface() {}
     void PlayCarAirborne() {}
     void StopCarAirborne() {}
     void SetGlobalStrength(float mul) { S().globalStrength.store(mul); }
-    void StopAll() { StopConstant(); StopDamper(); StopSpring(); }
+    void StopAll() { StopConstant(); StopDamper(); StopSpring(); StopFriction(); StopSine(); }
     void PlayLeds(float level) {}
     void ClearLeds() {}
     bool IsHandshakeActive() { return false; }
     void SetSurfaceBaselineMag(float mag) {}
-    void TriggerJolt(float lateralKick, int durationMs) {}
+    void TriggerJolt(float lateralKick, int durationMs) {
+        auto& st = S();
+        auto cfg = config::Current();
+        float mul = cfg.ffb.joltForcePct / 100.0f;
+        st.joltMagnitude.store(lateralKick * mul, std::memory_order_release);
+        // Convert duration to ticks at 250Hz
+        uint32_t ticks = std::max(1u, static_cast<uint32_t>(durationMs * 250 / 1000));
+        st.joltTicksLeft.store(ticks, std::memory_order_release);
+    }
     void UpdateCenteringSpring(float absSpeedMps, float angVelMagRad,
                                float suspensionActivity, float lateralVelocityMps,
                                float steer, float throttle, float brake,
@@ -495,6 +595,30 @@ namespace direct_wheel::wheel
                           * (activeTorqueStrengthPct / 100.0f);
         if (isReversing) activeForce *= 0.4f;
 
+        // === Road-feel: suspension activity → random-direction bumps ===
+        static uint32_t s_bumpTick = 0;
+        float bumpSign = (++s_bumpTick & 1) ? 1.0f : -1.0f;
+        float bumpMag = std::clamp(suspensionActivity * 3.0f * speedRatio, 0.f, 0.5f);
+        activeForce += bumpSign * bumpMag;
+
+        // === Jolt: collision pulse override ===
+        auto& st = S();
+        uint32_t jt = st.joltTicksLeft.load(std::memory_order_acquire);
+        if (jt > 0) {
+            float jm = st.joltMagnitude.load(std::memory_order_acquire);
+            activeForce += jm;  // Add jolt impulse on top
+            st.joltTicksLeft.store(jt - 1, std::memory_order_release);
+        }
+
         PlayConstant(std::clamp(activeForce, -1.0f, 1.0f));
+
+        // === Friction: road-texture resistance, scales with speed ===
+        float frictionCoef = std::clamp(speedRatio * 0.3f, 0.f, 0.4f);
+        PlayFriction(frictionCoef);
+
+        // === Sine: periodic vibration from road roughness ===
+        // suspensionActivity drives amplitude; quiet on smooth roads.
+        float sineMag = std::clamp(suspensionActivity * 2.0f * speedRatio, 0.f, 0.6f);
+        PlaySine(sineMag);
     }
 }

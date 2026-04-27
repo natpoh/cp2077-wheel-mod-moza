@@ -47,6 +47,9 @@ namespace direct_wheel::config
         int32_t constantForcePct = 30;
         int32_t springForcePct   = 30;
         int32_t damperForcePct   = 30;
+        int32_t frictionForcePct = 30;
+        int32_t sineForcePct     = 30;
+        int32_t joltForcePct     = 50;
     };
 
     struct PerVehicle
@@ -147,6 +150,9 @@ namespace direct_wheel::config
     void SetConstantForcePct(int32_t v);
     void SetSpringForcePct(int32_t v);
     void SetDamperForcePct(int32_t v);
+    void SetFrictionForcePct(int32_t v);
+    void SetSineForcePct(int32_t v);
+    void SetJoltForcePct(int32_t v);
 
     void SetHandshakePlayOnStart(bool v);
 

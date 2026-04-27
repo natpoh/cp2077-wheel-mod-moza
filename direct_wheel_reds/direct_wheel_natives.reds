@@ -35,6 +35,9 @@ public static native func DirectWheel_SetActiveTorqueStrengthPct(pct: Int32) -> 
 public static native func DirectWheel_SetConstantForcePct(pct: Int32) -> Bool;
 public static native func DirectWheel_SetSpringForcePct(pct: Int32) -> Bool;
 public static native func DirectWheel_SetDamperForcePct(pct: Int32) -> Bool;
+public static native func DirectWheel_SetFrictionForcePct(pct: Int32) -> Bool;
+public static native func DirectWheel_SetSineForcePct(pct: Int32) -> Bool;
+public static native func DirectWheel_SetJoltForcePct(pct: Int32) -> Bool;
 
 // Rev-strip LED bar on top of the wheel (G29/G920/G923). VisualizerWhileMusic
 // swaps the speed-driven rev bar for a WASAPI-loopback audio visualizer
