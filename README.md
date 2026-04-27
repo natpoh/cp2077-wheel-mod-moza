@@ -170,7 +170,11 @@ Axis name mapping:
 
 **Default** (Logitech G29/G920/G923): `steer=lX, throttle=lZ, brake=lRz, clutch=slider0`
 
-**Moza R3/R5** (typical): `steer=lX, throttle=lY, brake=lRz, clutch=slider0`
+**Moza R3**: `steer=lX, throttle=lY, brake=lRz, clutch=slider0`
+
+**Moza R5**: `steer=lX, throttle=lZ, brake=lRz, clutch=slider0` (same as Logitech)
+
+> Other wheels (Fanatec, Thrustmaster, etc.) - run `input_probe.exe` to check your axes.
 
 ---
 
