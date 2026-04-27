@@ -62,6 +62,12 @@ public static native func DirectWheel_SetInputBinding(inputId: Int32, action: In
 // them (remote-driving parked cars, etc.). Call SetPlayerVehicle on
 // mount and ClearPlayerVehicle on dismount from VehicleComponent event
 // wrappers.
+// Menu lifecycle signals. The direct_wheel_menu.reds wrappers call these
+// when gameplay-blocking menus open/close so the plugin can suppress
+// input injection while in menus.
+public static native func DirectWheel_MenuOpen(tag: String) -> Bool;
+public static native func DirectWheel_MenuClose(tag: String) -> Bool;
+
 public static native func DirectWheel_SetPlayerVehicle(v: ref<VehicleObject>) -> Bool;
 public static native func DirectWheel_ClearPlayerVehicle() -> Bool;
 

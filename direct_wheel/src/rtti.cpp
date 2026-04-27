@@ -144,6 +144,25 @@ namespace direct_wheel::rtti
             if (aOut) *aOut = RED4ext::CString(config::ReadAsJson().c_str());
         }
 
+        // -------- Menu lifecycle (no-op stubs) --------------------------------
+        // direct_wheel_menu.reds calls these when gameplay-blocking menus
+        // open/close. Currently used only for logging; the plugin does not
+        // suppress input while in menus (the mount/unmount gate is sufficient).
+
+        void MenuOpen(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            auto tag = ReadString(aFrame); aFrame->code++;
+            log::InfoF("[direct_wheel:menu] open: %s", tag.c_str());
+            if (aOut) *aOut = true;
+        }
+
+        void MenuClose(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            auto tag = ReadString(aFrame); aFrame->code++;
+            log::InfoF("[direct_wheel:menu] close: %s", tag.c_str());
+            if (aOut) *aOut = true;
+        }
+
         // -------- Config setters --------------------------------------------
 
         void SetInputEnabled(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
@@ -445,6 +464,13 @@ namespace direct_wheel::rtti
             RegisterGlobal(rtti, "DirectWheel_SetInputBinding",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInputBinding),
                            "Bool", {{ "Int32", "inputId" }, { "Int32", "action" }});
+
+            RegisterGlobal(rtti, "DirectWheel_MenuOpen",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&MenuOpen),
+                           "Bool", {{ "String", "tag" }});
+            RegisterGlobal(rtti, "DirectWheel_MenuClose",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&MenuClose),
+                           "Bool", {{ "String", "tag" }});
 
             RegisterGlobal(rtti, "DirectWheel_SetPlayerVehicle",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetPlayerVehicle),
