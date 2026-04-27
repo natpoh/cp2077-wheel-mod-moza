@@ -1,32 +1,30 @@
-# Cyberpunk 2077 — Logitech G-series Steering Wheel Mod
+# Cyberpunk 2077 — Moza & Logitech Racing Wheel Support
 
-**v2.31.0** for Cyberpunk 2077 game patch 2.31.
+**v2.31.7** for Cyberpunk 2077 game patch 2.31.
 
-Drive Cyberpunk 2077 with a Logitech G-series steering wheel. Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). Rev-strip LEDs follow real engine RPM. When the in-car radio is on, the rev strip becomes a music visualizer.
+Full racing wheel support for Cyberpunk 2077. Drive with a **Moza** or **Logitech** steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
 
-There is no virtual gamepad to install, no XInput shim, no third-party driver. The wheel talks to the game via the official Logitech Steering Wheel SDK (the same one driving sims use).
+There is no virtual gamepad to install, no XInput shim, no third-party driver. The mod hooks the game directly via DirectInput/Logitech SDK.
 
 ## Supported wheels
 
-The mod was designed to work with any wheel that is compatible with Logitech G Hub.
+The mod was designed to work with DirectInput-compatible wheels. Tested and confirmed on:
 
-I tested with:
+**Moza Racing:**
+- Moza R5
+- Moza R3
+*(Map your axes manually if needed in `config.json`)*
 
-- G923 (Xbox variant)
-- G920
-
-But theoretically these should all be compatible:
-
-- WingMan Formula Force, Formula Force GP
-- Driving Force, Driving Force Pro, Driving Force GT
-- Momo Force, Momo Racing
-- G25, G27, G29, G920
+**Logitech:**
 - G923 (Xbox, PS, PC variants)
-- Formula Vibration Feedback
+- G920, G29, G27, G25
+- Momo Force, Driving Force GT
 
-The mod auto-detects what hardware your wheel actually has (force feedback motor, rev-strip LEDs, lower-cluster buttons) and only shows the relevant settings.
+The mod auto-detects what hardware your Logitech wheel actually has (force feedback motor, rev-strip LEDs, lower-cluster buttons) and only shows the relevant settings.
 
-Non-Logitech wheels (Thrustmaster, Fanatec, Moza) are not supported.
+## New Features
+- **Custom Steering Equalizer:** 3-point equalizer (25%, 50%, 75%) to customize your steering curve and perfectly counteract the game's internal exponential steering physics! 
+- **Speed Steering Boost:** Compensates steering at speed (up to 3x multiplier) so you can still turn at 200 mph.
 
 ## Required mods
 
