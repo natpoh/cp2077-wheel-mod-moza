@@ -19,7 +19,7 @@
 //      `red4ext/plugins/mod_settings/user.ini` once at process start. So to
 //      drive the three capability flags from real hardware state we have to
 //      write that file BEFORE mod_settings reads it. That happens in
-//      direct_wheel.dll's RED4ext OnLoad — see direct_wheel/src/mod_settings_seed.cpp.
+//      direct_wheel.dll's RED4ext OnLoad - see direct_wheel/src/mod_settings_seed.cpp.
 //      Plugin OnLoads complete before script-data processing, so the
 //      ordering is safe regardless of plugin load order.
 //
@@ -36,7 +36,7 @@
 // mod_settings dependency evaluation reads from its OWN internal
 // RuntimeVariable<T> storage, NOT from the instance passed to
 // RegisterListenerToClass. Setting capability flags on the listener
-// instance from script does nothing for visibility — the only way to
+// instance from script does nothing for visibility - the only way to
 // drive them is via user.ini (above). Verified against mod_settings
 // source 2026-04-25.
 
@@ -103,7 +103,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Min turn angle (deg)")
-  @runtimeProperty("ModSettings.description", "Floor for maxWheelTurnDeg — wheels never turn less than this. 12 = default.")
+  @runtimeProperty("ModSettings.description", "Floor for maxWheelTurnDeg - wheels never turn less than this. 12 = default.")
   @runtimeProperty("ModSettings.min", "3")
   @runtimeProperty("ModSettings.max", "40")
   @runtimeProperty("ModSettings.step", "1")
@@ -132,7 +132,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let steeringSubBoost: Int32 = 12;
 
-  // ---- Force feedback — General -------------------------------------------
+  // ---- Force feedback - General -------------------------------------------
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Force feedback")
@@ -163,102 +163,102 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let stationaryThresholdMps: Float = 0.5;
 
-  // ---- FFB — Centering (Spring) ------------------------------------------
+  // ---- FFB - Centering (Spring) ------------------------------------------
   //
   // These three sliders all feed into the DirectInput Spring effect.
   // Together they control how strongly the wheel pulls back to center.
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "FFB — Centering (Spring)")
+  @runtimeProperty("ModSettings.category", "FFB - Centering (Spring)")
   @runtimeProperty("ModSettings.category.order", "210")
   @runtimeProperty("ModSettings.displayName", "Spring Force (%)")
-  @runtimeProperty("ModSettings.description", "Base centering spring — pulls the wheel back to center. The foundation of self-aligning feel.")
+  @runtimeProperty("ModSettings.description", "Base centering spring - pulls the wheel back to center. The foundation of self-aligning feel.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let springForcePct: Int32 = 30;
+  let springForcePct: Int32 = 15;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "FFB — Centering (Spring)")
+  @runtimeProperty("ModSettings.category", "FFB - Centering (Spring)")
   @runtimeProperty("ModSettings.category.order", "210")
-  @runtimeProperty("ModSettings.displayName", "Constant Force — centering addition (%)")
-  @runtimeProperty("ModSettings.description", "Smooth push-back force that adds to the spring. Grows with speed and steering angle — simulates self-aligning torque (SAT).")
+  @runtimeProperty("ModSettings.displayName", "Constant Force - centering addition (%)")
+  @runtimeProperty("ModSettings.description", "Smooth push-back force that adds to the spring. Grows with speed and steering angle - simulates self-aligning torque (SAT).")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let constantForcePct: Int32 = 30;
+  let constantForcePct: Int32 = 15;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "FFB — Centering (Spring)")
+  @runtimeProperty("ModSettings.category", "FFB - Centering (Spring)")
   @runtimeProperty("ModSettings.category.order", "210")
-  @runtimeProperty("ModSettings.displayName", "Cornering feedback — spring stiffness (%)")
+  @runtimeProperty("ModSettings.displayName", "Cornering feedback - spring stiffness (%)")
   @runtimeProperty("ModSettings.description", "Makes the spring stiffer while the car is rotating (yaw). More = heavier wheel in corners.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let yawFeedbackPct: Int32 = 50;
+  let yawFeedbackPct: Int32 = 15;
 
-  // ---- FFB — Steering feel ------------------------------------------------
+  // ---- FFB - Steering feel ------------------------------------------------
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "FFB — Steering feel")
+  @runtimeProperty("ModSettings.category", "FFB - Steering feel")
   @runtimeProperty("ModSettings.category.order", "220")
-  @runtimeProperty("ModSettings.displayName", "Damper — rotation resistance (%)")
-  @runtimeProperty("ModSettings.description", "Viscous damping — resists wheel rotation speed. More = heavier, slower steering.")
+  @runtimeProperty("ModSettings.displayName", "Damper - rotation resistance (%)")
+  @runtimeProperty("ModSettings.description", "Viscous damping - resists wheel rotation speed. More = heavier, slower steering.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let damperForcePct: Int32 = 30;
+  let damperForcePct: Int32 = 45;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "FFB — Steering feel")
+  @runtimeProperty("ModSettings.category", "FFB - Steering feel")
   @runtimeProperty("ModSettings.category.order", "220")
-  @runtimeProperty("ModSettings.displayName", "Active Torque — yaw push (%)")
-  @runtimeProperty("ModSettings.description", "Directional push during turns — simulates lateral force feedback. Uses Constant Force (short pulses).")
+  @runtimeProperty("ModSettings.displayName", "Active Torque - yaw push (%)")
+  @runtimeProperty("ModSettings.description", "Directional push during turns - simulates lateral force feedback. Uses Constant Force (short pulses).")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let activeTorqueStrengthPct: Int32 = 100;
+  let activeTorqueStrengthPct: Int32 = 45;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "FFB — Steering feel")
+  @runtimeProperty("ModSettings.category", "FFB - Steering feel")
   @runtimeProperty("ModSettings.category.order", "220")
-  @runtimeProperty("ModSettings.displayName", "Friction — road texture (%)")
+  @runtimeProperty("ModSettings.displayName", "Friction - road texture (%)")
   @runtimeProperty("ModSettings.description", "Static friction that simulates road grip. More = more textured feel on different surfaces.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let frictionForcePct: Int32 = 30;
+  let frictionForcePct: Int32 = 25;
 
-  // ---- FFB — Road effects -------------------------------------------------
+  // ---- FFB - Road effects -------------------------------------------------
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "FFB — Road effects")
+  @runtimeProperty("ModSettings.category", "FFB - Road effects")
   @runtimeProperty("ModSettings.category.order", "230")
-  @runtimeProperty("ModSettings.displayName", "Road vibration — surface buzz (%)")
+  @runtimeProperty("ModSettings.displayName", "Road vibration - surface buzz (%)")
   @runtimeProperty("ModSettings.description", "25 Hz periodic vibration from road roughness. Always present at speed with a baseline hum.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let sineForcePct: Int32 = 30;
+  let sineForcePct: Int32 = 10;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "FFB — Road effects")
+  @runtimeProperty("ModSettings.category", "FFB - Road effects")
   @runtimeProperty("ModSettings.category.order", "230")
-  @runtimeProperty("ModSettings.displayName", "Collision jolt — impact kick (%)")
-  @runtimeProperty("ModSettings.description", "Short high-magnitude pulse on crashes and obstacle hits. Uses Constant Force (80–300ms burst).")
+  @runtimeProperty("ModSettings.displayName", "Collision jolt - impact kick (%)")
+  @runtimeProperty("ModSettings.description", "Short high-magnitude pulse on crashes and obstacle hits. Uses Constant Force (80-300ms burst).")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let joltForcePct: Int32 = 50;
+  let joltForcePct: Int32 = 40;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Force feedback")
@@ -293,7 +293,7 @@ public class DirectWheelSettings extends IScriptable {
   // D-pad + A defaults are Menu-nav (Up/Down/Left/Right arrow keys and
   // Enter) so the wheel navigates pause/map/inventory menus like a
   // controller out of the box. If you'd rather those wheel controls stay
-  // inert while driving, set them to None — CP2077's arrow keys are
+  // inert while driving, set them to None - CP2077's arrow keys are
   // secondary vehicle controls (Up/Down = accelerate/decelerate, Left/Right
   // = steer), so binding the D-pad to Menu-nav and then pressing the D-pad
   // while driving will nudge the car.
@@ -509,11 +509,11 @@ public class DirectWheelSettings extends IScriptable {
 }
 
 // Actions the plugin knows how to dispatch. Indices must match the Action
-// enum in direct_wheel/src/input_bindings.h — same values, same order.
+// enum in direct_wheel/src/input_bindings.h - same values, same order.
 // Grouped by category (driving / camera / combat / weapons / radio /
 // gameplay / menus / menu-nav) so Mod Settings' scroll-list shows similar
 // actions adjacent. MUST stay in lockstep with the C++ `Action` enum in
-// direct_wheel/src/input_bindings.h — same names, same integer values, same
+// direct_wheel/src/input_bindings.h - same names, same integer values, same
 // order. Mod Settings persists each binding by integer value, so any
 // reorder shifts users' saved bindings (one-time forced re-bind).
 //
@@ -581,7 +581,7 @@ enum DirectWheelAction {
 // Attach our settings instance to the player puppet so it lives for the
 // session and register it as a listener with Mod Settings. The listener
 // receives OnModSettingsChange callbacks when the user clicks Apply in the
-// settings menu — we use that to push the new values into the C++ plugin
+// settings menu - we use that to push the new values into the C++ plugin
 // via the DirectWheel_Set* natives.
 //
 // The hidden capability flags (hasFfbHardware / hasRevLeds /

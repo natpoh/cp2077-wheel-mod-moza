@@ -49,17 +49,17 @@ namespace direct_wheel::config
         //   constant force. Peak is shaped (humped sqrt curve over deflection,
         //   lateral-accel proxy, grip-factor lightening past the yaw limit).
         float   stationaryThresholdMps  = 0.5f;
-        int32_t yawFeedbackPct          = 50;
-        int32_t activeTorqueStrengthPct = 100;
+        int32_t yawFeedbackPct          = 15;
+        int32_t activeTorqueStrengthPct = 45;
 
         // Per-effect strength sliders (0..100). Allow the user to
         // individually scale each DirectInput FFB effect type.
-        int32_t constantForcePct = 30;
-        int32_t springForcePct   = 30;
-        int32_t damperForcePct   = 30;
-        int32_t frictionForcePct = 30;
-        int32_t sineForcePct     = 30;
-        int32_t joltForcePct     = 50;
+        int32_t constantForcePct = 15;
+        int32_t springForcePct   = 15;
+        int32_t damperForcePct   = 45;
+        int32_t frictionForcePct = 25;
+        int32_t sineForcePct     = 10;
+        int32_t joltForcePct     = 40;
     };
 
     struct PerVehicle

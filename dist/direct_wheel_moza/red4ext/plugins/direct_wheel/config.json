@@ -15,14 +15,14 @@
     "debugLogging": false,
     "torquePct": 100,
     "stationaryThresholdMps": 0.5,
-    "yawFeedbackPct": 50,
-    "activeTorqueStrengthPct": 100,
-    "constantForcePct": 30,
-    "springForcePct": 30,
-    "damperForcePct": 30,
-    "frictionForcePct": 30,
-    "sineForcePct": 30,
-    "joltForcePct": 50
+    "yawFeedbackPct": 15,
+    "activeTorqueStrengthPct": 45,
+    "constantForcePct": 15,
+    "springForcePct": 15,
+    "damperForcePct": 45,
+    "frictionForcePct": 25,
+    "sineForcePct": 10,
+    "joltForcePct": 40
   },
   "handshake": {
     "playOnStart": true
