@@ -1,73 +1,157 @@
-# Cyberpunk 2077 — Logitech G-series Steering Wheel Mod
+# Direct Wheel — Moza/Logitech Racing Wheel Support for Cyberpunk 2077
 
-**v2.31.0** for Cyberpunk 2077 game patch 2.31.
+Full racing wheel support for Cyberpunk 2077 v2.31 with **force feedback**, **speed-sensitive steering compensation**, and **TweakDB steering physics overrides**.
 
-Drive Cyberpunk 2077 with a Logitech G-series steering wheel. Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). Rev-strip LEDs follow real engine RPM. When the in-car radio is on, the rev strip becomes a music visualizer.
+Tested with **Moza R5** and **Logitech G923**. Should work with any DirectInput-compatible wheel.
 
-There is no virtual gamepad to install, no XInput shim, no third-party driver. The wheel talks to the game via the official Logitech Steering Wheel SDK (the same one driving sims use).
+---
 
-## Supported wheels
+## Features
 
-The mod was designed to work with any wheel that is compatible with Logitech G Hub.
+### 🎮 Wheel Input
+- **Steering, Throttle, Brake, Clutch** — full axis mapping via Logitech SDK / DirectInput
+- **Clutch-as-Brake** — use the softer clutch pedal as brake (toggle in settings)
+- **Speed Steering Boost** — compensates for the game's built-in steering reduction at high speed. Multiplies steering input up to **3x** at cruise speed so the same physical wheel rotation produces consistent in-game turns regardless of velocity
 
-I tested with:
+### 🔧 TweakDB Steering Physics (CET companion)
+The game internally reduces steering effectiveness exponentially at speed through three TweakDB parameters. This mod overrides them in real-time:
 
-- G923 (Xbox variant)
-- G920
+| Parameter | What it does | How the mod compensates |
+|---|---|---|
+| `maxWheelTurnDeg` | Max wheel turn angle | Decreases with speed (configurable) |
+| `wheelTurnMaxAddPerSecond` | How fast wheels respond to steering | **Increases** at speed — snappier response |
+| `wheelTurnMaxSubPerSecond` | How fast wheels return to center | **Increases** at speed — faster centering |
 
-But theoretically these should all be compatible:
+All three parameters are tunable via **Mod Settings** sliders (no CET overlay needed).
 
-- WingMan Formula Force, Formula Force GP
-- Driving Force, Driving Force Pro, Driving Force GT
-- Momo Force, Momo Racing
-- G25, G27, G29, G920
-- G923 (Xbox, PS, PC variants)
-- Formula Vibration Feedback
+### 💪 Force Feedback
+- **Centering spring** — physics-based, scales with speed
+- **Cornering feedback** — spring stiffens during turns
+- **Friction** — road texture resistance, scales with speed
+- **Sine vibration** — 25 Hz road surface buzz from suspension activity
+- **Collision jolt** — sharp impact pulse on collision
+- **All FFB effects** have individual strength sliders (0–100%)
 
-The mod auto-detects what hardware your wheel actually has (force feedback motor, rev-strip LEDs, lower-cluster buttons) and only shows the relevant settings.
+### 💡 LED Support
+- Rev-strip LED bar (G29/G920/G923)
+- Optional WASAPI audio visualizer mode
 
-Non-Logitech wheels (Thrustmaster, Fanatec, Moza) are not supported.
+---
 
-## Required mods
+## Requirements
 
-1. **[RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380)**
-1. **[redscript](https://www.nexusmods.com/cyberpunk2077/mods/1511)**
-1. **[ArchiveXL](https://www.nexusmods.com/cyberpunk2077/mods/4198)**
-1. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** v0.2.21 or later
+1. **Cyberpunk 2077 v2.31** (latest patch)
+2. **[RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380)** — native plugin loader
+3. **[Cyber Engine Tweaks (CET)](https://www.nexusmods.com/cyberpunk2077/mods/107)** v1.37+ — for TweakDB steering overrides
+4. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** — in-game settings UI (patched version included)
+5. **Logitech G HUB** or **Logitech Gaming Software** — must be running (provides the steering SDK)
 
-## Required drivers
+---
 
-- **[Logitech G HUB](https://www.logitech.com/innovation/g-hub.html)**
+## Installation
 
-## Install
+### Quick Install (zip)
 
-1. Click the **Vortex** download button on this page (the green button in the Files tab).
-1. Vortex will ask about a file conflict on `mod_settings.dll`. Choose this mod to win the conflict (load after Mod Settings). The included file is a small patch on top of upstream Mod Settings.
+1. Download `direct_wheel_moza_v2.31.0.zip`
+2. Extract **directly into your Cyberpunk 2077 game folder**, for example:
+   ```
+   D:\SteamLibrary\steamapps\common\Cyberpunk 2077\
+   ```
+3. The zip merges into the existing folder structure:
+   ```
+   Cyberpunk 2077/
+   ├── bin/x64/plugins/cyber_engine_tweaks/mods/steering_debug/init.lua  ← CET script
+   ├── r6/scripts/direct_wheel/*.reds                                    ← Redscript
+   └── red4ext/plugins/
+       ├── direct_wheel/direct_wheel.dll                                 ← Main plugin
+       └── mod_settings/mod_settings.dll                                 ← Settings UI
+   ```
+4. **Start G HUB** (or LGS) before launching the game
+5. Launch Cyberpunk 2077
 
-(Manual Download is also available if you don't use Vortex, but Mod Manager Download is the supported path. If you go manual, you handle the file conflict on `mod_settings.dll` yourself by overwriting upstream Mod Settings' DLL with the one from this zip.)
+### First Launch
+- First launch after install is slow (30–60 seconds) — Redscript needs to compile
+- Your wheel should rumble briefly on load (handshake confirmation)
+- Enter any vehicle to start driving with the wheel
 
-## G HUB
+---
 
-This mod respects G HUB. Wheel rotation range, sensitivity, and centering spring stay with G HUB; the mod reads the rotation range and scales its force feedback to match. G HUB and this mod can both be running at the same time.
+## Configuration
 
-If you have wheel buttons configured in your G HUB Cyberpunk profile that overlap with the bindings here, you may get doubled keypresses. Clear the overlapping bindings from your G HUB Cyberpunk profile.
+All settings are in-game: **Main Menu → Settings → Mod Settings → G-series Wheel**
 
-I recommend starting with an operating range of 180 to start, since the rotation will match the animation you see in 1st person view inside of a car. I tend to like it a bit wider to help mitigate fishtailing.
+### Wheel Input Section
 
-## Troubleshooting
+| Slider | Default | Description |
+|---|---|---|
+| Enable wheel input | ON | Master toggle for steering/throttle/brake injection |
+| Treat clutch as brake | ON | Use clutch pedal as brake (softer pedal) |
+| **Speed steering boost (%)** | 50 | Compensates steering at speed. 0=off, 50=2x, 100=3x at cruise |
+| **Turn angle speed factor** | 15 | How fast maxTurnDeg decreases with speed (×0.001). Higher = less angle |
+| **Min turn angle (deg)** | 12 | Floor for wheel turn angle — never goes below this |
+| **Wheel turn add boost** | 8 | How fast wheel response speeds up at speed (×0.001) |
+| **Wheel turn sub boost** | 12 | How fast wheels return to center at speed (×0.001) |
 
-- **Wheel detected but the car doesn't move.** Make sure RED4ext is installed and current.
-- **Settings page is missing.** Mod Settings or ArchiveXL aren't installed correctly. The wheel will still work on defaults.
-- **Three orphan toggles named `hasFfbHardware` / `hasRevLeds` / `hasRightCluster` show up in settings.** Vortex installed stock Mod Settings on top of the patched build that ships with this mod. Re-deploy in Vortex and let this mod win the file conflict.
-- **Doubled keypresses on D-pad or A/B/X/Y.** G HUB and this mod are both binding the same keys. Reset the wheel-button entries in your G HUB Cyberpunk profile back to their default bindings.
+### Force Feedback Section
+
+| Slider | Default | Description |
+|---|---|---|
+| Enable force feedback | ON | Master FFB toggle |
+| FFB strength (%) | 100 | Overall FFB magnitude |
+| Cornering feedback (%) | 50 | Spring stiffness during turns |
+| Friction force (%) | 30 | Road texture resistance |
+| Road vibration (%) | 30 | Sine wave buzz from road surface |
+| Collision jolt (%) | 50 | Impact pulse on collision |
+
+---
+
+## Tuning Guide
+
+### Steering feels dead at high speed
+Increase **Speed steering boost** (try 70–100%) and **Wheel turn add boost** (try 12–20).
+
+### Steering is too twitchy at high speed
+Decrease **Speed steering boost** (try 20–40%) and increase **Min turn angle** (try 15–20).
+
+### FFB is too strong / too weak
+Adjust **FFB strength** first (overall), then tune individual effects.
+
+### Wheel doesn't respond at all
+1. Make sure **G HUB** (or LGS) is running
+2. Check that RED4ext is installed correctly
+3. Look at logs: `red4ext/logs/direct_wheel-*.log`
+
+---
+
+## How It Works
+
+The mod uses a **two-layer** approach:
+
+1. **RED4ext plugin** (`direct_wheel.dll`) — hooks `vehicle::BaseObject::UpdateVehicleCameraInput` to inject wheel axis values each frame. Also runs FFB effects (centering spring, friction, sine, jolt) via DirectInput. The **Speed Steering Boost** multiplies the raw steer input before injection.
+
+2. **CET companion script** (`steering_debug/init.lua`) — reads tuning parameters from `config.json` every 2 seconds, then modifies TweakDB `driveModelData` records in real-time. This fights the game's internal exponential steering reduction that no amount of input boosting can overcome.
+
+Both layers work together for the most realistic steering feel possible.
+
+---
+
+## Uninstallation
+
+Delete these folders:
+```
+red4ext/plugins/direct_wheel/
+r6/scripts/direct_wheel/
+bin/x64/plugins/cyber_engine_tweaks/mods/steering_debug/
+```
+
+---
 
 ## Credits
 
-- [RED4ext](https://github.com/WopsS/RED4ext) by WopsS
-- [redscript](https://github.com/jac3km4/redscript) by jac3km4
-- [Mod Settings](https://github.com/jackhumbert/mod_settings) by jackhumbert
-- [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) by psiberx
+- Based on [Logitech G-series Wheel Support](https://www.nexusmods.com/cyberpunk2077/mods/29172) by the original author
+- RED4ext SDK by [WopsS](https://github.com/WopsS/RED4ext.SDK)
+- Cyber Engine Tweaks by [yamashi / maximegmd](https://github.com/maximegmd/CyberEngineTweaks)
 
-## Reporting issues
+## License
 
-Include your wheel model, Cyberpunk patch version, RED4ext version, and your most recent `red4ext/logs/direct_wheel-*.log` file.
+MIT

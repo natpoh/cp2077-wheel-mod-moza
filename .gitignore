@@ -72,3 +72,5 @@ $RECYCLE.BIN/
 # Backups
 *.bak
 *.backup
+steering_debug/*.log
+steering_debug/db.sqlite3

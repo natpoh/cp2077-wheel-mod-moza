@@ -81,12 +81,56 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Speed steering boost (%)")
-  @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed. 0 = off, 50 = 1.5x at cruise, 100 = 2x at cruise. Makes steering feel consistent regardless of speed.")
+  @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed. 0 = off, 50 = 2x at cruise, 100 = 3x at cruise.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "5")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let speedSensitiveSteeringPct: Int32 = 50;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Turn angle speed factor (x1000)")
+  @runtimeProperty("ModSettings.description", "How fast max turn angle decreases with speed. Higher = less angle at speed. 15 = default.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "50")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringSpeedFactor: Int32 = 15;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Min turn angle (deg)")
+  @runtimeProperty("ModSettings.description", "Floor for maxWheelTurnDeg — wheels never turn less than this. 12 = default.")
+  @runtimeProperty("ModSettings.min", "3")
+  @runtimeProperty("ModSettings.max", "40")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringMinTurn: Int32 = 12;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Wheel turn add boost (x1000)")
+  @runtimeProperty("ModSettings.description", "How fast wheel turn response speeds up at high speed. Higher = snappier steering. 8 = default.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "30")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringAddBoost: Int32 = 8;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Wheel turn sub boost (x1000)")
+  @runtimeProperty("ModSettings.description", "How fast wheels return to center at high speed. Higher = faster return. 12 = default.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "30")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringSubBoost: Int32 = 12;
 
   // ---- Force feedback -----------------------------------------------------
 
@@ -406,6 +450,10 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetSineForcePct(this.sineForcePct);
     DirectWheel_SetJoltForcePct(this.joltForcePct);
     DirectWheel_SetSpeedSensitiveSteeringPct(this.speedSensitiveSteeringPct);
+    DirectWheel_SetSteeringSpeedFactor(this.steeringSpeedFactor);
+    DirectWheel_SetSteeringMinTurn(this.steeringMinTurn);
+    DirectWheel_SetSteeringAddBoost(this.steeringAddBoost);
+    DirectWheel_SetSteeringSubBoost(this.steeringSubBoost);
 
     DirectWheel_SetHandshakePlayOnStart(this.handshakePlayOnStart);
 

@@ -16,6 +16,10 @@ namespace direct_wheel::config
         float       maxWheelTurnDeg = 0.f;            // 0 = don't override
         float       wheelTurnMaxAddPerSecond = 0.f;   // 0 = don't override
         float       wheelTurnMaxSubPerSecond = 0.f;   // 0 = don't override
+        int32_t     steeringSpeedFactor = 15;   // x1000, used by CET script
+        int32_t     steeringMinTurn = 12;        // degrees
+        int32_t     steeringAddBoost = 8;        // x1000
+        int32_t     steeringSubBoost = 12;       // x1000
     };
 
     struct Ffb
@@ -158,6 +162,10 @@ namespace direct_wheel::config
     void SetSineForcePct(int32_t v);
     void SetJoltForcePct(int32_t v);
     void SetSpeedSensitiveSteeringPct(int32_t v);
+    void SetSteeringSpeedFactor(int32_t v);
+    void SetSteeringMinTurn(int32_t v);
+    void SetSteeringAddBoost(int32_t v);
+    void SetSteeringSubBoost(int32_t v);
 
     void SetHandshakePlayOnStart(bool v);
 
