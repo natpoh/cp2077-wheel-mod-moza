@@ -15,6 +15,7 @@ namespace direct_wheel::config
         bool        clutchAsBrake = false;
         std::string responseCurve = "default"; // default | subdued | sharp
         int32_t     speedSensitiveSteeringPct = 50; // 0=off, 100=max boost at speed
+        float       steeringLinearity = 0.5f;  // <1 = inverse expo (more center response), 1 = linear, >1 = expo
         float       maxWheelTurnDeg = 0.f;            // 0 = don't override
         float       wheelTurnMaxAddPerSecond = 0.f;   // 0 = don't override
         float       wheelTurnMaxSubPerSecond = 0.f;   // 0 = don't override
@@ -181,6 +182,7 @@ namespace direct_wheel::config
     void SetSineForcePct(int32_t v);
     void SetJoltForcePct(int32_t v);
     void SetSpeedSensitiveSteeringPct(int32_t v);
+    void SetSteeringLinearity(float v);
     void SetSteeringSpeedFactor(int32_t v);
     void SetSteeringMinTurn(int32_t v);
     void SetSteeringAddBoost(int32_t v);

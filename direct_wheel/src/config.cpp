@@ -113,6 +113,7 @@ namespace direct_wheel::config
                 out << "    \"responseCurve\": " << esc << ",\n";
             }
             out << "    \"speedSensitiveSteeringPct\": " << c.input.speedSensitiveSteeringPct << ",\n";
+            out << "    \"steeringLinearity\": "          << c.input.steeringLinearity          << ",\n";
             out << "    \"steeringSpeedFactor\": "       << c.input.steeringSpeedFactor       << ",\n";
             out << "    \"steeringMinTurn\": "           << c.input.steeringMinTurn           << ",\n";
             out << "    \"steeringAddBoost\": "          << c.input.steeringAddBoost          << ",\n";
@@ -286,6 +287,7 @@ namespace direct_wheel::config
             ExtractBool  (text, "input",    "clutchAsBrake",          c.input.clutchAsBrake);
             ExtractString(text, "input",    "responseCurve",          c.input.responseCurve);
             ExtractInt   (text, "input",    "speedSensitiveSteeringPct", c.input.speedSensitiveSteeringPct);
+            ExtractFloat (text, "input",    "steeringLinearity",      c.input.steeringLinearity);
             ExtractInt   (text, "input",    "steeringSpeedFactor",    c.input.steeringSpeedFactor);
             ExtractInt   (text, "input",    "steeringMinTurn",        c.input.steeringMinTurn);
             ExtractInt   (text, "input",    "steeringAddBoost",       c.input.steeringAddBoost);
@@ -462,6 +464,7 @@ namespace direct_wheel::config
     void SetSineForcePct(int32_t v)      { Mutate([&](Config& c){ c.ffb.sineForcePct = std::clamp(v, 0, 100); }); }
     void SetJoltForcePct(int32_t v)      { Mutate([&](Config& c){ c.ffb.joltForcePct = std::clamp(v, 0, 100); }); }
     void SetSpeedSensitiveSteeringPct(int32_t v) { Mutate([&](Config& c){ c.input.speedSensitiveSteeringPct = std::clamp(v, 0, 100); }); }
+    void SetSteeringLinearity(float v)           { Mutate([&](Config& c){ c.input.steeringLinearity = std::clamp(v, 0.1f, 3.0f); }); }
     void SetSteeringSpeedFactor(int32_t v)        { Mutate([&](Config& c){ c.input.steeringSpeedFactor = std::clamp(v, 0, 50); }); }
     void SetSteeringMinTurn(int32_t v)             { Mutate([&](Config& c){ c.input.steeringMinTurn = std::clamp(v, 3, 40); }); }
     void SetSteeringAddBoost(int32_t v)            { Mutate([&](Config& c){ c.input.steeringAddBoost = std::clamp(v, 0, 30); }); }

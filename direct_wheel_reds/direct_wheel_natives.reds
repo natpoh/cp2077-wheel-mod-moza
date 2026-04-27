@@ -39,6 +39,7 @@ public static native func DirectWheel_SetFrictionForcePct(pct: Int32) -> Bool;
 public static native func DirectWheel_SetSineForcePct(pct: Int32) -> Bool;
 public static native func DirectWheel_SetJoltForcePct(pct: Int32) -> Bool;
 public static native func DirectWheel_SetSpeedSensitiveSteeringPct(pct: Int32) -> Bool;
+public static native func DirectWheel_SetSteeringLinearity(v: Float) -> Bool;
 public static native func DirectWheel_SetSteeringSpeedFactor(pct: Int32) -> Bool;
 public static native func DirectWheel_SetSteeringMinTurn(pct: Int32) -> Bool;
 public static native func DirectWheel_SetSteeringAddBoost(pct: Int32) -> Bool;

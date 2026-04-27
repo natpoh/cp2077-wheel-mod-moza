@@ -91,6 +91,17 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Steering linearity")
+  @runtimeProperty("ModSettings.description", "Response curve. 0.5 = inverse expo (more response near center, counters game expo). 1.0 = linear. 2.0 = exponential.")
+  @runtimeProperty("ModSettings.min", "0.1")
+  @runtimeProperty("ModSettings.max", "3.0")
+  @runtimeProperty("ModSettings.step", "0.1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringLinearity: Float = 0.50;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Turn angle speed factor (x1000)")
   @runtimeProperty("ModSettings.description", "How fast max turn angle decreases with speed. Higher = less angle at speed. 15 = default.")
   @runtimeProperty("ModSettings.min", "0")
@@ -460,6 +471,7 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetSineForcePct(this.sineForcePct);
     DirectWheel_SetJoltForcePct(this.joltForcePct);
     DirectWheel_SetSpeedSensitiveSteeringPct(this.speedSensitiveSteeringPct);
+    DirectWheel_SetSteeringLinearity(this.steeringLinearity);
     DirectWheel_SetSteeringSpeedFactor(this.steeringSpeedFactor);
     DirectWheel_SetSteeringMinTurn(this.steeringMinTurn);
     DirectWheel_SetSteeringAddBoost(this.steeringAddBoost);

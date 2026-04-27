@@ -434,6 +434,10 @@ namespace direct_wheel::rtti
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetSpeedSensitiveSteeringPct>),
                            "Bool", {{ "Int32", "pct" }});
 
+            RegisterGlobal(rtti, "DirectWheel_SetSteeringLinearity",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetFloat<&config::SetSteeringLinearity>),
+                           "Bool", {{ "Float", "v" }});
+
             RegisterGlobal(rtti, "DirectWheel_SetSteeringSpeedFactor",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetSteeringSpeedFactor>),
                            "Bool", {{ "Int32", "pct" }});

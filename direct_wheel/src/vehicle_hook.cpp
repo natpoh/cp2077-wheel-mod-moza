@@ -494,6 +494,18 @@ namespace direct_wheel::vehicle_hook
                 const float wheelThrottle = Clamp(frame.axes.throttle,  0.0f, 1.0f);
                 const float wheelBrake    = Clamp(frame.axes.brake,     0.0f, 1.0f);
 
+                // Steering Linearity: reshape the input curve to counteract
+                // the game's internal exponential steering.
+                // linearity < 1 = inverse expo (more response near center)
+                // linearity = 1 = linear (no change)
+                // linearity > 1 = exponential (less response near center)
+                // Formula: sign(steer) * |steer|^linearity
+                const float lin = cfg.input.steeringLinearity;
+                if (lin > 0.01f && std::fabs(lin - 1.0f) > 0.01f) {
+                    const float sign = (wheelSteer >= 0.f) ? 1.f : -1.f;
+                    wheelSteer = sign * std::powf(std::fabs(wheelSteer), lin);
+                }
+
                 // Speed Steering Boost: the game internally reduces steering
                 // effectiveness at high speed. This multiplier compensates,
                 // so the same physical wheel rotation produces consistent
