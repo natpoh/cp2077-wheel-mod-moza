@@ -4,6 +4,8 @@ Full racing wheel support for Cyberpunk 2077 v2.31 with **force feedback**, **sp
 
 Tested with **Moza R5** and **Logitech G923**. Should work with any DirectInput-compatible wheel.
 
+### 📥 [Download direct_wheel_moza_v2.31.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel_moza_v2.31.0.zip)
+
 ---
 
 ## Features
