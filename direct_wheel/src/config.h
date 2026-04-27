@@ -12,7 +12,10 @@ namespace direct_wheel::config
         bool        enabled = true;
         bool        clutchAsBrake = false;
         std::string responseCurve = "default"; // default | subdued | sharp
-        int32_t     speedSensitiveSteeringPct = 50; // 0=off, 100=max reduction at speed
+        int32_t     speedSensitiveSteeringPct = 50; // 0=off, 100=max boost at speed
+        float       maxWheelTurnDeg = 0.f;            // 0 = don't override
+        float       wheelTurnMaxAddPerSecond = 0.f;   // 0 = don't override
+        float       wheelTurnMaxSubPerSecond = 0.f;   // 0 = don't override
     };
 
     struct Ffb

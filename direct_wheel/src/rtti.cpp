@@ -11,6 +11,7 @@
 #include "device_table.h"
 
 #include <RED4ext/RED4ext.hpp>
+#include <RED4ext/TweakDB.hpp>
 
 #include <cstdio>
 #include <string>

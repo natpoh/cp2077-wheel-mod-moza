@@ -498,13 +498,12 @@ namespace direct_wheel::vehicle_hook
                 // effectiveness at high speed. This multiplier compensates,
                 // so the same physical wheel rotation produces consistent
                 // in-game turn regardless of speed. Formula:
-                //   multiplier = 1 + speedRatio * (pct/100)
-                // At pct=50, cruise: 1.5x steer. At pct=100, cruise: 2.0x.
+                //   multiplier = 1 + speedRatio * 2.0 * (pct/100)
+                // At pct=50, cruise: 2.0x steer. At pct=100, cruise: 3.0x.
                 if (cfg.input.speedSensitiveSteeringPct > 0 && vehicleSpeed > 0.5f) {
-                    const float cruiseMps = cfg.ffb.stationaryThresholdMps > 0.1f
-                        ? 20.0f : 20.0f;  // Use a reasonable cruise speed
+                    const float cruiseMps = 20.0f; // ~72 km/h
                     const float speedRatio = Clamp(vehicleSpeed / cruiseMps, 0.f, 1.5f);
-                    const float boost = 1.0f + speedRatio * (cfg.input.speedSensitiveSteeringPct / 100.0f);
+                    const float boost = 1.0f + speedRatio * 2.0f * (cfg.input.speedSensitiveSteeringPct / 100.0f);
                     wheelSteer = Clamp(wheelSteer * boost, -1.0f, 1.0f);
                 }
 
