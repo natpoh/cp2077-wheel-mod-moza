@@ -4,7 +4,7 @@ Full racing wheel support for Cyberpunk 2077 v2.31 with **force feedback**, **sp
 
 Tested with **Moza R5** and **Logitech G923**. Should work with any DirectInput-compatible wheel.
 
-### 📥 [Download direct_wheel_moza_v2.31.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel_moza_v2.31.0.zip)
+### 📥 [Download direct_wheel_moza_v2.31.7.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel_moza_v2.31.7.zip)
 
 ---
 
@@ -54,7 +54,7 @@ All three parameters are tunable via **Mod Settings** sliders (no CET overlay ne
 
 ### Quick Install (zip)
 
-1. Download `direct_wheel_moza_v2.31.0.zip`
+1. Download `direct_wheel_moza_v2.31.7.zip`
 2. Extract **directly into your Cyberpunk 2077 game folder**, for example:
    ```
    D:\SteamLibrary\steamapps\common\Cyberpunk 2077\
@@ -89,6 +89,9 @@ All settings are in-game: **Main Menu → Settings → Mod Settings → G-series
 | Enable wheel input | ON | Master toggle for steering/throttle/brake injection |
 | Treat clutch as brake | ON | Use clutch pedal as brake (softer pedal) |
 | **Speed steering boost (%)** | 50 | Compensates steering at speed. 0=off, 50=2x, 100=3x at cruise |
+| **Equalizer: 25% input** | 40 | Custom steering curve. Output at 25% physical rotation |
+| **Equalizer: 50% input** | 70 | Custom steering curve. Output at 50% physical rotation |
+| **Equalizer: 75% input** | 87 | Custom steering curve. Output at 75% physical rotation |
 | **Turn angle speed factor** | 15 | How fast maxTurnDeg decreases with speed (×0.001). Higher = less angle |
 | **Min turn angle (deg)** | 12 | Floor for wheel turn angle — never goes below this |
 | **Wheel turn add boost** | 8 | How fast wheel response speeds up at speed (×0.001) |
