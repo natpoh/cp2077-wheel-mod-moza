@@ -94,9 +94,10 @@ namespace direct_wheel::wheel
 
         int ScaleConstant(float v)
         {
-            auto cfg = config::Current();
-            float mul = cfg.ffb.constantForcePct / 100.0f;
-            return static_cast<int>(std::clamp(v, -1.0f, 1.0f) * mul * 10000.0f);
+            // Raw mapping [-1..+1] → [-10000..+10000].
+            // Per-effect scaling (activeTorqueStrengthPct, constantForcePct)
+            // is applied by the caller before passing the value here.
+            return static_cast<int>(std::clamp(v, -1.0f, 1.0f) * 10000.0f);
         }
 
         int ScaleSpring(float v)
@@ -556,31 +557,29 @@ namespace direct_wheel::wheel
         float gripFactor = yawRatio < 1.0f ? 1.0f : std::exp(-2.0f * (yawRatio - 1.0f));
 
         // === Spring: centering force scales with speed² ===
-        // Base coefficient ~0.25 at cruise (was ~0.87 = way too strong).
-        // User slider 50% should feel "medium centering".
+        // Three contributors to spring stiffness:
+        //   1) Base centering — from vehicle wheelbase (always present)
+        //   2) Constant Force slider — extra speed-based centering stiffness
+        //   3) Cornering feedback slider — yaw-based stiffness in turns
+        auto cfg2 = config::Current();
+        float constantPct = cfg2.ffb.constantForcePct / 100.0f;
+
         float springCoef = std::clamp(
             centeringBaseline * 0.3f * speedSq * gripFactor
-            + yawRamp * 0.2f * (yawFeedbackPct / 100.0f),
-            0.f, 0.5f);
+            + speedRatio * 0.5f * constantPct               // Constant Force: smooth centering
+            + yawRamp * 0.2f * (yawFeedbackPct / 100.0f),   // Cornering feedback
+            0.f, 1.0f);
         if (isReversing) springCoef *= 0.4f;
         PlaySpring(springCoef);
 
         // === Damper: viscous resistance scales with speed ===
-        // Reduced from 0.4 to 0.15 base so it's felt but not overwhelming.
-        float damperCoef = std::clamp(speedRatio * 0.15f, 0.f, 0.3f);
+        // Base 0.3 so it's felt even at low speed; ramps up to 0.7 at cruise.
+        float damperCoef = std::clamp(0.3f + speedRatio * 0.4f, 0.f, 0.7f);
         PlayDamper(damperCoef);
 
-        // === Constant Force: active self-aligning torque ===
-        // Two components blended for stronger feel:
-        // 1) Speed-proportional centering push (always pushes toward center)
-        // 2) Yaw/lateral-load reactive push (dynamic in turns)
+        // === Active Torque: directional push in turns (PlayConstant) ===
         float absSteer = std::abs(steer);
 
-        // Component 1: direct steer-proportional push, scales with speed.
-        // At cruise with half steer → ~0.35 magnitude. Strong enough to feel.
-        float directPush = -steer * speedRatio * 0.5f;
-
-        // Component 2: lateral load / yaw reactive push
         float steerShape = std::sqrt(std::max(absSteer, 0.001f))
                          * (1.0f - absSteer * absSteer);
         float loadFactor = std::clamp(
@@ -588,25 +587,18 @@ namespace direct_wheel::wheel
             0.f, 1.5f);
         float weight = 1.0f + 0.3f * brake - 0.05f * throttle;
         float yawPush = -copysignf(1.0f, steer)
-                      * steerShape * loadFactor * gripFactor * weight;
+                      * steerShape * loadFactor * gripFactor * weight
+                      * (activeTorqueStrengthPct / 100.0f);
 
-        // Blend: 60% direct push + 40% yaw reactive, scaled by config
-        float activeForce = (0.6f * directPush + 0.4f * yawPush)
-                          * (activeTorqueStrengthPct / 100.0f);
+        float activeForce = yawPush;
         if (isReversing) activeForce *= 0.4f;
-
-        // === Road-feel: suspension activity → random-direction bumps ===
-        static uint32_t s_bumpTick = 0;
-        float bumpSign = (++s_bumpTick & 1) ? 1.0f : -1.0f;
-        float bumpMag = std::clamp(suspensionActivity * 3.0f * speedRatio, 0.f, 0.5f);
-        activeForce += bumpSign * bumpMag;
 
         // === Jolt: collision pulse override ===
         auto& st = S();
         uint32_t jt = st.joltTicksLeft.load(std::memory_order_acquire);
         if (jt > 0) {
             float jm = st.joltMagnitude.load(std::memory_order_acquire);
-            activeForce += jm;  // Add jolt impulse on top
+            activeForce += jm;
             st.joltTicksLeft.store(jt - 1, std::memory_order_release);
         }
 
