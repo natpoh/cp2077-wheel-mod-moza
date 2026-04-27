@@ -1,8 +1,8 @@
-# Direct Wheel — Direct Drive & Logitech Racing Wheel Support for Cyberpunk 2077
+# Direct Wheel — Moza & Direct Drive Racing Wheel Support for Cyberpunk 2077
 
 Full racing wheel support for Cyberpunk 2077 v2.31 with **force feedback**, **speed-sensitive steering compensation**, and **TweakDB steering physics overrides**.
 
-Tested with **Moza R5** (Direct Drive) and **Logitech G923**. Should work with any DirectInput-compatible wheel.
+Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ### 📥 [Download direct_wheel_moza_v2.31.7.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel_moza_v2.31.7.zip)
 
