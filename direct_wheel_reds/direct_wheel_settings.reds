@@ -91,13 +91,35 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
-  @runtimeProperty("ModSettings.displayName", "Steering linearity")
-  @runtimeProperty("ModSettings.description", "Response curve. 0.5 = inverse expo (more response near center, counters game expo). 1.0 = linear.")
-  @runtimeProperty("ModSettings.min", "0.1")
-  @runtimeProperty("ModSettings.max", "1.0")
-  @runtimeProperty("ModSettings.step", "0.1")
+  @runtimeProperty("ModSettings.displayName", "Equalizer: output at 25% input (%)")
+  @runtimeProperty("ModSettings.description", "Custom steering curve shape. Sets the final steering response when the physical wheel is turned 25%.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
-  let steeringLinearity: Float = 0.50;
+  let steeringCurve25: Int32 = 40;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Equalizer: output at 50% input (%)")
+  @runtimeProperty("ModSettings.description", "Custom steering curve shape. Sets the final steering response when the physical wheel is turned 50%.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringCurve50: Int32 = 70;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Equalizer: output at 75% input (%)")
+  @runtimeProperty("ModSettings.description", "Custom steering curve shape. Sets the final steering response when the physical wheel is turned 75%.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringCurve75: Int32 = 87;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Wheel input")
@@ -471,7 +493,9 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetSineForcePct(this.sineForcePct);
     DirectWheel_SetJoltForcePct(this.joltForcePct);
     DirectWheel_SetSpeedSensitiveSteeringPct(this.speedSensitiveSteeringPct);
-    DirectWheel_SetSteeringLinearity(this.steeringLinearity);
+    DirectWheel_SetSteeringCurve25(this.steeringCurve25);
+    DirectWheel_SetSteeringCurve50(this.steeringCurve50);
+    DirectWheel_SetSteeringCurve75(this.steeringCurve75);
     DirectWheel_SetSteeringSpeedFactor(this.steeringSpeedFactor);
     DirectWheel_SetSteeringMinTurn(this.steeringMinTurn);
     DirectWheel_SetSteeringAddBoost(this.steeringAddBoost);

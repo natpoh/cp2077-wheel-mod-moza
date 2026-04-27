@@ -498,17 +498,26 @@ namespace direct_wheel::vehicle_hook
                 const float wheelThrottle = Clamp(frame.axes.throttle,  0.0f, 1.0f);
                 const float wheelBrake    = Clamp(frame.axes.brake,     0.0f, 1.0f);
 
-                // Steering Linearity: reshape the input curve to counteract
-                // the game's internal exponential steering.
-                // linearity < 1 = inverse expo (more response near center)
-                // linearity = 1 = linear (no change)
-                // linearity > 1 = exponential (less response near center)
-                // Formula: sign(steer) * |steer|^linearity
-                const float lin = cfg.input.steeringLinearity;
-                if (lin > 0.01f && std::fabs(lin - 1.0f) > 0.01f) {
-                    const float sign = (wheelSteer >= 0.f) ? 1.f : -1.f;
-                    wheelSteer = sign * std::powf(std::fabs(wheelSteer), lin);
+                // Steering Equalizer (Custom Curve)
+                // We map the physical wheel input (0 to 1) using 3 control points
+                // at 25%, 50%, 75% to allow custom non-linear response curves.
+                float absSteer = std::fabs(wheelSteer);
+                float mappedSteer = 0.0f;
+                const float c25 = cfg.input.steeringCurve25 / 100.0f;
+                const float c50 = cfg.input.steeringCurve50 / 100.0f;
+                const float c75 = cfg.input.steeringCurve75 / 100.0f;
+
+                if (absSteer <= 0.25f) {
+                    mappedSteer = (absSteer / 0.25f) * c25;
+                } else if (absSteer <= 0.50f) {
+                    mappedSteer = c25 + ((absSteer - 0.25f) / 0.25f) * (c50 - c25);
+                } else if (absSteer <= 0.75f) {
+                    mappedSteer = c50 + ((absSteer - 0.50f) / 0.25f) * (c75 - c50);
+                } else {
+                    mappedSteer = c75 + ((absSteer - 0.75f) / 0.25f) * (1.0f - c75);
                 }
+                
+                wheelSteer = (wheelSteer >= 0.f) ? mappedSteer : -mappedSteer;
 
                 // Speed Steering Boost: the game internally reduces steering
                 // effectiveness at high speed. This multiplier compensates,
