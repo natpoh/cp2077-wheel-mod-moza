@@ -123,6 +123,55 @@ Adjust **FFB strength** first (overall), then tune individual effects.
 2. Check that RED4ext is installed correctly
 3. Look at logs: `red4ext/logs/direct_wheel-*.log`
 
+### Non-Logitech Wheels (Moza, Fanatec, Thrustmaster, etc.)
+
+Different wheel bases assign gas/brake/clutch to different DirectInput axes. If your wheel connects but pedals don't work, you need to remap the axes in `config.json`.
+
+**Step 1 — Identify your axes** using `input_probe.exe` (included in `bin/`):
+
+```
+> bin\input_probe.exe
+Found device: DirectInput Wheel (Moza)
+Wheel connected and acquired. Reading axes (Press Ctrl+C to exit):
+--------------------------------------------------------
+X:32767  Y:0  Z:65535  Rx:0  Ry:0  Rz:65535  S0:65535  S1:0
+```
+
+Press each pedal one at a time and note which value changes:
+- **Steering** = the value that moves when you turn the wheel (usually `X`)
+- **Throttle** = the value that drops when you press gas
+- **Brake** = the value that drops when you press brake
+- **Clutch** = the value that drops when you press clutch
+
+**Step 2 — Edit `config.json`** (in `red4ext/plugins/direct_wheel/`):
+
+```json
+{
+  "axes": {
+    "steer": "lX",
+    "throttle": "lY",
+    "brake": "lRz",
+    "clutch": "slider0"
+  }
+}
+```
+
+Axis name mapping:
+| input_probe label | config.json name |
+|---|---|
+| X | `lX` |
+| Y | `lY` |
+| Z | `lZ` |
+| Rx | `lRx` |
+| Ry | `lRy` |
+| Rz | `lRz` |
+| S0 | `slider0` |
+| S1 | `slider1` |
+
+**Default** (Logitech G29/G920/G923): `steer=lX, throttle=lZ, brake=lRz, clutch=slider0`
+
+**Moza R3/R5** (typical): `steer=lX, throttle=lY, brake=lRz, clutch=slider0`
+
 ---
 
 ## How It Works

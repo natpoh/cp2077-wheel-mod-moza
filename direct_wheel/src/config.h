@@ -5,6 +5,8 @@
 #include <string>
 #include <string_view>
 
+struct DIJOYSTATE2;  // forward-declare for AxisMap resolver
+
 namespace direct_wheel::config
 {
     struct Input
@@ -89,6 +91,22 @@ namespace direct_wheel::config
         bool visualizerWhileMusic = true;
     };
 
+    // DirectInput axis mapping. Each field names which DIJOYSTATE2 member
+    // to read for that logical input. Valid values:
+    //   "lX", "lY", "lZ", "lRx", "lRy", "lRz", "slider0", "slider1"
+    // Defaults match Logitech G923/G29/G920 out of the box.
+    // Moza (R3/R5/R9) with pedals via base typically uses lY for throttle.
+    struct AxisMap
+    {
+        std::string steer    = "lX";
+        std::string throttle = "lZ";
+        std::string brake    = "lRz";
+        std::string clutch   = "slider0";
+
+        // Resolve a named axis to a raw LONG value from a DIJOYSTATE2.
+        static long Read(const DIJOYSTATE2& js, const std::string& axisName);
+    };
+
     struct Music
     {
         // Target process name for per-process audio capture. Empty =
@@ -117,6 +135,7 @@ namespace direct_wheel::config
         Handshake   handshake;
         Led         led;
         Music       music;
+        AxisMap     axes;
         PerVehicle  car        = { 1.0f, 20 };
         PerVehicle  motorcycle = { 1.2f, 10 };
         PerVehicle  truck      = { 0.8f, 40 };

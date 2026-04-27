@@ -84,7 +84,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed. 0 = off, 50 = 2x at cruise, 100 = 3x at cruise.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let speedSensitiveSteeringPct: Int32 = 50;
 
@@ -132,7 +132,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let steeringSubBoost: Int32 = 12;
 
-  // ---- Force feedback -----------------------------------------------------
+  // ---- Force feedback — General -------------------------------------------
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Force feedback")
@@ -145,97 +145,118 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Force feedback")
   @runtimeProperty("ModSettings.category.order", "200")
   @runtimeProperty("ModSettings.displayName", "FFB strength (%)")
+  @runtimeProperty("ModSettings.description", "Master gain applied to ALL force feedback effects.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let ffbTorquePct: Int32 = 100;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Force feedback")
   @runtimeProperty("ModSettings.category.order", "200")
-  @runtimeProperty("ModSettings.displayName", "Cornering feedback (%)")
-  @runtimeProperty("ModSettings.description", "Adds spring stiffness while the car is rotating.")
-  @runtimeProperty("ModSettings.min", "0")
-  @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.displayName", "Stationary threshold (m/s)")
+  @runtimeProperty("ModSettings.description", "Below this speed, all centering forces are OFF so the wheel rests wherever you leave it.")
+  @runtimeProperty("ModSettings.min", "0.0")
+  @runtimeProperty("ModSettings.max", "5.0")
+  @runtimeProperty("ModSettings.step", "0.1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let yawFeedbackPct: Int32 = 50;
+  let stationaryThresholdMps: Float = 0.5;
+
+  // ---- FFB — Centering (Spring) ------------------------------------------
+  //
+  // These three sliders all feed into the DirectInput Spring effect.
+  // Together they control how strongly the wheel pulls back to center.
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Force feedback")
-  @runtimeProperty("ModSettings.category.order", "200")
-  @runtimeProperty("ModSettings.displayName", "Active torque (%)")
-  @runtimeProperty("ModSettings.description", "How hard the wheel pushes toward center, scaled by speed and steering angle.")
+  @runtimeProperty("ModSettings.category", "FFB — Centering (Spring)")
+  @runtimeProperty("ModSettings.category.order", "210")
+  @runtimeProperty("ModSettings.displayName", "Spring Force (%)")
+  @runtimeProperty("ModSettings.description", "Base centering spring — pulls the wheel back to center. The foundation of self-aligning feel.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
-  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let activeTorqueStrengthPct: Int32 = 100;
-
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Force feedback")
-  @runtimeProperty("ModSettings.category.order", "200")
-  @runtimeProperty("ModSettings.displayName", "Constant Force strength (%)")
-  @runtimeProperty("ModSettings.description", "Scales the push/pull effect (SAT, collisions). Lower = softer hits.")
-  @runtimeProperty("ModSettings.min", "0")
-  @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
-  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let constantForcePct: Int32 = 30;
-
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Force feedback")
-  @runtimeProperty("ModSettings.category.order", "200")
-  @runtimeProperty("ModSettings.displayName", "Spring Force strength (%)")
-  @runtimeProperty("ModSettings.description", "Scales the centering spring that returns the wheel to center. Lower = lighter.")
-  @runtimeProperty("ModSettings.min", "0")
-  @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let springForcePct: Int32 = 30;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Force feedback")
-  @runtimeProperty("ModSettings.category.order", "200")
-  @runtimeProperty("ModSettings.displayName", "Damper Force strength (%)")
-  @runtimeProperty("ModSettings.description", "Scales the viscous resistance/friction. Lower = less resistance when turning.")
+  @runtimeProperty("ModSettings.category", "FFB — Centering (Spring)")
+  @runtimeProperty("ModSettings.category.order", "210")
+  @runtimeProperty("ModSettings.displayName", "Constant Force — centering addition (%)")
+  @runtimeProperty("ModSettings.description", "Smooth push-back force that adds to the spring. Grows with speed and steering angle — simulates self-aligning torque (SAT).")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
+  let constantForcePct: Int32 = 30;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "FFB — Centering (Spring)")
+  @runtimeProperty("ModSettings.category.order", "210")
+  @runtimeProperty("ModSettings.displayName", "Cornering feedback — spring stiffness (%)")
+  @runtimeProperty("ModSettings.description", "Makes the spring stiffer while the car is rotating (yaw). More = heavier wheel in corners.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
+  let yawFeedbackPct: Int32 = 50;
+
+  // ---- FFB — Steering feel ------------------------------------------------
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "FFB — Steering feel")
+  @runtimeProperty("ModSettings.category.order", "220")
+  @runtimeProperty("ModSettings.displayName", "Damper — rotation resistance (%)")
+  @runtimeProperty("ModSettings.description", "Viscous damping — resists wheel rotation speed. More = heavier, slower steering.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let damperForcePct: Int32 = 30;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Force feedback")
-  @runtimeProperty("ModSettings.category.order", "200")
-  @runtimeProperty("ModSettings.displayName", "Friction Force strength (%)")
-  @runtimeProperty("ModSettings.description", "Road-texture friction resistance. Higher = more grip feel on different surfaces.")
+  @runtimeProperty("ModSettings.category", "FFB — Steering feel")
+  @runtimeProperty("ModSettings.category.order", "220")
+  @runtimeProperty("ModSettings.displayName", "Active Torque — yaw push (%)")
+  @runtimeProperty("ModSettings.description", "Directional push during turns — simulates lateral force feedback. Uses Constant Force (short pulses).")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
+  let activeTorqueStrengthPct: Int32 = 100;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "FFB — Steering feel")
+  @runtimeProperty("ModSettings.category.order", "220")
+  @runtimeProperty("ModSettings.displayName", "Friction — road texture (%)")
+  @runtimeProperty("ModSettings.description", "Static friction that simulates road grip. More = more textured feel on different surfaces.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let frictionForcePct: Int32 = 30;
 
+  // ---- FFB — Road effects -------------------------------------------------
+
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Force feedback")
-  @runtimeProperty("ModSettings.category.order", "200")
-  @runtimeProperty("ModSettings.displayName", "Road vibration strength (%)")
-  @runtimeProperty("ModSettings.description", "Periodic vibration from road surface roughness. Higher = more buzz on rough roads.")
+  @runtimeProperty("ModSettings.category", "FFB — Road effects")
+  @runtimeProperty("ModSettings.category.order", "230")
+  @runtimeProperty("ModSettings.displayName", "Road vibration — surface buzz (%)")
+  @runtimeProperty("ModSettings.description", "25 Hz periodic vibration from road roughness. Always present at speed with a baseline hum.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let sineForcePct: Int32 = 30;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Force feedback")
-  @runtimeProperty("ModSettings.category.order", "200")
-  @runtimeProperty("ModSettings.displayName", "Collision jolt strength (%)")
-  @runtimeProperty("ModSettings.description", "Sudden kick on hard impacts and collisions. Higher = stronger jolt.")
+  @runtimeProperty("ModSettings.category", "FFB — Road effects")
+  @runtimeProperty("ModSettings.category.order", "230")
+  @runtimeProperty("ModSettings.displayName", "Collision jolt — impact kick (%)")
+  @runtimeProperty("ModSettings.description", "Short high-magnitude pulse on crashes and obstacle hits. Uses Constant Force (80–300ms burst).")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let joltForcePct: Int32 = 50;
 

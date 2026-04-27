@@ -17,6 +17,7 @@
 #include <cstring>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 namespace direct_wheel::wheel
 {
@@ -128,15 +129,92 @@ namespace direct_wheel::wheel
             return static_cast<int>(std::clamp(v, 0.0f, 1.0f) * mul * 10000.0f);
         }
 
+        // Device selection: enumerate ALL attached game controllers, log them
+        // all, then pick the best candidate. Priority:
+        //   1. Device with FFB support (real wheel)
+        //   2. Non-virtual device without FFB
+        //   3. Anything left
+        // Known virtual devices (vJoy, ViGEm) are deprioritized.
+
+        struct DeviceCandidate
+        {
+            DIDEVICEINSTANCEW info;
+            bool hasFFB = false;
+            bool isVirtual = false;
+        };
+
+        static std::vector<DeviceCandidate> g_candidates;
+
+        bool IsVirtualDevice(const wchar_t* name)
+        {
+            // Common virtual joystick / gamepad emulators
+            const wchar_t* kVirtualNames[] = {
+                L"vJoy", L"ViGEm", L"Virtual", L"Xbox360",
+                L"DS4Windows", L"BetterJoy", L"XOutput",
+            };
+            for (const auto* vn : kVirtualNames)
+            {
+                if (wcsstr(name, vn)) return true;
+            }
+            return false;
+        }
+
         BOOL CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCEW* pdidInstance, VOID* pContext)
         {
             auto& st = S();
-            if (st.pWheel) return DIENUM_STOP;
 
-            HRESULT hr = st.pDI->CreateDevice(pdidInstance->guidInstance, &st.pWheel, nullptr);
-            if (FAILED(hr)) return DIENUM_CONTINUE;
+            // Probe FFB capability by checking DIDC_FORCEFEEDBACK on the device
+            IDirectInputDevice8W* probe = nullptr;
+            bool hasFFB = false;
+            if (SUCCEEDED(st.pDI->CreateDevice(pdidInstance->guidInstance, &probe, nullptr)))
+            {
+                probe->SetDataFormat(&c_dfDIJoystick2);
+                DIDEVCAPS caps = {};
+                caps.dwSize = sizeof(DIDEVCAPS);
+                if (SUCCEEDED(probe->GetCapabilities(&caps)))
+                    hasFFB = (caps.dwFlags & DIDC_FORCEFEEDBACK) != 0;
+                probe->Release();
+            }
 
-            return DIENUM_STOP;
+            char utf8Name[256] = {};
+            WideCharToMultiByte(CP_UTF8, 0, pdidInstance->tszProductName, -1,
+                                utf8Name, sizeof(utf8Name), nullptr, nullptr);
+            bool isVirtual = IsVirtualDevice(pdidInstance->tszProductName);
+
+            log::InfoF("[direct_wheel] enumerated device: \"%s\" ffb=%s virtual=%s",
+                       utf8Name,
+                       hasFFB ? "yes" : "no",
+                       isVirtual ? "yes" : "no");
+
+            DeviceCandidate c;
+            c.info = *pdidInstance;
+            c.hasFFB = hasFFB;
+            c.isVirtual = isVirtual;
+            g_candidates.push_back(c);
+
+            return DIENUM_CONTINUE; // keep enumerating — we want ALL devices
+        }
+
+        // After enumeration, pick the best device from g_candidates.
+        // Returns the index, or -1 if empty.
+        int SelectBestDevice()
+        {
+            int bestIdx = -1;
+            int bestScore = -1;
+            for (int i = 0; i < static_cast<int>(g_candidates.size()); ++i)
+            {
+                const auto& c = g_candidates[i];
+                // Score: FFB real > non-FFB real > FFB virtual > non-FFB virtual
+                int score = 0;
+                if (!c.isVirtual) score += 10;
+                if (c.hasFFB)     score += 5;
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestIdx = i;
+                }
+            }
+            return bestIdx;
         }
 
         void InitFFB(State& st)
@@ -307,8 +385,30 @@ namespace direct_wheel::wheel
         }
 
         if (!st.pWheel) {
+            g_candidates.clear();
             st.pDI->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, nullptr, DIEDFL_ATTACHEDONLY);
-            if (!st.pWheel) return;
+
+            if (g_candidates.empty()) return;
+
+            const int bestIdx = SelectBestDevice();
+            if (bestIdx < 0) return;
+
+            const auto& chosen = g_candidates[bestIdx];
+            HRESULT hr = st.pDI->CreateDevice(chosen.info.guidInstance, &st.pWheel, nullptr);
+            if (FAILED(hr)) {
+                log::WarnF("[direct_wheel] CreateDevice on selected device failed hr=0x%08lX", (unsigned long)hr);
+                g_candidates.clear();
+                return;
+            }
+
+            char utf8Name[256] = {};
+            WideCharToMultiByte(CP_UTF8, 0, chosen.info.tszProductName, -1,
+                                utf8Name, sizeof(utf8Name), nullptr, nullptr);
+            log::InfoF("[direct_wheel] selected device: \"%s\" (index %d of %d, ffb=%s, virtual=%s)",
+                       utf8Name, bestIdx, (int)g_candidates.size(),
+                       chosen.hasFFB ? "yes" : "no",
+                       chosen.isVirtual ? "yes" : "no");
+            g_candidates.clear();
 
             st.pWheel->SetDataFormat(&c_dfDIJoystick2);
 
@@ -329,8 +429,8 @@ namespace direct_wheel::wheel
             log::InfoF("[direct_wheel] Initial Acquire hr=0x%08lX", (unsigned long)hrAcq);
 
             std::lock_guard lk(st.capsMtx);
-            std::strncpy(st.caps.productName, "DirectInput Wheel (Moza)", 255);
-            st.caps.hasFFB = false;
+            std::strncpy(st.caps.productName, utf8Name, 255);
+            st.caps.hasFFB = chosen.hasFFB;
             st.caps.operatingRangeDeg = 900;
 
             // Only init FFB if we got EXCLUSIVE access
@@ -339,8 +439,8 @@ namespace direct_wheel::wheel
             }
 
             st.ready.store(true, std::memory_order_release);
-            log::Info("[direct_wheel] DirectInput wheel connected.");
-            input_bindings::SetDeviceLayout("DirectInput Wheel (Moza)");
+            log::InfoF("[direct_wheel] DirectInput wheel connected: \"%s\"", utf8Name);
+            input_bindings::SetDeviceLayout(utf8Name);
         }
 
         // Deferred FFB init: if we started without EXCLUSIVE access,
@@ -371,12 +471,14 @@ namespace direct_wheel::wheel
             return;
         }
 
+        const auto axes = config::Current().axes;
+
         Snapshot s;
         s.connected = true;
-        s.steer = NormalizeSteer(js.lX);
-        s.throttle = NormalizePedal(js.lZ);
-        s.brake = NormalizePedal(js.lRz);
-        s.clutch = NormalizePedal(js.rglSlider[0]);
+        s.steer    = NormalizeSteer(config::AxisMap::Read(js, axes.steer));
+        s.throttle = NormalizePedal(config::AxisMap::Read(js, axes.throttle));
+        s.brake    = NormalizePedal(config::AxisMap::Read(js, axes.brake));
+        s.clutch   = NormalizePedal(config::AxisMap::Read(js, axes.clutch));
         s.pov = static_cast<uint16_t>(js.rgdwPOV[0] & 0xFFFF);
 
         uint32_t bits = 0;

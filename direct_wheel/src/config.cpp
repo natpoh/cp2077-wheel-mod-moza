@@ -3,7 +3,9 @@
 #include "input_bindings.h"
 #include "wheel.h"
 
+#define DIRECTINPUT_VERSION 0x0800
 #include <windows.h>
+#include <dinput.h>
 
 #include <algorithm>
 #include <atomic>
@@ -16,6 +18,30 @@
 
 namespace direct_wheel::config
 {
+    // AxisMap::Read — resolve a string like "lX", "lY", "lRz", "slider0"
+    // to the corresponding member of a DIJOYSTATE2. Case-insensitive.
+    long AxisMap::Read(const DIJOYSTATE2& js, const std::string& axisName)
+    {
+        // Tiny linear scan — only called 4× per tick, zero allocation.
+        struct Entry { const char* name; long DIJOYSTATE2::* member; };
+        static constexpr long DIJOYSTATE2::* kNone = nullptr;
+        static const Entry kTable[] = {
+            { "lX",      &DIJOYSTATE2::lX },
+            { "lY",      &DIJOYSTATE2::lY },
+            { "lZ",      &DIJOYSTATE2::lZ },
+            { "lRx",     &DIJOYSTATE2::lRx },
+            { "lRy",     &DIJOYSTATE2::lRy },
+            { "lRz",     &DIJOYSTATE2::lRz },
+        };
+        for (const auto& e : kTable)
+        {
+            if (_stricmp(axisName.c_str(), e.name) == 0)
+                return js.*e.member;
+        }
+        if (_stricmp(axisName.c_str(), "slider0") == 0) return js.rglSlider[0];
+        if (_stricmp(axisName.c_str(), "slider1") == 0) return js.rglSlider[1];
+        return 0; // unknown axis name — treat as zero
+    }
     namespace
     {
         struct Store
@@ -121,6 +147,20 @@ namespace direct_wheel::config
                 std::string esc;
                 EscapeJsonTo(esc, c.music.processName);
                 out << "    \"processName\": " << esc << "\n";
+            }
+            out << "  },\n";
+
+            out << "  \"axes\": {\n";
+            {
+                std::string esc;
+                EscapeJsonTo(esc, c.axes.steer);
+                out << "    \"steer\": " << esc << ",\n";
+                esc.clear(); EscapeJsonTo(esc, c.axes.throttle);
+                out << "    \"throttle\": " << esc << ",\n";
+                esc.clear(); EscapeJsonTo(esc, c.axes.brake);
+                out << "    \"brake\": " << esc << ",\n";
+                esc.clear(); EscapeJsonTo(esc, c.axes.clutch);
+                out << "    \"clutch\": " << esc << "\n";
             }
             out << "  },\n";
 
@@ -275,6 +315,11 @@ namespace direct_wheel::config
 
             ExtractString(text, "music",    "processName",            c.music.processName);
 
+            ExtractString(text, "axes",     "steer",                  c.axes.steer);
+            ExtractString(text, "axes",     "throttle",               c.axes.throttle);
+            ExtractString(text, "axes",     "brake",                  c.axes.brake);
+            ExtractString(text, "axes",     "clutch",                 c.axes.clutch);
+
             auto vehExtract = [&](const char* section, PerVehicle& pv) {
                 ExtractFloat(text, section, "steeringMultiplier", pv.steeringMultiplier);
                 ExtractInt  (text, section, "responseDelayMs",    pv.responseDelayMs);
@@ -368,6 +413,9 @@ namespace direct_wheel::config
                            c.input.enabled ? "true" : "false",
                            c.ffb.enabled ? "true" : "false",
                            c.ffb.debugLogging ? "true" : "false");
+                log::InfoF("[direct_wheel] axis map: steer=%s throttle=%s brake=%s clutch=%s",
+                           c.axes.steer.c_str(), c.axes.throttle.c_str(),
+                           c.axes.brake.c_str(), c.axes.clutch.c_str());
             }
             catch (...)
             {
