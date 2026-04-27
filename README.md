@@ -62,7 +62,6 @@ All three parameters are tunable via **Mod Settings** sliders (no CET overlay ne
 3. The zip merges into the existing folder structure:
    ```
    Cyberpunk 2077/
-   ├── bin/x64/plugins/cyber_engine_tweaks/mods/steering_debug/init.lua  ← CET script
    ├── r6/scripts/direct_wheel/*.reds                                    ← Redscript
    └── red4ext/plugins/
        ├── direct_wheel/direct_wheel.dll                                 ← Main plugin
