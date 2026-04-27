@@ -6,6 +6,10 @@
 #include "wheel.h"
 #include "vehicle_physics_ext.h"
 #include "rtti_offsets.h"
+#include "debug_steer.h"
+
+std::atomic<float> g_debugWheelSteer{0.0f};
+std::atomic<float> g_debugRawSteer{0.0f};
 
 #include <RED4ext/Relocation.hpp>
 #include <RED4ext/Api/v1/Sdk.hpp>
@@ -518,6 +522,9 @@ namespace direct_wheel::vehicle_hook
                     const float boost = 1.0f + speedRatio * 2.0f * (cfg.input.speedSensitiveSteeringPct / 100.0f);
                     wheelSteer = Clamp(wheelSteer * boost, -1.0f, 1.0f);
                 }
+
+                g_debugRawSteer.store(frame.axes.steer, std::memory_order_relaxed);
+                g_debugWheelSteer.store(wheelSteer, std::memory_order_relaxed);
 
                 // Merge with whatever the vanilla input pipeline (keyboard /
                 // gamepad) already wrote into the struct. g_original(self)

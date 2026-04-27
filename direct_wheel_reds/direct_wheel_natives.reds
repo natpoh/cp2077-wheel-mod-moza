@@ -5,6 +5,9 @@ public static native func DirectWheel_GetVersion() -> String;
 public static native func DirectWheel_IsPluginReady() -> Bool;
 public static native func DirectWheel_GetDeviceInfo() -> String;
 public static native func DirectWheel_HasFFB() -> Bool;
+public static native func DirectWheel_IsDebugLoggingEnabled() -> Bool;
+public static native func DirectWheel_GetDebugRawSteer() -> Float;
+public static native func DirectWheel_GetDebugWheelSteer() -> Float;
 public static native func DirectWheel_ReadConfig() -> String;
 
 // Wheel-model auto-discovery. Read at OnGameAttached to populate dependency

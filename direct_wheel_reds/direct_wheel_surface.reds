@@ -27,6 +27,9 @@ public class DirectWheelSurfacePoller extends IScriptable {
   private let vehicle: wref<VehicleObject>;
   private let lastMaterial: CName;
   private let running: Bool;
+  private let debugLayer1: Uint32;
+  private let debugLayer2: Uint32;
+  private let hasDrawnDebug: Bool;
 
   public func Start(v: ref<VehicleObject>) -> Void {
     this.vehicle = v;
@@ -37,6 +40,11 @@ public class DirectWheelSurfacePoller extends IScriptable {
 
   public func Stop() -> Void {
     this.running = false;
+    if this.hasDrawnDebug && IsDefined(this.vehicle) {
+      GameInstance.GetDebugVisualizerSystem(this.vehicle.GetGame()).ClearLayer(this.debugLayer1);
+      GameInstance.GetDebugVisualizerSystem(this.vehicle.GetGame()).ClearLayer(this.debugLayer2);
+      this.hasDrawnDebug = false;
+    }
   }
 
   private func ScheduleNext() -> Void {
@@ -56,6 +64,24 @@ public class DirectWheelSurfacePoller extends IScriptable {
     if !IsDefined(sqs) {
       this.ScheduleNext();
       return;
+    }
+
+    if DirectWheel_IsDebugLoggingEnabled() {
+      if this.hasDrawnDebug {
+        GameInstance.GetDebugVisualizerSystem(v.GetGame()).ClearLayer(this.debugLayer1);
+        GameInstance.GetDebugVisualizerSystem(v.GetGame()).ClearLayer(this.debugLayer2);
+      }
+      let rawSteer = DirectWheel_GetDebugRawSteer();
+      let gameSteer = DirectWheel_GetDebugWheelSteer();
+      this.debugLayer1 = GameInstance.GetDebugVisualizerSystem(v.GetGame()).DrawText(new Vector4(20.0, 20.0, 0.0, 0.0), "Steering (Wheel): " + FloatToString(rawSteer), gameDebugViewETextAlignment.Left, new Color(Cast<Uint8>(0), Cast<Uint8>(255), Cast<Uint8>(0), Cast<Uint8>(255)));
+      GameInstance.GetDebugVisualizerSystem(v.GetGame()).SetScale(this.debugLayer1, new Vector4(1.0, 1.0, 0.0, 0.0));
+      this.debugLayer2 = GameInstance.GetDebugVisualizerSystem(v.GetGame()).DrawText(new Vector4(20.0, 40.0, 0.0, 0.0), "Steering (Game):  " + FloatToString(gameSteer), gameDebugViewETextAlignment.Left, new Color(Cast<Uint8>(0), Cast<Uint8>(255), Cast<Uint8>(255), Cast<Uint8>(255)));
+      GameInstance.GetDebugVisualizerSystem(v.GetGame()).SetScale(this.debugLayer2, new Vector4(1.0, 1.0, 0.0, 0.0));
+      this.hasDrawnDebug = true;
+    } else if this.hasDrawnDebug {
+      GameInstance.GetDebugVisualizerSystem(v.GetGame()).ClearLayer(this.debugLayer1);
+      GameInstance.GetDebugVisualizerSystem(v.GetGame()).ClearLayer(this.debugLayer2);
+      this.hasDrawnDebug = false;
     }
 
     // Vehicle origin sits near the chassis centre. Starting the ray

@@ -3,6 +3,7 @@
 #include "wheel.h"
 #include "input_bindings.h"
 #include "vehicle_hook.h"
+#include "debug_steer.h"
 #include "plugin.h"
 #include "logging.h"
 #include "rtti_dump.h"
@@ -161,6 +162,24 @@ namespace direct_wheel::rtti
             auto tag = ReadString(aFrame); aFrame->code++;
             log::InfoF("[direct_wheel:menu] close: %s", tag.c_str());
             if (aOut) *aOut = true;
+        }
+
+        void GetDebugRawSteer(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, float* aOut, int64_t)
+        {
+            aFrame->code++;
+            if (aOut) *aOut = g_debugRawSteer.load(std::memory_order_relaxed);
+        }
+
+        void GetDebugWheelSteer(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, float* aOut, int64_t)
+        {
+            aFrame->code++;
+            if (aOut) *aOut = g_debugWheelSteer.load(std::memory_order_relaxed);
+        }
+
+        void IsDebugLoggingEnabled(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            aFrame->code++;
+            if (aOut) *aOut = config::Current().ffb.debugLogging;
         }
 
         // -------- Config setters --------------------------------------------
@@ -365,6 +384,15 @@ namespace direct_wheel::rtti
             RegisterGlobal(rtti, "DirectWheel_HasFFB",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&HasFFB),
                            "Bool", {});
+            RegisterGlobal(rtti, "DirectWheel_IsDebugLoggingEnabled",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&IsDebugLoggingEnabled),
+                           "Bool", {});
+            RegisterGlobal(rtti, "DirectWheel_GetDebugRawSteer",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetDebugRawSteer),
+                           "Float", {});
+            RegisterGlobal(rtti, "DirectWheel_GetDebugWheelSteer",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetDebugWheelSteer),
+                           "Float", {});
             RegisterGlobal(rtti, "DirectWheel_DetectedHasRightCluster",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&DetectedHasRightCluster),
                            "Bool", {});
