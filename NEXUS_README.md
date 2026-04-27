@@ -66,6 +66,10 @@ I recommend starting with an operating range of 180 to start, since the rotation
 - [Mod Settings](https://github.com/jackhumbert/mod_settings) by jackhumbert
 - [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl) by psiberx
 
+## Source Code
+
+Source code is available on [GitHub](https://github.com/natpoh/cp2077-wheel-mod-moza). Pull requests and feedback are welcome!
+
 ## Reporting issues
 
 Include your wheel model, Cyberpunk patch version, RED4ext version, and your most recent `red4ext/logs/direct_wheel-*.log` file.
