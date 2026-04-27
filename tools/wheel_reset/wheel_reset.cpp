@@ -12,7 +12,7 @@
 // Requires G HUB (or LGS) to be running, same as the main plugin.
 
 #include <windows.h>
-#include <LogitechSteeringWheelLib.h>
+#include <LogitechSteerindirectWheelLib.h>
 
 #include <chrono>
 #include <cstdio>
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     wc.cbSize = sizeof(wc);
     wc.lpfnWndProc = DefWindowProcW;
     wc.hInstance = hinst;
-    wc.lpszClassName = L"gwheel_reset_window";
+    wc.lpszClassName = L"direct_wheel_reset_window";
     RegisterClassExW(&wc);
     HWND hwnd = CreateWindowExW(
         0, wc.lpszClassName, L"wheel_reset",

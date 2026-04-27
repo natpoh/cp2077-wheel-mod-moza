@@ -1,5 +1,5 @@
 # Build the project: patched mod_settings.dll (vendor/mod_settings/) followed by
-# gwheel.dll itself.
+# direct_wheel.dll itself.
 #
 # Requires:
 #   - Visual Studio 2022 with the "Desktop development with C++" workload
@@ -90,17 +90,17 @@ if ($msNeedBuild) {
   Write-Host "mod_settings.dll is up to date; skipping mod_settings build."
 }
 
-# ---------- gwheel.dll -----------------------------------------------------
+# ---------- direct_wheel.dll -----------------------------------------------------
 
-Write-Host "Configuring gwheel..."
+Write-Host "Configuring direct_wheel..."
 & $cmake -S . -B $BuildDir -A x64
 if ($LASTEXITCODE -ne 0) { throw "CMake configure failed." }
 
-Write-Host "Building gwheel..."
+Write-Host "Building direct_wheel..."
 & $cmake --build $BuildDir --config $Config
 if ($LASTEXITCODE -ne 0) { throw "CMake build failed." }
 
-$dll = Join-Path $BuildDir "gwheel\$Config\gwheel.dll"
+$dll = Join-Path $BuildDir "direct_wheel\$Config\direct_wheel.dll"
 if (Test-Path $dll) {
   Write-Host ""
   Write-Host "Built: $dll"
@@ -108,5 +108,5 @@ if (Test-Path $dll) {
   Write-Host ""
   Write-Host "Run deploy.ps1 to package or push to a game install."
 } else {
-  throw "Build succeeded but gwheel.dll was not found at $dll"
+  throw "Build succeeded but direct_wheel.dll was not found at $dll"
 }

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(gwheel
+project(direct_wheel
   VERSION 2.31.0
   DESCRIPTION "Logitech G-series steering wheel mod for Cyberpunk 2077"
   LANGUAGES CXX
@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(NOT WIN32)
-  message(FATAL_ERROR "gwheel targets Windows only (Cyberpunk 2077 is Windows-native).")
+  message(FATAL_ERROR "direct_wheel targets Windows only (Cyberpunk 2077 is Windows-native).")
 endif()
 
 if(MSVC)
@@ -26,6 +26,5 @@ if(MSVC)
 endif()
 
 add_subdirectory(vendor/RED4ext.SDK EXCLUDE_FROM_ALL)
-add_subdirectory(gwheel)
-add_subdirectory(tools/wheel_reset)
+add_subdirectory(direct_wheel)
 add_subdirectory(tools/input_probe)

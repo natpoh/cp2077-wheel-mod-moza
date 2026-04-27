@@ -78,7 +78,7 @@ In the **Credits** section, list:
 Upload the FOMOD zip:
 
 ```
-dist/gwheel-2.31.0.zip
+dist/direct_wheel-2.31.0.zip
 ```
 
 In the file's metadata:
@@ -118,7 +118,7 @@ TROUBLESHOOTING TIPS — read before reporting an issue:
    to match the current Cyberpunk patch. Check the RED4ext Nexus page.
 
 4. Bug reports must include: your wheel model, Cyberpunk patch version,
-   RED4ext version, and the contents of red4ext/logs/gwheel-*.log
+   RED4ext version, and the contents of red4ext/logs/direct_wheel-*.log
    (most recent file). Without those four pieces of info I cannot help.
 
 5. Non-Logitech wheels (Thrustmaster, Fanatec, Moza) are not supported.

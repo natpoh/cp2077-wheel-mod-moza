@@ -1,4 +1,4 @@
-# gwheel — Architecture
+# direct_wheel — Architecture
 
 This document is the contract the rest of the implementation is built against. It covers: plugin layout, the startup sequence, the hardware-to-game data path (Logitech SDK → `sources::` seam → vehicle detour + button dispatch), the config JSON schema, the redscript-facing native API, the button-binding model, and the G HUB coexistence model.
 
@@ -12,7 +12,7 @@ A Cyberpunk 2077 RED4ext plugin that reads a Logitech G-series wheel via the off
 Logitech G-series wheel ──USB HID──▶ Logitech Steering Wheel SDK (via G HUB / LGS)
                                                      │
                                                      ▼
-                           gwheel.dll  (red4ext plugin, 250 Hz pump)
+                           direct_wheel.dll  (red4ext plugin, 250 Hz pump)
                            ┌──────────────────────────────────────────┐
                            │   wheel::  ─────▶  sources::Frame        │
                            │                      │         │          │
@@ -27,7 +27,7 @@ Logitech G-series wheel ──USB HID──▶ Logitech Steering Wheel SDK (via 
                                       ▼                  ▼
                                 game vehicle        game input queue
                                                          │
-                           redscript (r6/scripts/gwheel/*.reds)
+                           redscript (r6/scripts/direct_wheel/*.reds)
                                       │
                                       ▼
                        Main Menu → Mod Settings → G-series Wheel
@@ -35,25 +35,25 @@ Logitech G-series wheel ──USB HID──▶ Logitech Steering Wheel SDK (via 
 
 | File | Role |
 | --- | --- |
-| `gwheel/src/dllmain.cpp` | RED4ext `Main` / `Query` entry points. |
-| `gwheel/src/plugin.{h,cpp}` | Lifecycle: 6-step `OnLoad` (config → rtti → wheel → vehicle_hook → kbd_hook → pump thread); owns the 250 Hz pump loop. |
-| `gwheel/src/logging.{h,cpp}` | Thin wrapper over the RED4ext logger + optional local log file. |
-| `gwheel/src/device_table.{h,cpp}` | Logitech G-series VID/PID table. |
-| `gwheel/src/wheel.{h,cpp}` | Logitech SDK wrapper: init, `Pump`, `Snapshot` (steer/throttle/brake/clutch/buttons/POV), and FFB dispatch (`PlayConstant`/`PlayDamper`/`PlaySpring` + global strength). |
-| `gwheel/src/sources.{h,cpp}` | Hardware-agnostic publish/read seam. `sources::Frame` = axes + digital + connected. Also carries `InVehicle()` control context (set by reds mount wrappers). |
-| `gwheel/src/input_bindings.{h,cpp}` | Physical-input enum, per-device layout, edge detection, `SendInput` dispatch. Entry point: `OnTick(const sources::Frame&)`. Every input falls through to the user's Mod Settings binding; menu-nav is the default for D-pad + A but is user-overridable. |
-| `gwheel/src/vehicle_hook.{h,cpp}` | RED4ext hash-resolved detour on `vehicle::BaseObject::UpdateVehicleCameraInput`. Gated on a cached player-vehicle pointer so we don't remote-drive parked cars. |
-| `gwheel/src/kbd_hook.{h,cpp}` | Low-level `WH_KEYBOARD_LL` hook that suppresses G HUB's synthetic vehicle-key presses while on foot. Our own `SendInput` events tag `dwExtraInfo = kExtraInfoTag` ('gWHL') so the hook passes them through. |
-| `gwheel/src/config.{h,cpp}` | Config struct, `Load()`, `ReadAsJson()`, per-field setters. Atomic double-buffered snapshot; every setter writes back to disk. |
-| `gwheel/src/rtti.{h,cpp}` | Registers 28 global native functions exposed to redscript in `PostRegisterTypes`. |
-| `gwheel/src/mod_settings_seed.cpp` | Writes hardware-capability flags to `red4ext/plugins/mod_settings/user.ini` at plugin load, before Mod Settings reads it, so the in-game Settings page hides sections for hardware the wheel doesn't have. |
-| `gwheel/src/rtti_dump.{h,cpp}` | Debug-only RTTI dumper (disabled this build during a bisect). |
-| `gwheel_reds/gwheel_natives.reds` | Declarations only — kept in lockstep with `rtti.cpp::PostRegisterTypes`. |
-| `gwheel_reds/gwheel_settings.reds` | `GWheelSettings` Mod Settings class + `GWheelAction` enum; pushes values to plugin on every change. |
-| `gwheel_reds/gwheel_mount.reds` | Wraps `VehicleComponent::OnVehicleFinishedMountingEvent` / `OnUnmountingEvent`; notifies plugin of the player's current vehicle pointer. |
-| `gwheel_reds/gwheel_events.reds` | Wraps `VehicleObject::OnVehicleBumpEvent`; queues a transient FFB jolt (in player-frame world-right) on collision. |
-| `gwheel_reds/gwheel_surface.reds` | 20 Hz downward raycast from chassis; pushes ground material CName transitions to the plugin (FFB mapping currently dormant). |
-| `gwheel_reds/gwheel_vehicle_signals.reds` | Subscribes to vehicle Blackboard for RPMValue + VehRadioState; pushes normalized RPM and radio state to the plugin so the LED rev-strip / music-visualizer reflect real game state. |
+| `direct_wheel/src/dllmain.cpp` | RED4ext `Main` / `Query` entry points. |
+| `direct_wheel/src/plugin.{h,cpp}` | Lifecycle: 6-step `OnLoad` (config → rtti → wheel → vehicle_hook → kbd_hook → pump thread); owns the 250 Hz pump loop. |
+| `direct_wheel/src/logging.{h,cpp}` | Thin wrapper over the RED4ext logger + optional local log file. |
+| `direct_wheel/src/device_table.{h,cpp}` | Logitech G-series VID/PID table. |
+| `direct_wheel/src/wheel.{h,cpp}` | Logitech SDK wrapper: init, `Pump`, `Snapshot` (steer/throttle/brake/clutch/buttons/POV), and FFB dispatch (`PlayConstant`/`PlayDamper`/`PlaySpring` + global strength). |
+| `direct_wheel/src/sources.{h,cpp}` | Hardware-agnostic publish/read seam. `sources::Frame` = axes + digital + connected. Also carries `InVehicle()` control context (set by reds mount wrappers). |
+| `direct_wheel/src/input_bindings.{h,cpp}` | Physical-input enum, per-device layout, edge detection, `SendInput` dispatch. Entry point: `OnTick(const sources::Frame&)`. Every input falls through to the user's Mod Settings binding; menu-nav is the default for D-pad + A but is user-overridable. |
+| `direct_wheel/src/vehicle_hook.{h,cpp}` | RED4ext hash-resolved detour on `vehicle::BaseObject::UpdateVehicleCameraInput`. Gated on a cached player-vehicle pointer so we don't remote-drive parked cars. |
+| `direct_wheel/src/kbd_hook.{h,cpp}` | Low-level `WH_KEYBOARD_LL` hook that suppresses G HUB's synthetic vehicle-key presses while on foot. Our own `SendInput` events tag `dwExtraInfo = kExtraInfoTag` ('dWHL') so the hook passes them through. |
+| `direct_wheel/src/config.{h,cpp}` | Config struct, `Load()`, `ReadAsJson()`, per-field setters. Atomic double-buffered snapshot; every setter writes back to disk. |
+| `direct_wheel/src/rtti.{h,cpp}` | Registers 28 global native functions exposed to redscript in `PostRegisterTypes`. |
+| `direct_wheel/src/mod_settings_seed.cpp` | Writes hardware-capability flags to `red4ext/plugins/mod_settings/user.ini` at plugin load, before Mod Settings reads it, so the in-game Settings page hides sections for hardware the wheel doesn't have. |
+| `direct_wheel/src/rtti_dump.{h,cpp}` | Debug-only RTTI dumper (disabled this build during a bisect). |
+| `direct_wheel_reds/direct_wheel_natives.reds` | Declarations only — kept in lockstep with `rtti.cpp::PostRegisterTypes`. |
+| `direct_wheel_reds/direct_wheel_settings.reds` | `DirectWheelSettings` Mod Settings class + `DirectWheelAction` enum; pushes values to plugin on every change. |
+| `direct_wheel_reds/direct_wheel_mount.reds` | Wraps `VehicleComponent::OnVehicleFinishedMountingEvent` / `OnUnmountingEvent`; notifies plugin of the player's current vehicle pointer. |
+| `direct_wheel_reds/direct_wheel_events.reds` | Wraps `VehicleObject::OnVehicleBumpEvent`; queues a transient FFB jolt (in player-frame world-right) on collision. |
+| `direct_wheel_reds/direct_wheel_surface.reds` | 20 Hz downward raycast from chassis; pushes ground material CName transitions to the plugin (FFB mapping currently dormant). |
+| `direct_wheel_reds/direct_wheel_vehicle_signals.reds` | Subscribes to vehicle Blackboard for RPMValue + VehRadioState; pushes normalized RPM and radio state to the plugin so the LED rev-strip / music-visualizer reflect real game state. |
 
 ## Supported hardware (device_table)
 
@@ -82,11 +82,11 @@ VID = 0x046D, entries in (PID, model_id, name, ffb_default, steering_range_deg):
 0xCA04  FORMULA_VFB                 "Formula Vibration Feedback"   yes  240
 ```
 
-`ffb_default` is informational only. The authoritative check is the `hasFFB` flag on `wheel::Caps`, derived from `LogiHasForceFeedback` at bind time. This drives the `GWheel_HasFFB` native, which in turn disables the FFB section of the Settings UI for motorless wheels.
+`ffb_default` is informational only. The authoritative check is the `hasFFB` flag on `wheel::Caps`, derived from `LogiHasForceFeedback` at bind time. This drives the `DirectWheel_HasFFB` native, which in turn disables the FFB section of the Settings UI for motorless wheels.
 
 ## Startup sequence
 
-`plugin::OnLoad` runs six steps in order (see [plugin.cpp:63-95](gwheel/src/plugin.cpp#L63-L95)):
+`plugin::OnLoad` runs six steps in order (see [plugin.cpp:63-95](direct_wheel/src/plugin.cpp#L63-L95)):
 
 1. `config::Load()` — read `config.json` from the plugin install dir; fall back to defaults if missing / unparseable. Pushes initial bindings into `input_bindings::ReplaceAll`.
 2. `rtti::Register()` — queue pre- and post-register callbacks with `CRTTISystem`; natives are registered in `PostRegisterTypes` once RTTI is built.
@@ -108,7 +108,7 @@ The `sources::` module is a hardware-agnostic seam. Today only `wheel.cpp` publi
 
 `sources::` also carries a control-context flag:
 
-- `sources::InVehicle()` — flipped on/off by the redscript mount-event wrappers via `GWheel_Set/ClearPlayerVehicle`. `input_bindings::Dispatch` consults this to suppress vehicle-only actions (Handbrake, Headlights, Horn, camera cycles, etc.) while V is walking — the same keyboard keys mean different things on foot and we don't want the wheel firing Jump / Interact because a paddle is mapped to Handbrake.
+- `sources::InVehicle()` — flipped on/off by the redscript mount-event wrappers via `DirectWheel_Set/ClearPlayerVehicle`. `input_bindings::Dispatch` consults this to suppress vehicle-only actions (Handbrake, Headlights, Horn, camera cycles, etc.) while V is walking — the same keyboard keys mean different things on foot and we don't want the wheel firing Jump / Interact because a paddle is mapped to Handbrake.
 
 The vehicle hook doesn't go through `sources::`; the detour fires on the game thread and reads `wheel::CurrentSnapshot()` directly to minimize latency into the input path.
 
@@ -118,7 +118,7 @@ Single target: `vehicle::BaseObject::UpdateVehicleCameraInput(self)`. Resolved v
 
 If the hash doesn't resolve — meaning RED4ext itself is behind the current game build — RED4ext terminates the process with its own MessageBox at load. The game won't launch at all until the RED4ext address database catches up.
 
-The detour fires per-vehicle per-tick (not just for the player's car). A cached `g_playerVehicle` pointer, set by the redscript mount/unmount wrappers through `GWheel_SetPlayerVehicle` / `GWheel_ClearPlayerVehicle`, gates injection to the player's currently-mounted vehicle only. Without this gate, our writes would propagate to parked cars, AI traffic, and anything else with active camera updates.
+The detour fires per-vehicle per-tick (not just for the player's car). A cached `g_playerVehicle` pointer, set by the redscript mount/unmount wrappers through `DirectWheel_SetPlayerVehicle` / `DirectWheel_ClearPlayerVehicle`, gates injection to the player's currently-mounted vehicle only. Without this gate, our writes would propagate to parked cars, AI traffic, and anything else with active camera updates.
 
 Struct field offsets (CP2077 v2.31, build 5294808, found empirically 2026-04-21 — LTBF's SDK labels did not match):
 
@@ -130,11 +130,11 @@ Struct field offsets (CP2077 v2.31, build 5294808, found empirically 2026-04-21 
 
 Re-probe if the game patches the `vehicle::BaseObject` struct. The detour also merges with vanilla keyboard/gamepad input (max-magnitude wins), so keyboard steering still works when the wheel isn't moving.
 
-`vehicle_hook::FireCount()` is a monotonic tick counter surfaced through `GWheel_GetDeviceInfo` for live-hook confirmation.
+`vehicle_hook::FireCount()` is a monotonic tick counter surfaced through `DirectWheel_GetDeviceInfo` for live-hook confirmation.
 
 ## Native function surface (RTTI)
 
-Registered as global static native functions (not a class; no `IScriptable` parent) in [gwheel/src/rtti.cpp](gwheel/src/rtti.cpp) `PostRegisterTypes` via `RED4ext::CGlobalFunction::Create(name, name, fn)` + `AddParam` + `SetReturnType` + `rtti->RegisterFunction(func)`.
+Registered as global static native functions (not a class; no `IScriptable` parent) in [direct_wheel/src/rtti.cpp](direct_wheel/src/rtti.cpp) `PostRegisterTypes` via `RED4ext::CGlobalFunction::Create(name, name, fn)` + `AddParam` + `SetReturnType` + `rtti->RegisterFunction(func)`.
 
 Each function uses the canonical stack-frame shape:
 
@@ -151,15 +151,15 @@ Parameters are read sequentially with `RED4ext::GetParameter(aFrame, &arg)`, fol
 
 | Native | Params | Returns | Purpose |
 | --- | --- | --- | --- |
-| `GWheel_GetVersion` | — | `String` | Plugin version string (`kVersionString`). |
-| `GWheel_IsPluginReady` | — | `Bool` | `true` iff the Logitech SDK bound a device. |
-| `GWheel_GetDeviceInfo` | — | `String` | Human-readable summary: product name, operating range, FFB flag, SDK version, hook state, fire count. |
-| `GWheel_HasFFB` | — | `Bool` | `true` iff a device is bound and advertises force feedback. |
-| `GWheel_DetectedHasFfbHardware` | — | `Bool` | Same as HasFFB; named distinctly so the Mod Settings capability-flag plumbing reads cleanly. |
-| `GWheel_DetectedHasRevLeds` | — | `Bool` | `true` iff the bound wheel has the rev-strip LED bar (G25/G27/G29/G920/G923 etc.). |
-| `GWheel_DetectedHasRightCluster` | — | `Bool` | `true` iff the bound wheel has the lower-cluster cluster (Plus/Minus/scroll; absent on G920). |
-| `GWheel_DetectedModelName` | — | `String` | Wheel model name from the device table. |
-| `GWheel_ReadConfig` | — | `String` | Current config serialized as JSON (same schema as `config.json`). |
+| `DirectWheel_GetVersion` | — | `String` | Plugin version string (`kVersionString`). |
+| `DirectWheel_IsPluginReady` | — | `Bool` | `true` iff the Logitech SDK bound a device. |
+| `DirectWheel_GetDeviceInfo` | — | `String` | Human-readable summary: product name, operating range, FFB flag, SDK version, hook state, fire count. |
+| `DirectWheel_HasFFB` | — | `Bool` | `true` iff a device is bound and advertises force feedback. |
+| `DirectWheel_DetectedHasFfbHardware` | — | `Bool` | Same as HasFFB; named distinctly so the Mod Settings capability-flag plumbing reads cleanly. |
+| `DirectWheel_DetectedHasRevLeds` | — | `Bool` | `true` iff the bound wheel has the rev-strip LED bar (G25/G27/G29/G920/G923 etc.). |
+| `DirectWheel_DetectedHasRightCluster` | — | `Bool` | `true` iff the bound wheel has the lower-cluster cluster (Plus/Minus/scroll; absent on G920). |
+| `DirectWheel_DetectedModelName` | — | `String` | Wheel model name from the device table. |
+| `DirectWheel_ReadConfig` | — | `String` | Current config serialized as JSON (same schema as `config.json`). |
 
 ### Config setters
 
@@ -167,49 +167,49 @@ Each setter atomically swaps the live snapshot and writes `config.json` to disk.
 
 | Native | Params |
 | --- | --- |
-| `GWheel_SetInputEnabled` | `v: Bool` |
-| `GWheel_SetClutchAsBrake` | `v: Bool` |
-| `GWheel_SetFfbEnabled` | `v: Bool` |
-| `GWheel_SetFfbDebugLogging` | `v: Bool` |
-| `GWheel_SetFfbTorquePct` | `pct: Int32` (0–100) |
-| `GWheel_SetStationaryThresholdMps` | `v: Float` (0.0–5.0) |
-| `GWheel_SetYawFeedbackPct` | `pct: Int32` (0–100) |
-| `GWheel_SetActiveTorqueStrengthPct` | `pct: Int32` (0–100) |
-| `GWheel_SetHandshakePlayOnStart` | `v: Bool` |
-| `GWheel_SetLedEnabled` | `v: Bool` |
-| `GWheel_SetLedVisualizerWhileMusic` | `v: Bool` |
+| `DirectWheel_SetInputEnabled` | `v: Bool` |
+| `DirectWheel_SetClutchAsBrake` | `v: Bool` |
+| `DirectWheel_SetFfbEnabled` | `v: Bool` |
+| `DirectWheel_SetFfbDebugLogging` | `v: Bool` |
+| `DirectWheel_SetFfbTorquePct` | `pct: Int32` (0–100) |
+| `DirectWheel_SetStationaryThresholdMps` | `v: Float` (0.0–5.0) |
+| `DirectWheel_SetYawFeedbackPct` | `pct: Int32` (0–100) |
+| `DirectWheel_SetActiveTorqueStrengthPct` | `pct: Int32` (0–100) |
+| `DirectWheel_SetHandshakePlayOnStart` | `v: Bool` |
+| `DirectWheel_SetLedEnabled` | `v: Bool` |
+| `DirectWheel_SetLedVisualizerWhileMusic` | `v: Bool` |
 
 ### Bindings
 
 | Native | Params | Purpose |
 | --- | --- | --- |
-| `GWheel_SetInputBinding` | `inputId: Int32, action: Int32` | Map a PhysicalInput (0–19) to an Action (0–36). |
+| `DirectWheel_SetInputBinding` | `inputId: Int32, action: Int32` | Map a PhysicalInput (0–19) to an Action (0–36). |
 
 ### Player-vehicle lifecycle
 
 | Native | Params | Purpose |
 | --- | --- | --- |
-| `GWheel_SetPlayerVehicle` | `v: ref<VehicleObject>` | Cache on mount (also sets `sources::InVehicle(true)`). |
-| `GWheel_ClearPlayerVehicle` | — | Clear on dismount (also `sources::InVehicle(false)`). |
+| `DirectWheel_SetPlayerVehicle` | `v: ref<VehicleObject>` | Cache on mount (also sets `sources::InVehicle(true)`). |
+| `DirectWheel_ClearPlayerVehicle` | — | Clear on dismount (also `sources::InVehicle(false)`). |
 
 ### Vehicle telemetry (pushed from redscript)
 
 | Native | Params | Purpose |
 | --- | --- | --- |
-| `GWheel_SetEngineRpmNormalized` | `v: Float` (0..1) | Pushed by `gwheel_vehicle_signals.reds` from the vehicle Blackboard's RPMValue / MaxRPM. Drives the LED rev strip. |
-| `GWheel_SetRadioActive` | `v: Bool` | Pushed when the in-car radio is on. Switches the LED rev strip to the music visualizer. |
+| `DirectWheel_SetEngineRpmNormalized` | `v: Float` (0..1) | Pushed by `direct_wheel_vehicle_signals.reds` from the vehicle Blackboard's RPMValue / MaxRPM. Drives the LED rev strip. |
+| `DirectWheel_SetRadioActive` | `v: Bool` | Pushed when the in-car radio is on. Switches the LED rev strip to the music visualizer. |
 
 ### Event natives
 
 | Native | Params | Purpose |
 | --- | --- | --- |
-| `GWheel_OnVehicleBump` | `kick: Float` | Called from `gwheel_events.reds` `OnVehicleBumpEvent` wrap; queues a transient FFB jolt overlay. |
-| `GWheel_OnVehicleHit` | `kick: Float` | Currently unused (legacy path; OnVehicleHit lives on the wrong class). |
-| `GWheel_OnWheelMaterial` | `wheelIdx: Int32, mat: CName` | Called from `gwheel_surface.reds` raycast; surface-baseline mapping currently dormant. |
+| `DirectWheel_OnVehicleBump` | `kick: Float` | Called from `direct_wheel_events.reds` `OnVehicleBumpEvent` wrap; queues a transient FFB jolt overlay. |
+| `DirectWheel_OnVehicleHit` | `kick: Float` | Currently unused (legacy path; OnVehicleHit lives on the wrong class). |
+| `DirectWheel_OnWheelMaterial` | `wheelIdx: Int32, mat: CName` | Called from `direct_wheel_surface.reds` raycast; surface-baseline mapping currently dormant. |
 
 ## Config JSON schema
 
-Path: `<CP2077>/red4ext/plugins/gwheel/config.json`. Loaded at plugin load, written back on every setter. Schema version `4`. The FOMOD installer ships a minimal `{ "version": 4, "handshake": { "playOnStart": true|false } }` (every other field falls back to its in-code default until the user touches it in Mod Settings); the C++ side serializes the full schema on its first write.
+Path: `<CP2077>/red4ext/plugins/direct_wheel/config.json`. Loaded at plugin load, written back on every setter. Schema version `4`. The FOMOD installer ships a minimal `{ "version": 4, "handshake": { "playOnStart": true|false } }` (every other field falls back to its in-code default until the user touches it in Mod Settings); the C++ side serializes the full schema on its first write.
 
 ```json
 {
@@ -254,7 +254,7 @@ Path: `<CP2077>/red4ext/plugins/gwheel/config.json`. Loaded at plugin load, writ
 }
 ```
 
-**Defaults** (constants in [gwheel/src/config.h](gwheel/src/config.h)):
+**Defaults** (constants in [direct_wheel/src/config.h](direct_wheel/src/config.h)):
 
 | Field | Default | Range | Notes |
 | --- | --- | --- | --- |
@@ -280,8 +280,8 @@ Validation is per-setter inside `config::Set*`: each setter clamps/rejects out-o
 
 Wheel buttons map to in-game actions through a table driven by two enums that must stay in lockstep:
 
-- `PhysicalInput` ([input_bindings.h:14-37](gwheel/src/input_bindings.h#L14-L37)) — 20 stable IDs for the controls on a modern G923-class wheel: `PaddleLeft`, `PaddleRight`, `DpadUp..Right`, `ButtonA..Y`, `Start`, `Select`, `LSB`, `RSB`, `Plus`, `Minus`, `ScrollClick`, `ScrollCW`, `ScrollCCW`, `Xbox`. Order is locked by the config.json `bindings` array and by the field order in `gwheel_settings.reds` — do not renumber; new controls append.
-- `Action` ([gwheel/src/input_bindings.h](gwheel/src/input_bindings.h)) — 36 values (plus `None=0`) covering driving (horn, headlights, handbrake, autodrive, exit, call vehicle), camera (cycle forward, rear-view, reset), combat (shoot primary/secondary/tertiary), weapons (next/prev, slot 1/2, switch, holster), radio (menu, next), gameplay (consumable, iconic cyberware, quick save), menus (map, journal, inventory, phone, perks, crafting, pause), and menu nav (Confirm / Cancel / Up / Down / Left / Right). Indices must match `GWheelAction` in [gwheel_reds/gwheel_settings.reds](gwheel_reds/gwheel_settings.reds) so Mod Settings dropdown indices round-trip.
+- `PhysicalInput` ([input_bindings.h:14-37](direct_wheel/src/input_bindings.h#L14-L37)) — 20 stable IDs for the controls on a modern G923-class wheel: `PaddleLeft`, `PaddleRight`, `DpadUp..Right`, `ButtonA..Y`, `Start`, `Select`, `LSB`, `RSB`, `Plus`, `Minus`, `ScrollClick`, `ScrollCW`, `ScrollCCW`, `Xbox`. Order is locked by the config.json `bindings` array and by the field order in `direct_wheel_settings.reds` — do not renumber; new controls append.
+- `Action` ([direct_wheel/src/input_bindings.h](direct_wheel/src/input_bindings.h)) — 36 values (plus `None=0`) covering driving (horn, headlights, handbrake, autodrive, exit, call vehicle), camera (cycle forward, rear-view, reset), combat (shoot primary/secondary/tertiary), weapons (next/prev, slot 1/2, switch, holster), radio (menu, next), gameplay (consumable, iconic cyberware, quick save), menus (map, journal, inventory, phone, perks, crafting, pause), and menu nav (Confirm / Cancel / Up / Down / Left / Right). Indices must match `DirectWheelAction` in [direct_wheel_reds/direct_wheel_settings.reds](direct_wheel_reds/direct_wheel_settings.reds) so Mod Settings dropdown indices round-trip.
 
 Each `Action` dispatches to a specific Windows virtual-key or mouse event via `SendInput`. Tap actions fire DOWN+UP on rising edge; Hold actions mirror the physical state.
 
@@ -299,7 +299,7 @@ Dispatch lifecycle each pump tick (`input_bindings::OnTick`):
 3. If an edge fired, `Dispatch(bindings[input], rising)`:
    - Suppress if the action is `VehicleOnly` and `sources::InVehicle()` is false.
    - Otherwise `SendInput` with `dwExtraInfo = kbd_hook::kExtraInfoTag` so our own LL keyboard hook doesn't filter the event.
-4. There is no menu-state-aware override. An earlier design hard-overrode D-pad + A/B/X/Y to arrow keys / Enter / Escape while any menu was open, but CP2077's arrow keys are secondary vehicle controls (Up/Down = accelerate/decelerate, Left/Right = steer), so the override drove the car when the user pressed the D-pad even with binding=None. Menu nav is now just the user-visible default for D-pad + A in `gwheel_settings.reds`; the user can rebind to None to fully disable.
+4. There is no menu-state-aware override. An earlier design hard-overrode D-pad + A/B/X/Y to arrow keys / Enter / Escape while any menu was open, but CP2077's arrow keys are secondary vehicle controls (Up/Down = accelerate/decelerate, Left/Right = steer), so the override drove the car when the user pressed the D-pad even with binding=None. Menu nav is now just the user-visible default for D-pad + A in `direct_wheel_settings.reds`; the user can rebind to None to fully disable.
 
 ## FFB effect model
 
@@ -316,14 +316,14 @@ A 200 ms watchdog tears down all effects when the vehicle detour stops firing (p
 | Rotation range (°) | G HUB. The mod reads it via `LogiGetOperatingRange` at 1 Hz and scales its FFB output to match. |
 | Sensitivity curve | G HUB. |
 | Centering spring | The mod's physics-derived centering torque. G HUB's own spring should be off in the wheel's profile. |
-| Collision FFB | Mod (`gwheel_events.reds` + `wheel::TriggerJolt`). |
+| Collision FFB | Mod (`direct_wheel_events.reds` + `wheel::TriggerJolt`). |
 | Surface-texture FFB | Mod (envelope from chassis dynamics; surface-material baseline currently dormant). |
 | Slip-angle countersteer | Mod (lateral-velocity dot world-right, gated on grip factor). |
 | Per-vehicle response | Mod (derived from WheeledPhysics; user-tunable scalars in Mod Settings). |
-| Rev-strip LEDs / music visualizer | Mod (driven from vehicle Blackboard via `gwheel_vehicle_signals.reds`). |
+| Rev-strip LEDs / music visualizer | Mod (driven from vehicle Blackboard via `direct_wheel_vehicle_signals.reds`). |
 | Wheel button → keyboard | Mod (`input_bindings` + `kbd_hook`). |
 
-The `kbd_hook` layer keeps this peaceful. G HUB's own Cyberpunk profile also synthesizes keyboard events; without filtering, bound controls would double-fire (wheel → `SendInput(Handbrake)` and G HUB → `Space`). The LL keyboard hook drops any non-tagged synthetic event matching a vehicle-only key while the player is on foot; the plugin's own events carry the `'gWHL'` `dwExtraInfo` tag to pass through.
+The `kbd_hook` layer keeps this peaceful. G HUB's own Cyberpunk profile also synthesizes keyboard events; without filtering, bound controls would double-fire (wheel → `SendInput(Handbrake)` and G HUB → `Space`). The LL keyboard hook drops any non-tagged synthetic event matching a vehicle-only key while the player is on foot; the plugin's own events carry the `'dWHL'` `dwExtraInfo` tag to pass through.
 
 The Logitech SDK's `LogiSetPreferredControllerProperties` API is broken on most G HUB builds and has been since at least 2023, so this mod does not write rotation range, sensitivity, or centering preferences back to the wheel. Per-effect magnitude scaling is the workaround.
 
@@ -334,8 +334,8 @@ The Logitech SDK's `LogiSetPreferredControllerProperties` API is broken on most 
 
 ## Build / deploy
 
-- Build: `powershell -ExecutionPolicy Bypass -File build.ps1 -Config Release` (wraps CMake + MSVC; VS2022 + CMake 3.21+ required). Output at `build/gwheel/Release/gwheel.dll`.
-- Deploy: `powershell -ExecutionPolicy Bypass -File deploy.ps1 [-Game <path>]`. Zip mode (default) produces `dist/gwheel-<version>.zip` laid out for the FOMOD installer (includes the patched `mod_settings.dll` from `vendor/mod_settings/build/Release/`). Direct mode (`-Game`) copies the DLL + six `.reds` files into `<CP2077>/red4ext/plugins/gwheel/` and `<CP2077>/r6/scripts/gwheel/`, overwrites `<CP2077>/red4ext/plugins/mod_settings/mod_settings.dll` with the patched build, and invalidates the redscript cache.
+- Build: `powershell -ExecutionPolicy Bypass -File build.ps1 -Config Release` (wraps CMake + MSVC; VS2022 + CMake 3.21+ required). Output at `build/direct_wheel/Release/direct_wheel.dll`.
+- Deploy: `powershell -ExecutionPolicy Bypass -File deploy.ps1 [-Game <path>]`. Zip mode (default) produces `dist/direct_wheel-<version>.zip` laid out for the FOMOD installer (includes the patched `mod_settings.dll` from `vendor/mod_settings/build/Release/`). Direct mode (`-Game`) copies the DLL + six `.reds` files into `<CP2077>/red4ext/plugins/direct_wheel/` and `<CP2077>/r6/scripts/direct_wheel/`, overwrites `<CP2077>/red4ext/plugins/mod_settings/mod_settings.dll` with the patched build, and invalidates the redscript cache.
 - Runtime deps: [RED4ext](https://github.com/WopsS/RED4ext), [redscript](https://github.com/jac3km4/redscript), [Mod Settings](https://github.com/jackhumbert/mod_settings), [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl).
 
 ## Sources

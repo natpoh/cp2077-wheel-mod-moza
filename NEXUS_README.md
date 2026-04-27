@@ -70,4 +70,4 @@ I recommend starting with an operating range of 180 to start, since the rotation
 
 ## Reporting issues
 
-Include your wheel model, Cyberpunk patch version, RED4ext version, and your most recent `red4ext/logs/gwheel-*.log` file.
+Include your wheel model, Cyberpunk patch version, RED4ext version, and your most recent `red4ext/logs/direct_wheel-*.log` file.
