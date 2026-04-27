@@ -17,7 +17,7 @@
     "stationaryThresholdMps": 0.5,
     "yawFeedbackPct": 15,
     "activeTorqueStrengthPct": 45,
-    "constantForcePct": 15,
+    "constantForcePct": 50,
     "springForcePct": 15,
     "damperForcePct": 45,
     "frictionForcePct": 25,

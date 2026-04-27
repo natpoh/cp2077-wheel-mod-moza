@@ -199,7 +199,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let constantForcePct: Int32 = 15;
+  let constantForcePct: Int32 = 50;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "FFB - Centering (Spring)")

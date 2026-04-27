@@ -668,7 +668,7 @@ namespace direct_wheel::wheel
 
         float springCoef = std::clamp(
             centeringBaseline * 0.3f * speedSq * gripFactor
-            + speedRatio * 0.5f * constantPct               // Constant Force: smooth centering
+            + speedRatio * 0.15f * constantPct               // Constant Force: smooth centering
             + yawRamp * 0.2f * (yawFeedbackPct / 100.0f),   // Cornering feedback
             0.f, 1.0f);
         if (isReversing) springCoef *= 0.4f;

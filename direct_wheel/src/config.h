@@ -55,7 +55,7 @@ namespace direct_wheel::config
 
         // Per-effect strength sliders (0..100). Allow the user to
         // individually scale each DirectInput FFB effect type.
-        int32_t constantForcePct = 15;
+        int32_t constantForcePct = 50;
         int32_t springForcePct   = 15;
         int32_t damperForcePct   = 45;
         int32_t frictionForcePct = 25;
