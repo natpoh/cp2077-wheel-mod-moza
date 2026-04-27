@@ -260,17 +260,6 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let joltForcePct: Int32 = 40;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Force feedback")
-  @runtimeProperty("ModSettings.category.order", "200")
-  @runtimeProperty("ModSettings.displayName", "Stationary threshold (m/s)")
-  @runtimeProperty("ModSettings.description", "Below this speed the wheel has no centering force.")
-  @runtimeProperty("ModSettings.min", "0.0")
-  @runtimeProperty("ModSettings.max", "5.0")
-  @runtimeProperty("ModSettings.step", "0.1")
-  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
-  let stationaryThresholdMps: Float = 0.5;
-
   // ---- Rev-strip LEDs -----------------------------------------------------
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
