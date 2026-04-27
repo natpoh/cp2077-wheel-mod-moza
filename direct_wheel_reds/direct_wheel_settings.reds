@@ -92,9 +92,9 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Steering linearity")
-  @runtimeProperty("ModSettings.description", "Response curve. 0.5 = inverse expo (more response near center, counters game expo). 1.0 = linear. 2.0 = exponential.")
+  @runtimeProperty("ModSettings.description", "Response curve. 0.5 = inverse expo (more response near center, counters game expo). 1.0 = linear.")
   @runtimeProperty("ModSettings.min", "0.1")
-  @runtimeProperty("ModSettings.max", "3.0")
+  @runtimeProperty("ModSettings.max", "1.0")
   @runtimeProperty("ModSettings.step", "0.1")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let steeringLinearity: Float = 0.50;

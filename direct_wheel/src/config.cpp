@@ -464,7 +464,7 @@ namespace direct_wheel::config
     void SetSineForcePct(int32_t v)      { Mutate([&](Config& c){ c.ffb.sineForcePct = std::clamp(v, 0, 100); }); }
     void SetJoltForcePct(int32_t v)      { Mutate([&](Config& c){ c.ffb.joltForcePct = std::clamp(v, 0, 100); }); }
     void SetSpeedSensitiveSteeringPct(int32_t v) { Mutate([&](Config& c){ c.input.speedSensitiveSteeringPct = std::clamp(v, 0, 100); }); }
-    void SetSteeringLinearity(float v)           { Mutate([&](Config& c){ c.input.steeringLinearity = std::clamp(v, 0.1f, 3.0f); }); }
+    void SetSteeringLinearity(float v)           { Mutate([&](Config& c){ c.input.steeringLinearity = std::clamp(v, 0.1f, 1.0f); }); }
     void SetSteeringSpeedFactor(int32_t v)        { Mutate([&](Config& c){ c.input.steeringSpeedFactor = std::clamp(v, 0, 50); }); }
     void SetSteeringMinTurn(int32_t v)             { Mutate([&](Config& c){ c.input.steeringMinTurn = std::clamp(v, 3, 40); }); }
     void SetSteeringAddBoost(int32_t v)            { Mutate([&](Config& c){ c.input.steeringAddBoost = std::clamp(v, 0, 30); }); }
