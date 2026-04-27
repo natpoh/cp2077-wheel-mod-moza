@@ -1,8 +1,8 @@
-# Cyberpunk 2077 — Moza & Logitech Racing Wheel Support
+# Cyberpunk 2077 — Direct Drive & Logitech Wheel Support
 
 **v2.31.7** for Cyberpunk 2077 game patch 2.31.
 
-Full racing wheel support for Cyberpunk 2077. Drive with a **Moza** or **Logitech** steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
+Full racing wheel support for Cyberpunk 2077. Drive with a **Direct Drive** (Moza, etc) or **Logitech** steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
 
 There is no virtual gamepad to install, no XInput shim, no third-party driver. The mod hooks the game directly via DirectInput/Logitech SDK.
 
