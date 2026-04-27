@@ -18,29 +18,30 @@
 
 namespace direct_wheel::config
 {
-    // AxisMap::Read — resolve a string like "lX", "lY", "lRz", "slider0"
+    // AxisMap::Read - resolve a string like "lX", "Y", "Rz", "slider0", "S0"
     // to the corresponding member of a DIJOYSTATE2. Case-insensitive.
+    // Accepts both DirectInput names (lX, lRz) and short names (X, Rz, S0)
+    // matching input_probe.exe output.
     long AxisMap::Read(const DIJOYSTATE2& js, const std::string& axisName)
     {
-        // Tiny linear scan — only called 4× per tick, zero allocation.
+        // Tiny linear scan - only called 4x per tick, zero allocation.
         struct Entry { const char* name; long DIJOYSTATE2::* member; };
-        static constexpr long DIJOYSTATE2::* kNone = nullptr;
         static const Entry kTable[] = {
-            { "lX",      &DIJOYSTATE2::lX },
-            { "lY",      &DIJOYSTATE2::lY },
-            { "lZ",      &DIJOYSTATE2::lZ },
-            { "lRx",     &DIJOYSTATE2::lRx },
-            { "lRy",     &DIJOYSTATE2::lRy },
-            { "lRz",     &DIJOYSTATE2::lRz },
+            { "lX",  &DIJOYSTATE2::lX },  { "X",  &DIJOYSTATE2::lX },
+            { "lY",  &DIJOYSTATE2::lY },  { "Y",  &DIJOYSTATE2::lY },
+            { "lZ",  &DIJOYSTATE2::lZ },  { "Z",  &DIJOYSTATE2::lZ },
+            { "lRx", &DIJOYSTATE2::lRx }, { "Rx", &DIJOYSTATE2::lRx },
+            { "lRy", &DIJOYSTATE2::lRy }, { "Ry", &DIJOYSTATE2::lRy },
+            { "lRz", &DIJOYSTATE2::lRz }, { "Rz", &DIJOYSTATE2::lRz },
         };
         for (const auto& e : kTable)
         {
             if (_stricmp(axisName.c_str(), e.name) == 0)
                 return js.*e.member;
         }
-        if (_stricmp(axisName.c_str(), "slider0") == 0) return js.rglSlider[0];
-        if (_stricmp(axisName.c_str(), "slider1") == 0) return js.rglSlider[1];
-        return 0; // unknown axis name — treat as zero
+        if (_stricmp(axisName.c_str(), "slider0") == 0 || _stricmp(axisName.c_str(), "S0") == 0) return js.rglSlider[0];
+        if (_stricmp(axisName.c_str(), "slider1") == 0 || _stricmp(axisName.c_str(), "S1") == 0) return js.rglSlider[1];
+        return 0; // unknown axis name - treat as zero
     }
     namespace
     {
