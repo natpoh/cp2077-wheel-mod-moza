@@ -41,6 +41,12 @@ namespace direct_wheel::config
         float   stationaryThresholdMps  = 0.5f;
         int32_t yawFeedbackPct          = 50;
         int32_t activeTorqueStrengthPct = 100;
+
+        // Per-effect strength sliders (0..100). Allow the user to
+        // individually scale each DirectInput FFB effect type.
+        int32_t constantForcePct = 30;
+        int32_t springForcePct   = 30;
+        int32_t damperForcePct   = 30;
     };
 
     struct PerVehicle
@@ -138,6 +144,9 @@ namespace direct_wheel::config
     void SetStationaryThresholdMps(float v);
     void SetYawFeedbackPct(int32_t v);
     void SetActiveTorqueStrengthPct(int32_t v);
+    void SetConstantForcePct(int32_t v);
+    void SetSpringForcePct(int32_t v);
+    void SetDamperForcePct(int32_t v);
 
     void SetHandshakePlayOnStart(bool v);
 

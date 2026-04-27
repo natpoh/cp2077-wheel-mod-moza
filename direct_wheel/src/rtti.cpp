@@ -395,6 +395,15 @@ namespace direct_wheel::rtti
             RegisterGlobal(rtti, "DirectWheel_SetActiveTorqueStrengthPct",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetActiveTorqueStrengthPct>),
                            "Bool", {{ "Int32", "pct" }});
+            RegisterGlobal(rtti, "DirectWheel_SetConstantForcePct",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetConstantForcePct>),
+                           "Bool", {{ "Int32", "pct" }});
+            RegisterGlobal(rtti, "DirectWheel_SetSpringForcePct",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetSpringForcePct>),
+                           "Bool", {{ "Int32", "pct" }});
+            RegisterGlobal(rtti, "DirectWheel_SetDamperForcePct",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetDamperForcePct>),
+                           "Bool", {{ "Int32", "pct" }});
 
             RegisterGlobal(rtti, "DirectWheel_SetLedEnabled",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetBool<&config::SetLedEnabled>),

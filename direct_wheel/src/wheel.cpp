@@ -38,6 +38,10 @@ namespace direct_wheel::wheel
 
             std::atomic<uint32_t> initAttempts{0};
             std::atomic<bool> handshakeActive{false};
+
+            IDirectInputEffect* pConstantEffect = nullptr;
+            IDirectInputEffect* pSpringEffect = nullptr;
+            IDirectInputEffect* pDamperEffect = nullptr;
         };
 
         State& S() { static State s; return s; }
@@ -81,6 +85,27 @@ namespace direct_wheel::wheel
             return std::clamp(static_cast<float>(v - 32767) / kMax, -1.f, 1.f);
         }
 
+        int ScaleConstant(float v)
+        {
+            auto cfg = config::Current();
+            float mul = cfg.ffb.constantForcePct / 100.0f;
+            return static_cast<int>(std::clamp(v, -1.0f, 1.0f) * mul * 10000.0f);
+        }
+
+        int ScaleSpring(float v)
+        {
+            auto cfg = config::Current();
+            float mul = cfg.ffb.springForcePct / 100.0f;
+            return static_cast<int>(std::clamp(v, 0.0f, 1.0f) * mul * 10000.0f);
+        }
+
+        int ScaleDamper(float v)
+        {
+            auto cfg = config::Current();
+            float mul = cfg.ffb.damperForcePct / 100.0f;
+            return static_cast<int>(std::clamp(v, 0.0f, 1.0f) * mul * 10000.0f);
+        }
+
         BOOL CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCEW* pdidInstance, VOID* pContext)
         {
             auto& st = S();
@@ -90,6 +115,62 @@ namespace direct_wheel::wheel
             if (FAILED(hr)) return DIENUM_CONTINUE;
 
             return DIENUM_STOP;
+        }
+
+        void InitFFB(State& st)
+        {
+            if (!st.pWheel) return;
+
+            DWORD rgdwAxes[1] = { DIJOFS_X };
+            LONG rglDirection[1] = { 0 };
+
+            DIEFFECT diEffect = {0};
+            diEffect.dwSize = sizeof(DIEFFECT);
+            diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+            diEffect.cAxes = 1;
+            diEffect.rgdwAxes = rgdwAxes;
+            diEffect.rglDirection = rglDirection;
+            diEffect.dwSamplePeriod = 0;
+            diEffect.dwGain = DI_FFNOMINALMAX;
+            diEffect.dwTriggerButton = DIEB_NOTRIGGER;
+            diEffect.dwTriggerRepeatInterval = 0;
+            diEffect.dwDuration = INFINITE;
+
+            // Constant Force
+            DICONSTANTFORCE cf = {0};
+            diEffect.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
+            diEffect.lpvTypeSpecificParams = &cf;
+            if (FAILED(st.pWheel->CreateEffect(GUID_ConstantForce, &diEffect, &st.pConstantEffect, nullptr))) {
+                log::Warn("[direct_wheel] Failed to create GUID_ConstantForce");
+            }
+
+            // Spring Force
+            DICONDITION spr = {0};
+            diEffect.cbTypeSpecificParams = sizeof(DICONDITION);
+            diEffect.lpvTypeSpecificParams = &spr;
+            if (FAILED(st.pWheel->CreateEffect(GUID_Spring, &diEffect, &st.pSpringEffect, nullptr))) {
+                log::Warn("[direct_wheel] Failed to create GUID_Spring");
+            }
+
+            // Damper Force
+            DICONDITION dmp = {0};
+            diEffect.cbTypeSpecificParams = sizeof(DICONDITION);
+            diEffect.lpvTypeSpecificParams = &dmp;
+            if (FAILED(st.pWheel->CreateEffect(GUID_Damper, &diEffect, &st.pDamperEffect, nullptr))) {
+                log::Warn("[direct_wheel] Failed to create GUID_Damper");
+            }
+
+            // Turn off autocenter
+            DIPROPDWORD dipdw;
+            dipdw.diph.dwSize = sizeof(DIPROPDWORD);
+            dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+            dipdw.diph.dwObj = 0;
+            dipdw.diph.dwHow = DIPH_DEVICE;
+            dipdw.dwData = DIPROPAUTOCENTER_OFF;
+            st.pWheel->SetProperty(DIPROP_AUTOCENTER, &dipdw.diph);
+
+            st.caps.hasFFB = (st.pConstantEffect || st.pSpringEffect || st.pDamperEffect);
+            st.hasFFB.store(st.caps.hasFFB);
         }
     }
 
@@ -118,6 +199,9 @@ namespace direct_wheel::wheel
     {
         auto& st = S();
         st.ready.store(false, std::memory_order_release);
+        if (st.pConstantEffect) { st.pConstantEffect->Release(); st.pConstantEffect = nullptr; }
+        if (st.pSpringEffect) { st.pSpringEffect->Release(); st.pSpringEffect = nullptr; }
+        if (st.pDamperEffect) { st.pDamperEffect->Release(); st.pDamperEffect = nullptr; }
         if (st.pWheel) {
             st.pWheel->Unacquire();
             st.pWheel->Release();
@@ -157,7 +241,7 @@ namespace direct_wheel::wheel
             st.pWheel->SetDataFormat(&c_dfDIJoystick2);
             HWND hwnd = FindOwnGameWindow();
             if (hwnd) {
-                st.pWheel->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
+                st.pWheel->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
             }
             
             // Acquire the device
@@ -165,9 +249,11 @@ namespace direct_wheel::wheel
 
             std::lock_guard lk(st.capsMtx);
             std::strncpy(st.caps.productName, "DirectInput Wheel (Moza)", 255);
-            st.caps.hasFFB = false; // TODO: Implement DI FFB enumeration
+            st.caps.hasFFB = false;
             st.caps.operatingRangeDeg = 900;
             
+            InitFFB(st);
+
             st.ready.store(true, std::memory_order_release);
             log::Info("[direct_wheel] DirectInput wheel connected.");
             input_bindings::SetDeviceLayout("DirectInput Wheel (Moza)");
@@ -213,18 +299,62 @@ namespace direct_wheel::wheel
         return st.snap;
     }
 
-    void PlayConstant(float magnitude) {}
-    void StopConstant() {}
-    void PlayDamper(float coefficient) {}
-    void StopDamper() {}
-    void PlaySpring(float coefficient) {}
-    void StopSpring() {}
+    void PlayConstant(float magnitude) {
+        auto& st = S();
+        if (!st.pConstantEffect) return;
+        DICONSTANTFORCE cf = {0};
+        cf.lMagnitude = ScaleConstant(magnitude);
+        DIEFFECT eff = {0};
+        eff.dwSize = sizeof(DIEFFECT);
+        eff.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
+        eff.lpvTypeSpecificParams = &cf;
+        st.pConstantEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+    }
+    void StopConstant() {
+        if (S().pConstantEffect) S().pConstantEffect->Stop();
+    }
+    void PlayDamper(float coefficient) {
+        auto& st = S();
+        if (!st.pDamperEffect) return;
+        int val = ScaleDamper(coefficient);
+        DICONDITION cond = {0};
+        cond.lPositiveCoefficient = val;
+        cond.lNegativeCoefficient = val;
+        cond.dwPositiveSaturation = 10000;
+        cond.dwNegativeSaturation = 10000;
+        DIEFFECT eff = {0};
+        eff.dwSize = sizeof(DIEFFECT);
+        eff.cbTypeSpecificParams = sizeof(DICONDITION);
+        eff.lpvTypeSpecificParams = &cond;
+        st.pDamperEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+    }
+    void StopDamper() {
+        if (S().pDamperEffect) S().pDamperEffect->Stop();
+    }
+    void PlaySpring(float coefficient) {
+        auto& st = S();
+        if (!st.pSpringEffect) return;
+        int val = ScaleSpring(coefficient);
+        DICONDITION cond = {0};
+        cond.lPositiveCoefficient = val;
+        cond.lNegativeCoefficient = val;
+        cond.dwPositiveSaturation = 10000;
+        cond.dwNegativeSaturation = 10000;
+        DIEFFECT eff = {0};
+        eff.dwSize = sizeof(DIEFFECT);
+        eff.cbTypeSpecificParams = sizeof(DICONDITION);
+        eff.lpvTypeSpecificParams = &cond;
+        st.pSpringEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+    }
+    void StopSpring() {
+        if (S().pSpringEffect) S().pSpringEffect->Stop();
+    }
     void PlayRoadSurface(float magnitude, int periodMs) {}
     void StopRoadSurface() {}
     void PlayCarAirborne() {}
     void StopCarAirborne() {}
     void SetGlobalStrength(float mul) { S().globalStrength.store(mul); }
-    void StopAll() {}
+    void StopAll() { StopConstant(); StopDamper(); StopSpring(); }
     void PlayLeds(float level) {}
     void ClearLeds() {}
     bool IsHandshakeActive() { return false; }

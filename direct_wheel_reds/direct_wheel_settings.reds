@@ -121,6 +121,39 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Force feedback")
   @runtimeProperty("ModSettings.category.order", "200")
+  @runtimeProperty("ModSettings.displayName", "Constant Force strength (%)")
+  @runtimeProperty("ModSettings.description", "Scales the push/pull effect (SAT, collisions). Lower = softer hits.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
+  let constantForcePct: Int32 = 30;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Force feedback")
+  @runtimeProperty("ModSettings.category.order", "200")
+  @runtimeProperty("ModSettings.displayName", "Spring Force strength (%)")
+  @runtimeProperty("ModSettings.description", "Scales the centering spring that returns the wheel to center. Lower = lighter.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
+  let springForcePct: Int32 = 30;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Force feedback")
+  @runtimeProperty("ModSettings.category.order", "200")
+  @runtimeProperty("ModSettings.displayName", "Damper Force strength (%)")
+  @runtimeProperty("ModSettings.description", "Scales the viscous resistance/friction. Lower = less resistance when turning.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
+  let damperForcePct: Int32 = 30;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Force feedback")
+  @runtimeProperty("ModSettings.category.order", "200")
   @runtimeProperty("ModSettings.displayName", "Stationary threshold (m/s)")
   @runtimeProperty("ModSettings.description", "Below this speed the wheel has no centering force.")
   @runtimeProperty("ModSettings.min", "0.0")
@@ -322,6 +355,9 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetStationaryThresholdMps(this.stationaryThresholdMps);
     DirectWheel_SetYawFeedbackPct(this.yawFeedbackPct);
     DirectWheel_SetActiveTorqueStrengthPct(this.activeTorqueStrengthPct);
+    DirectWheel_SetConstantForcePct(this.constantForcePct);
+    DirectWheel_SetSpringForcePct(this.springForcePct);
+    DirectWheel_SetDamperForcePct(this.damperForcePct);
 
     DirectWheel_SetHandshakePlayOnStart(this.handshakePlayOnStart);
 
