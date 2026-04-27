@@ -269,13 +269,12 @@ namespace direct_wheel::rtti
             RED4ext::GetParameter(aFrame, &handle);
             RED4ext::GetParameter(aFrame, &kick);
             aFrame->code++;
-            void* ptr = static_cast<void*>(handle.instance);
-            const bool isPlayer = vehicle_hook::IsPlayerVehicle(ptr);
-            if (log::DebugEnabled())
-                log::DebugF("[direct_wheel:evt] bump: kick=%+.3f vehicle=%p isPlayer=%d",
-                            kick, ptr, isPlayer ? 1 : 0);
-            if (isPlayer)
-                wheel::TriggerJolt(kick, 120); // short scrape
+            // Always log + always trigger — the .reds wrapper already
+            // filters for player vehicle. Ensure kick has minimum magnitude.
+            float absKick = std::max(std::abs(kick), 0.5f);
+            float signedKick = kick >= 0.f ? absKick : -absKick;
+            log::InfoF("[direct_wheel:evt] bump: kick=%+.3f (boosted=%+.3f)", kick, signedKick);
+            wheel::TriggerJolt(signedKick, 200);
             if (aOut) *aOut = true;
         }
 
@@ -286,13 +285,10 @@ namespace direct_wheel::rtti
             RED4ext::GetParameter(aFrame, &handle);
             RED4ext::GetParameter(aFrame, &kick);
             aFrame->code++;
-            void* ptr = static_cast<void*>(handle.instance);
-            const bool isPlayer = vehicle_hook::IsPlayerVehicle(ptr);
-            if (log::DebugEnabled())
-                log::DebugF("[direct_wheel:evt] hit: kick=%+.3f vehicle=%p isPlayer=%d",
-                            kick, ptr, isPlayer ? 1 : 0);
-            if (isPlayer)
-                wheel::TriggerJolt(kick, 280); // heavier impact
+            float absKick = std::max(std::abs(kick), 0.7f);
+            float signedKick = kick >= 0.f ? absKick : -absKick;
+            log::InfoF("[direct_wheel:evt] hit: kick=%+.3f (boosted=%+.3f)", kick, signedKick);
+            wheel::TriggerJolt(signedKick, 400);
             if (aOut) *aOut = true;
         }
 
