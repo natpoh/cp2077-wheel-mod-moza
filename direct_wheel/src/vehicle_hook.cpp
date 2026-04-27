@@ -545,6 +545,33 @@ namespace direct_wheel::vehicle_hook
             {
                 const float speed = vehicleSpeed;
 
+                // === Collision detection via sudden speed drop ===
+                // VehicleBumpEvent is broken in CP2077 2.31 — detect
+                // collisions by monitoring speed deltas instead.
+                {
+                    static std::atomic<float> s_prevSpeed{0.f};
+                    static std::atomic<uint32_t> s_cooldown{0};
+                    const float prev = s_prevSpeed.load(std::memory_order_relaxed);
+                    const float delta = prev - speed; // positive = deceleration
+                    s_prevSpeed.store(speed, std::memory_order_relaxed);
+
+                    uint32_t cd = s_cooldown.load(std::memory_order_relaxed);
+                    if (cd > 0) {
+                        s_cooldown.store(cd - 1, std::memory_order_relaxed);
+                    }
+                    // Threshold: 5 m/s drop in one tick (~250Hz) = hard hit
+                    // Cooldown: 60 ticks (~240ms) between jolts
+                    else if (delta > 5.0f && prev > 3.0f) {
+                        float intensity = std::clamp(delta / 15.0f, 0.3f, 1.0f);
+                        // Random-ish direction based on steer position
+                        float dir = (frame.axes.steer > 0.f) ? -1.0f : 1.0f;
+                        float kick = dir * intensity;
+                        log::InfoF("[direct_wheel:jolt] collision detected! dv=%.1f m/s prev=%.1f kick=%.2f",
+                                   delta, prev, kick);
+                        wheel::TriggerJolt(kick, 300);
+                        s_cooldown.store(60, std::memory_order_relaxed);
+                    }
+                }
                 // Angular velocity magnitude from the vehicle's PhysicsData,
                 // read via the RTTI-resolved offsets. Dominant component is
                 // yaw (Z in REDengine), but we take the full vector
@@ -590,6 +617,27 @@ namespace direct_wheel::vehicle_hook
                 }
                 const float suspensionActivity = dX + dY + 0.8f * dVz;
 
+                // === Obstacle bump jolt from suspension spikes ===
+                // When suspensionActivity exceeds a threshold, it means
+                // we hit a curb/pothole/object. Trigger a short jolt.
+                {
+                    static std::atomic<uint32_t> s_bumpCooldown{0};
+                    uint32_t bcd = s_bumpCooldown.load(std::memory_order_relaxed);
+                    if (bcd > 0) {
+                        s_bumpCooldown.store(bcd - 1, std::memory_order_relaxed);
+                    }
+                    // Threshold 0.8 = significant bump; cooldown 30 ticks (~120ms)
+                    else if (suspensionActivity > 0.8f && speed > 2.0f) {
+                        float bumpIntensity = std::clamp(suspensionActivity / 3.0f, 0.3f, 1.0f);
+                        // Direction from vertical velocity sign (positive dVz = upward bounce)
+                        float bumpDir = (dVz > dX + dY) ? 1.0f : -1.0f;
+                        float kick = bumpDir * bumpIntensity;
+                        log::InfoF("[direct_wheel:jolt] bump! susp=%.3f dX=%.3f dY=%.3f dVz=%.3f kick=%.2f",
+                                   suspensionActivity, dX, dY, dVz, kick);
+                        wheel::TriggerJolt(kick, 80); // short 80ms pulse
+                        s_bumpCooldown.store(30, std::memory_order_relaxed);
+                    }
+                }
                 // Slip-angle proxy. Dot linear velocity with the car's
                 // world-space right vector to get lateral velocity in
                 // car-local frame. Positive = sliding rightward,

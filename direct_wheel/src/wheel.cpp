@@ -609,8 +609,11 @@ namespace direct_wheel::wheel
         PlayFriction(frictionCoef);
 
         // === Sine: periodic vibration from road roughness ===
-        // suspensionActivity drives amplitude; quiet on smooth roads.
-        float sineMag = std::clamp(suspensionActivity * 2.0f * speedRatio, 0.f, 0.6f);
+        // Base vibration at speed (engine/tire hum) + boost from suspension.
+        // Ensures the wheel always has subtle road-feel even on smooth asphalt.
+        float sineBase = speedRatio * 0.08f;  // subtle hum at cruise
+        float sineSusp = suspensionActivity * 2.0f * speedRatio;
+        float sineMag = std::clamp(sineBase + sineSusp, 0.f, 0.7f);
         PlaySine(sineMag);
     }
 }
