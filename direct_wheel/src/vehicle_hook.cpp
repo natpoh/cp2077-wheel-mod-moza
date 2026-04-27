@@ -482,14 +482,31 @@ namespace direct_wheel::vehicle_hook
             // (what we've historically called throttle/brake in this mod).
             auto* veh = static_cast<RED4ext::vehicle::BaseObject*>(self);
 
+            // Read speed early — needed for both speed-steering-boost and FFB.
+            const float vehicleSpeed = std::fabs(ReadVehicleSpeed(self));
+
             if (cfg.input.enabled)
             {
                 // Compute the wheel's contribution to each axis. G HUB owns
                 // the per-profile operating range, so wheel position passes
                 // through unmodified.
-                const float wheelSteer    = Clamp(frame.axes.steer,    -1.0f, 1.0f);
+                float wheelSteer    = Clamp(frame.axes.steer,    -1.0f, 1.0f);
                 const float wheelThrottle = Clamp(frame.axes.throttle,  0.0f, 1.0f);
                 const float wheelBrake    = Clamp(frame.axes.brake,     0.0f, 1.0f);
+
+                // Speed Steering Boost: the game internally reduces steering
+                // effectiveness at high speed. This multiplier compensates,
+                // so the same physical wheel rotation produces consistent
+                // in-game turn regardless of speed. Formula:
+                //   multiplier = 1 + speedRatio * (pct/100)
+                // At pct=50, cruise: 1.5x steer. At pct=100, cruise: 2.0x.
+                if (cfg.input.speedSensitiveSteeringPct > 0 && vehicleSpeed > 0.5f) {
+                    const float cruiseMps = cfg.ffb.stationaryThresholdMps > 0.1f
+                        ? 20.0f : 20.0f;  // Use a reasonable cruise speed
+                    const float speedRatio = Clamp(vehicleSpeed / cruiseMps, 0.f, 1.5f);
+                    const float boost = 1.0f + speedRatio * (cfg.input.speedSensitiveSteeringPct / 100.0f);
+                    wheelSteer = Clamp(wheelSteer * boost, -1.0f, 1.0f);
+                }
 
                 // Merge with whatever the vanilla input pipeline (keyboard /
                 // gamepad) already wrote into the struct. g_original(self)
@@ -527,7 +544,7 @@ namespace direct_wheel::vehicle_hook
             // toggle; there is no separate "centering only" gate.
             if (cfg.ffb.enabled)
             {
-                const float speed = std::fabs(ReadVehicleSpeed(self));
+                const float speed = vehicleSpeed;
 
                 // Angular velocity magnitude from the vehicle's PhysicsData,
                 // read via the RTTI-resolved offsets. Dominant component is

@@ -77,6 +77,17 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let clutchAsBrake: Bool = true;
 
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Speed steering boost (%)")
+  @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed. 0 = off, 50 = 1.5x at cruise, 100 = 2x at cruise. Makes steering feel consistent regardless of speed.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "5")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let speedSensitiveSteeringPct: Int32 = 50;
+
   // ---- Force feedback -----------------------------------------------------
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
@@ -394,6 +405,7 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetFrictionForcePct(this.frictionForcePct);
     DirectWheel_SetSineForcePct(this.sineForcePct);
     DirectWheel_SetJoltForcePct(this.joltForcePct);
+    DirectWheel_SetSpeedSensitiveSteeringPct(this.speedSensitiveSteeringPct);
 
     DirectWheel_SetHandshakePlayOnStart(this.handshakePlayOnStart);
 

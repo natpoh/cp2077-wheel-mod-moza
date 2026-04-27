@@ -12,6 +12,7 @@ namespace direct_wheel::config
         bool        enabled = true;
         bool        clutchAsBrake = false;
         std::string responseCurve = "default"; // default | subdued | sharp
+        int32_t     speedSensitiveSteeringPct = 50; // 0=off, 100=max reduction at speed
     };
 
     struct Ffb
@@ -153,6 +154,7 @@ namespace direct_wheel::config
     void SetFrictionForcePct(int32_t v);
     void SetSineForcePct(int32_t v);
     void SetJoltForcePct(int32_t v);
+    void SetSpeedSensitiveSteeringPct(int32_t v);
 
     void SetHandshakePlayOnStart(bool v);
 

@@ -414,6 +414,10 @@ namespace direct_wheel::rtti
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetJoltForcePct>),
                            "Bool", {{ "Int32", "pct" }});
 
+            RegisterGlobal(rtti, "DirectWheel_SetSpeedSensitiveSteeringPct",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetSpeedSensitiveSteeringPct>),
+                           "Bool", {{ "Int32", "pct" }});
+
             RegisterGlobal(rtti, "DirectWheel_SetLedEnabled",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetBool<&config::SetLedEnabled>),
                            "Bool", {{ "Bool", "v" }});

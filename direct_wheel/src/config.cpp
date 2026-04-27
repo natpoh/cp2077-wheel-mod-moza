@@ -83,8 +83,9 @@ namespace direct_wheel::config
             {
                 std::string esc;
                 EscapeJsonTo(esc, c.input.responseCurve);
-                out << "    \"responseCurve\": " << esc << "\n";
+                out << "    \"responseCurve\": " << esc << ",\n";
             }
+            out << "    \"speedSensitiveSteeringPct\": " << c.input.speedSensitiveSteeringPct << "\n";
             out << "  },\n";
 
             out << "  \"ffb\": {\n";
@@ -239,6 +240,7 @@ namespace direct_wheel::config
             ExtractBool  (text, "input",    "enabled",                c.input.enabled);
             ExtractBool  (text, "input",    "clutchAsBrake",          c.input.clutchAsBrake);
             ExtractString(text, "input",    "responseCurve",          c.input.responseCurve);
+            ExtractInt   (text, "input",    "speedSensitiveSteeringPct", c.input.speedSensitiveSteeringPct);
 
             ExtractBool  (text, "ffb",      "enabled",                c.ffb.enabled);
             ExtractBool  (text, "ffb",      "debugLogging",           c.ffb.debugLogging);
@@ -402,6 +404,7 @@ namespace direct_wheel::config
     void SetFrictionForcePct(int32_t v)  { Mutate([&](Config& c){ c.ffb.frictionForcePct = std::clamp(v, 0, 100); }); }
     void SetSineForcePct(int32_t v)      { Mutate([&](Config& c){ c.ffb.sineForcePct = std::clamp(v, 0, 100); }); }
     void SetJoltForcePct(int32_t v)      { Mutate([&](Config& c){ c.ffb.joltForcePct = std::clamp(v, 0, 100); }); }
+    void SetSpeedSensitiveSteeringPct(int32_t v) { Mutate([&](Config& c){ c.input.speedSensitiveSteeringPct = std::clamp(v, 0, 100); }); }
 
     void SetHandshakePlayOnStart(bool v)    { Mutate([&](Config& c){ c.handshake.playOnStart = v; }); }
 
