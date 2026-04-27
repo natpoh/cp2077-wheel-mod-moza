@@ -28,15 +28,8 @@ namespace direct_wheel::mod_settings_seed
         {
             auto* result = reinterpret_cast<DetectedWheel*>(ud);
 
-            // DIDEVICEINSTANCE.guidProduct.Data1 packs (PID << 16) | VID.
             const uint16_t vid = static_cast<uint16_t>(inst->guidProduct.Data1 & 0xFFFF);
             const uint16_t pid = static_cast<uint16_t>(inst->guidProduct.Data1 >> 16);
-            if (vid != static_cast<uint16_t>(kLogitechVid)) return DIENUM_CONTINUE;
-
-            // Only treat it as a wheel if it's in our PID table. This keeps
-            // Logitech mice / keyboards / gamepads from triggering a false
-            // positive when the user has those plugged in alongside.
-            if (!LookupByPid(pid)) return DIENUM_CONTINUE;
 
             result->found = true;
             result->pid = pid;
@@ -114,13 +107,21 @@ namespace direct_wheel::mod_settings_seed
                 hasFfb          = info->ffb_default;
                 hasLeds         = info->has_rev_leds;
                 hasRightCluster = info->has_right_cluster;
-                log::InfoF("[direct_wheel] mod_settings_seed: detected '%s' (pid=0x%04X) "
-                           "ffb=%d leds=%d rightCluster=%d",
-                           det.name, det.pid,
-                           hasFfb ? 1 : 0,
-                           hasLeds ? 1 : 0,
-                           hasRightCluster ? 1 : 0);
             }
+            else
+            {
+                // Non-Logitech wheel (e.g. Moza, Fanatec, Thrustmaster)
+                // — assume FFB capable, no LEDs, no right cluster.
+                hasFfb          = true;
+                hasLeds         = false;
+                hasRightCluster = false;
+            }
+            log::InfoF("[direct_wheel] mod_settings_seed: detected '%s' (pid=0x%04X) "
+                       "ffb=%d leds=%d rightCluster=%d",
+                       det.name, det.pid,
+                       hasFfb ? 1 : 0,
+                       hasLeds ? 1 : 0,
+                       hasRightCluster ? 1 : 0);
         }
         else
         {

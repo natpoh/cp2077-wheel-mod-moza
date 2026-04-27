@@ -42,6 +42,7 @@ namespace direct_wheel::wheel
             IDirectInputEffect* pConstantEffect = nullptr;
             IDirectInputEffect* pSpringEffect = nullptr;
             IDirectInputEffect* pDamperEffect = nullptr;
+            HWND hFFBWindow = nullptr;
         };
 
         State& S() { static State s; return s; }
@@ -120,6 +121,7 @@ namespace direct_wheel::wheel
         void InitFFB(State& st)
         {
             if (!st.pWheel) return;
+            log::Info("[direct_wheel] InitFFB: starting FFB initialization...");
 
             DWORD rgdwAxes[1] = { DIJOFS_X };
             LONG rglDirection[1] = { 0 };
@@ -140,24 +142,42 @@ namespace direct_wheel::wheel
             DICONSTANTFORCE cf = {0};
             diEffect.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
             diEffect.lpvTypeSpecificParams = &cf;
-            if (FAILED(st.pWheel->CreateEffect(GUID_ConstantForce, &diEffect, &st.pConstantEffect, nullptr))) {
-                log::Warn("[direct_wheel] Failed to create GUID_ConstantForce");
+            HRESULT hr = st.pWheel->CreateEffect(GUID_ConstantForce, &diEffect, &st.pConstantEffect, nullptr);
+            if (FAILED(hr)) {
+                log::WarnF("[direct_wheel] InitFFB: GUID_ConstantForce FAILED hr=0x%08lX", (unsigned long)hr);
+            } else {
+                HRESULT hrd = st.pConstantEffect->Download();
+                HRESULT hrs = st.pConstantEffect->Start(1, 0);
+                log::InfoF("[direct_wheel] InitFFB: GUID_ConstantForce created OK, Download=0x%08lX Start=0x%08lX",
+                           (unsigned long)hrd, (unsigned long)hrs);
             }
 
             // Spring Force
             DICONDITION spr = {0};
             diEffect.cbTypeSpecificParams = sizeof(DICONDITION);
             diEffect.lpvTypeSpecificParams = &spr;
-            if (FAILED(st.pWheel->CreateEffect(GUID_Spring, &diEffect, &st.pSpringEffect, nullptr))) {
-                log::Warn("[direct_wheel] Failed to create GUID_Spring");
+            hr = st.pWheel->CreateEffect(GUID_Spring, &diEffect, &st.pSpringEffect, nullptr);
+            if (FAILED(hr)) {
+                log::WarnF("[direct_wheel] InitFFB: GUID_Spring FAILED hr=0x%08lX", (unsigned long)hr);
+            } else {
+                HRESULT hrd = st.pSpringEffect->Download();
+                HRESULT hrs = st.pSpringEffect->Start(1, 0);
+                log::InfoF("[direct_wheel] InitFFB: GUID_Spring created OK, Download=0x%08lX Start=0x%08lX",
+                           (unsigned long)hrd, (unsigned long)hrs);
             }
 
             // Damper Force
             DICONDITION dmp = {0};
             diEffect.cbTypeSpecificParams = sizeof(DICONDITION);
             diEffect.lpvTypeSpecificParams = &dmp;
-            if (FAILED(st.pWheel->CreateEffect(GUID_Damper, &diEffect, &st.pDamperEffect, nullptr))) {
-                log::Warn("[direct_wheel] Failed to create GUID_Damper");
+            hr = st.pWheel->CreateEffect(GUID_Damper, &diEffect, &st.pDamperEffect, nullptr);
+            if (FAILED(hr)) {
+                log::WarnF("[direct_wheel] InitFFB: GUID_Damper FAILED hr=0x%08lX", (unsigned long)hr);
+            } else {
+                HRESULT hrd = st.pDamperEffect->Download();
+                HRESULT hrs = st.pDamperEffect->Start(1, 0);
+                log::InfoF("[direct_wheel] InitFFB: GUID_Damper created OK, Download=0x%08lX Start=0x%08lX",
+                           (unsigned long)hrd, (unsigned long)hrs);
             }
 
             // Turn off autocenter
@@ -239,32 +259,59 @@ namespace direct_wheel::wheel
             if (!st.pWheel) return;
 
             st.pWheel->SetDataFormat(&c_dfDIJoystick2);
+
+            // Initial cooperative level: NONEXCLUSIVE|BACKGROUND so we can
+            // read axes immediately even before the game window exists.
+            // FFB needs EXCLUSIVE, which we'll set up once HWND is found.
             HWND hwnd = FindOwnGameWindow();
             if (hwnd) {
-                st.pWheel->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+                HRESULT hrCoop = st.pWheel->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
+                log::InfoF("[direct_wheel] SetCooperativeLevel(EXCLUSIVE|BACKGROUND) hr=0x%08lX", (unsigned long)hrCoop);
+            } else {
+                log::Info("[direct_wheel] Game window not found yet — using NONEXCLUSIVE, FFB deferred");
+                st.pWheel->SetCooperativeLevel(GetDesktopWindow(), DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
             }
-            
+
             // Acquire the device
-            st.pWheel->Acquire();
+            HRESULT hrAcq = st.pWheel->Acquire();
+            log::InfoF("[direct_wheel] Initial Acquire hr=0x%08lX", (unsigned long)hrAcq);
 
             std::lock_guard lk(st.capsMtx);
             std::strncpy(st.caps.productName, "DirectInput Wheel (Moza)", 255);
             st.caps.hasFFB = false;
             st.caps.operatingRangeDeg = 900;
-            
-            InitFFB(st);
+
+            // Only init FFB if we got EXCLUSIVE access
+            if (hwnd) {
+                InitFFB(st);
+            }
 
             st.ready.store(true, std::memory_order_release);
             log::Info("[direct_wheel] DirectInput wheel connected.");
             input_bindings::SetDeviceLayout("DirectInput Wheel (Moza)");
         }
 
+        // Deferred FFB init: if we started without EXCLUSIVE access,
+        // retry every tick until the game window appears.
+        if (st.pWheel && !st.hasFFB.load() && !st.pConstantEffect) {
+            HWND hwnd = FindOwnGameWindow();
+            if (hwnd) {
+                st.pWheel->Unacquire();
+                HRESULT hrCoop = st.pWheel->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
+                log::InfoF("[direct_wheel] Deferred SetCooperativeLevel(EXCLUSIVE|BACKGROUND) hr=0x%08lX", (unsigned long)hrCoop);
+                HRESULT hrAcq = st.pWheel->Acquire();
+                log::InfoF("[direct_wheel] Deferred Acquire hr=0x%08lX", (unsigned long)hrAcq);
+                InitFFB(st);
+            }
+        }
+
         if (FAILED(st.pWheel->Poll())) {
             HRESULT hr = st.pWheel->Acquire();
-            while (hr == DIERR_INPUTLOST) {
+            if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
+                // Keep trying to re-acquire (FOREGROUND mode loses access on alt-tab)
                 hr = st.pWheel->Acquire();
             }
-            if (hr == DIERR_OTHERAPPHASPRIO || hr == DIERR_NOTACQUIRED) return; 
+            if (FAILED(hr)) return;
         }
 
         DIJOYSTATE2 js;
@@ -299,6 +346,7 @@ namespace direct_wheel::wheel
         return st.snap;
     }
 
+    static uint64_t s_cfCount = 0;
     void PlayConstant(float magnitude) {
         auto& st = S();
         if (!st.pConstantEffect) return;
@@ -308,7 +356,15 @@ namespace direct_wheel::wheel
         eff.dwSize = sizeof(DIEFFECT);
         eff.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
         eff.lpvTypeSpecificParams = &cf;
-        st.pConstantEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        HRESULT hr = st.pConstantEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        if (FAILED(hr)) {
+            st.pWheel->Acquire();
+            hr = st.pConstantEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        }
+        if (++s_cfCount <= 5 || s_cfCount % 500 == 0) {
+            log::InfoF("[direct_wheel:ffb] PlayConstant #%llu mag=%.3f scaled=%d hr=0x%08lX",
+                       (unsigned long long)s_cfCount, magnitude, (int)cf.lMagnitude, (unsigned long)hr);
+        }
     }
     void StopConstant() {
         if (S().pConstantEffect) S().pConstantEffect->Stop();
@@ -326,7 +382,11 @@ namespace direct_wheel::wheel
         eff.dwSize = sizeof(DIEFFECT);
         eff.cbTypeSpecificParams = sizeof(DICONDITION);
         eff.lpvTypeSpecificParams = &cond;
-        st.pDamperEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        HRESULT hr = st.pDamperEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        if (FAILED(hr)) {
+            st.pWheel->Acquire();
+            st.pDamperEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        }
     }
     void StopDamper() {
         if (S().pDamperEffect) S().pDamperEffect->Stop();
@@ -344,7 +404,11 @@ namespace direct_wheel::wheel
         eff.dwSize = sizeof(DIEFFECT);
         eff.cbTypeSpecificParams = sizeof(DICONDITION);
         eff.lpvTypeSpecificParams = &cond;
-        st.pSpringEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        HRESULT hr = st.pSpringEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        if (FAILED(hr)) {
+            st.pWheel->Acquire();
+            st.pSpringEffect->SetParameters(&eff, DIEP_TYPESPECIFICPARAMS | DIEP_START);
+        }
     }
     void StopSpring() {
         if (S().pSpringEffect) S().pSpringEffect->Stop();
@@ -360,5 +424,77 @@ namespace direct_wheel::wheel
     bool IsHandshakeActive() { return false; }
     void SetSurfaceBaselineMag(float mag) {}
     void TriggerJolt(float lateralKick, int durationMs) {}
-    void UpdateCenteringSpring(float, float, float, float, float, float, float, bool, bool, bool, float, float, float, int, float, int, bool) {}
+    void UpdateCenteringSpring(float absSpeedMps, float angVelMagRad,
+                               float suspensionActivity, float lateralVelocityMps,
+                               float steer, float throttle, float brake,
+                               bool isReversing, bool isOnGround, bool enabled,
+                               float stationaryMps, float cruiseMps,
+                               float centeringBaseline, int yawFeedbackPct,
+                               float yawRef, int activeTorqueStrengthPct,
+                               bool debugLog)
+    {
+        if (!enabled || !isOnGround) {
+            StopAll();
+            return;
+        }
+
+        // Below stationary threshold → no forces
+        if (absSpeedMps < stationaryMps) {
+            StopAll();
+            return;
+        }
+
+        // Speed factor: ramps 0→1 as speed goes from 0→cruiseMps
+        float speedRatio = std::clamp(absSpeedMps / std::max(cruiseMps, 1.0f), 0.f, 1.5f);
+        float speedSq = speedRatio * speedRatio;
+
+        // Yaw factor
+        float yawRatio = std::abs(angVelMagRad) / std::max(yawRef, 0.01f);
+        float yawRamp = std::clamp(yawRatio, 0.f, 1.f);
+
+        // Grip factor — decays past yaw limit
+        float gripFactor = yawRatio < 1.0f ? 1.0f : std::exp(-2.0f * (yawRatio - 1.0f));
+
+        // === Spring: centering force scales with speed² ===
+        // Base coefficient ~0.25 at cruise (was ~0.87 = way too strong).
+        // User slider 50% should feel "medium centering".
+        float springCoef = std::clamp(
+            centeringBaseline * 0.3f * speedSq * gripFactor
+            + yawRamp * 0.2f * (yawFeedbackPct / 100.0f),
+            0.f, 0.5f);
+        if (isReversing) springCoef *= 0.4f;
+        PlaySpring(springCoef);
+
+        // === Damper: viscous resistance scales with speed ===
+        // Reduced from 0.4 to 0.15 base so it's felt but not overwhelming.
+        float damperCoef = std::clamp(speedRatio * 0.15f, 0.f, 0.3f);
+        PlayDamper(damperCoef);
+
+        // === Constant Force: active self-aligning torque ===
+        // Two components blended for stronger feel:
+        // 1) Speed-proportional centering push (always pushes toward center)
+        // 2) Yaw/lateral-load reactive push (dynamic in turns)
+        float absSteer = std::abs(steer);
+
+        // Component 1: direct steer-proportional push, scales with speed.
+        // At cruise with half steer → ~0.35 magnitude. Strong enough to feel.
+        float directPush = -steer * speedRatio * 0.5f;
+
+        // Component 2: lateral load / yaw reactive push
+        float steerShape = std::sqrt(std::max(absSteer, 0.001f))
+                         * (1.0f - absSteer * absSteer);
+        float loadFactor = std::clamp(
+            std::abs(angVelMagRad * absSpeedMps) / std::max(yawRef * cruiseMps, 0.01f),
+            0.f, 1.5f);
+        float weight = 1.0f + 0.3f * brake - 0.05f * throttle;
+        float yawPush = -copysignf(1.0f, steer)
+                      * steerShape * loadFactor * gripFactor * weight;
+
+        // Blend: 60% direct push + 40% yaw reactive, scaled by config
+        float activeForce = (0.6f * directPush + 0.4f * yawPush)
+                          * (activeTorqueStrengthPct / 100.0f);
+        if (isReversing) activeForce *= 0.4f;
+
+        PlayConstant(std::clamp(activeForce, -1.0f, 1.0f));
+    }
 }
