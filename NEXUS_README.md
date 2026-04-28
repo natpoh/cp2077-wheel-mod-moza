@@ -50,7 +50,7 @@ This mod respects G HUB. Wheel rotation range, sensitivity, and centering spring
 
 If you have wheel buttons configured in your G HUB Cyberpunk profile that overlap with the bindings here, you may get doubled keypresses. Clear the overlapping bindings from your G HUB Cyberpunk profile.
 
-I recommend starting with an operating range of 180 to start, since the rotation will match the animation you see in 1st person view inside of a car. I tend to like it a bit wider to help mitigate fishtailing.
+I highly recommend setting your operating range / rotation angle to **720 degrees** in your wheel software for the best driving experience and steering response.
 
 ## Troubleshooting
 

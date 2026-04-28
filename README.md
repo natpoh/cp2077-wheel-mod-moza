@@ -15,17 +15,6 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 - **Clutch-as-Brake** — use the softer clutch pedal as brake (toggle in settings)
 - **Speed Steering Boost** — compensates for the game's built-in steering reduction at high speed. Multiplies steering input up to **3x** at cruise speed so the same physical wheel rotation produces consistent in-game turns regardless of velocity
 
-### 🔧 TweakDB Steering Physics (CET companion)
-The game internally reduces steering effectiveness exponentially at speed through three TweakDB parameters. This mod overrides them in real-time:
-
-| Parameter | What it does | How the mod compensates |
-|---|---|---|
-| `maxWheelTurnDeg` | Max wheel turn angle | Decreases with speed (configurable) |
-| `wheelTurnMaxAddPerSecond` | How fast wheels respond to steering | **Increases** at speed — snappier response |
-| `wheelTurnMaxSubPerSecond` | How fast wheels return to center | **Increases** at speed — faster centering |
-
-All three parameters are tunable via **Mod Settings** sliders (no CET overlay needed).
-
 ### 💪 Force Feedback
 - **Centering spring** — physics-based, scales with speed
 - **Cornering feedback** — spring stiffens during turns
@@ -44,8 +33,7 @@ All three parameters are tunable via **Mod Settings** sliders (no CET overlay ne
 
 1. **Cyberpunk 2077 v2.31** (latest patch)
 2. **[RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380)** — native plugin loader
-3. **[Cyber Engine Tweaks (CET)](https://www.nexusmods.com/cyberpunk2077/mods/107)** v1.37+ — for TweakDB steering overrides
-4. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** — in-game settings UI (patched version included)
+3. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** — in-game settings UI (patched version included)
 5. **Logitech G HUB** or **Logitech Gaming Software** — must be running (provides the steering SDK)
 
 ---
@@ -81,6 +69,8 @@ All three parameters are tunable via **Mod Settings** sliders (no CET overlay ne
 
 All settings are in-game: **Main Menu → Settings → Mod Settings → G-series Wheel**
 
+> **Note:** It is highly recommended to set your wheel's operating range (rotation angle) to **720 degrees** in your wheel software (Logitech G HUB, Moza Pit House, Fanatec Control Panel, etc.) for the best steering response.
+
 ### Wheel Input Section
 
 | Slider | Default | Description |
@@ -91,10 +81,6 @@ All settings are in-game: **Main Menu → Settings → Mod Settings → G-series
 | **Equalizer: 25% input** | 40 | Custom steering curve. Output at 25% physical rotation |
 | **Equalizer: 50% input** | 70 | Custom steering curve. Output at 50% physical rotation |
 | **Equalizer: 75% input** | 87 | Custom steering curve. Output at 75% physical rotation |
-| **Turn angle speed factor** | 15 | How fast maxTurnDeg decreases with speed (×0.001). Higher = less angle |
-| **Min turn angle (deg)** | 12 | Floor for wheel turn angle — never goes below this |
-| **Wheel turn add boost** | 8 | How fast wheel response speeds up at speed (×0.001) |
-| **Wheel turn sub boost** | 12 | How fast wheels return to center at speed (×0.001) |
 
 ### Force Feedback Section
 
@@ -115,7 +101,7 @@ All settings are in-game: **Main Menu → Settings → Mod Settings → G-series
 Increase **Speed steering boost** (try 70–100%) and **Wheel turn add boost** (try 12–20).
 
 ### Steering is too twitchy at high speed
-Decrease **Speed steering boost** (try 20–40%) and increase **Min turn angle** (try 15–20).
+Decrease **Speed steering boost** (try 20–40%).
 
 ### FFB is too strong / too weak
 Adjust **FFB strength** first (overall), then tune individual effects.
@@ -182,13 +168,7 @@ Axis name mapping:
 
 ## How It Works
 
-The mod uses a **two-layer** approach:
-
-1. **RED4ext plugin** (`direct_wheel.dll`) — hooks `vehicle::BaseObject::UpdateVehicleCameraInput` to inject wheel axis values each frame. Also runs FFB effects (centering spring, friction, sine, jolt) via DirectInput. The **Speed Steering Boost** multiplies the raw steer input before injection.
-
-2. **CET companion script** (`steering_debug/init.lua`) — reads tuning parameters from `config.json` every 2 seconds, then modifies TweakDB `driveModelData` records in real-time. This fights the game's internal exponential steering reduction that no amount of input boosting can overcome.
-
-Both layers work together for the most realistic steering feel possible.
+The mod works via a **RED4ext plugin** (`direct_wheel.dll`) that hooks `vehicle::BaseObject::UpdateVehicleCameraInput` to inject wheel axis values each frame. It also runs FFB effects (centering spring, friction, sine, jolt) via DirectInput. The **Speed Steering Boost** multiplies the raw steer input before injection.
 
 ---
 
@@ -198,7 +178,6 @@ Delete these folders:
 ```
 red4ext/plugins/direct_wheel/
 r6/scripts/direct_wheel/
-bin/x64/plugins/cyber_engine_tweaks/mods/steering_debug/
 ```
 
 ---

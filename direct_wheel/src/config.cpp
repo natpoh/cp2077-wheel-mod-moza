@@ -115,11 +115,7 @@ namespace direct_wheel::config
             out << "    \"speedSensitiveSteeringPct\": " << c.input.speedSensitiveSteeringPct << ",\n";
             out << "    \"steeringCurve25\": "          << c.input.steeringCurve25          << ",\n";
             out << "    \"steeringCurve50\": "          << c.input.steeringCurve50          << ",\n";
-            out << "    \"steeringCurve75\": "          << c.input.steeringCurve75          << ",\n";
-            out << "    \"steeringSpeedFactor\": "       << c.input.steeringSpeedFactor       << ",\n";
-            out << "    \"steeringMinTurn\": "           << c.input.steeringMinTurn           << ",\n";
-            out << "    \"steeringAddBoost\": "          << c.input.steeringAddBoost          << ",\n";
-            out << "    \"steeringSubBoost\": "          << c.input.steeringSubBoost          << "\n";
+            out << "    \"steeringCurve75\": "          << c.input.steeringCurve75          << "\n";
             out << "  },\n";
 
             out << "  \"ffb\": {\n";
@@ -292,10 +288,6 @@ namespace direct_wheel::config
             ExtractInt   (text, "input",    "steeringCurve25",        c.input.steeringCurve25);
             ExtractInt   (text, "input",    "steeringCurve50",        c.input.steeringCurve50);
             ExtractInt   (text, "input",    "steeringCurve75",        c.input.steeringCurve75);
-            ExtractInt   (text, "input",    "steeringSpeedFactor",    c.input.steeringSpeedFactor);
-            ExtractInt   (text, "input",    "steeringMinTurn",        c.input.steeringMinTurn);
-            ExtractInt   (text, "input",    "steeringAddBoost",       c.input.steeringAddBoost);
-            ExtractInt   (text, "input",    "steeringSubBoost",       c.input.steeringSubBoost);
 
             ExtractBool  (text, "ffb",      "enabled",                c.ffb.enabled);
             ExtractBool  (text, "ffb",      "debugLogging",           c.ffb.debugLogging);
@@ -471,10 +463,6 @@ namespace direct_wheel::config
     void SetSteeringCurve25(int32_t v)           { Mutate([&](Config& c){ c.input.steeringCurve25 = std::clamp(v, 0, 100); }); }
     void SetSteeringCurve50(int32_t v)           { Mutate([&](Config& c){ c.input.steeringCurve50 = std::clamp(v, 0, 100); }); }
     void SetSteeringCurve75(int32_t v)           { Mutate([&](Config& c){ c.input.steeringCurve75 = std::clamp(v, 0, 100); }); }
-    void SetSteeringSpeedFactor(int32_t v)        { Mutate([&](Config& c){ c.input.steeringSpeedFactor = std::clamp(v, 0, 50); }); }
-    void SetSteeringMinTurn(int32_t v)             { Mutate([&](Config& c){ c.input.steeringMinTurn = std::clamp(v, 3, 40); }); }
-    void SetSteeringAddBoost(int32_t v)            { Mutate([&](Config& c){ c.input.steeringAddBoost = std::clamp(v, 0, 30); }); }
-    void SetSteeringSubBoost(int32_t v)            { Mutate([&](Config& c){ c.input.steeringSubBoost = std::clamp(v, 0, 30); }); }
 
     void SetHandshakePlayOnStart(bool v)    { Mutate([&](Config& c){ c.handshake.playOnStart = v; }); }
 

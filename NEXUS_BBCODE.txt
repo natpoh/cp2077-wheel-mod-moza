@@ -1,0 +1,74 @@
+[size=5][b]Cyberpunk 2077 — Moza & Direct Drive Wheel Support[/b][/size]
+
+[b]v2.31.7[/b] for Cyberpunk 2077 game patch 2.31.
+
+Full racing wheel support for Cyberpunk 2077. Drive with a [b]Moza[/b] or any other [b]Direct Drive[/b] steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
+
+There is no virtual gamepad to install, no XInput shim, no third-party driver. The mod hooks the game directly via DirectInput/Logitech SDK.
+
+[size=4][b]Supported wheels[/b][/size]
+The mod was designed to work with DirectInput-compatible wheels. Tested and confirmed on:
+
+[b]Moza Racing & Others:[/b]
+[list]
+[*]Moza R5
+[*]Moza R3
+[*]Fanatec / Thrustmaster (requires manual mapping)
+[/list]
+[b]How to map axes for non-Logitech wheels:[/b]
+Run [b]bin\input_probe.exe[/b] (included in the mod zip). It will show you the exact names of your steering, throttle, and brake axes. Open [b]red4ext\plugins\direct_wheel\config.json[/b] and type those names into the "axes" section!
+
+[b]Logitech:[/b]
+[list]
+[*]G923 (Xbox, PS, PC variants)
+[*]G920, G29, G27, G25
+[*]Momo Force, Driving Force GT
+[/list]
+The mod auto-detects what hardware your Logitech wheel actually has (force feedback motor, rev-strip LEDs, lower-cluster buttons) and only shows the relevant settings.
+
+[size=4][b]New Features[/b][/size]
+[list]
+[*][b]Custom Steering Equalizer:[/b] 3-point equalizer (25%, 50%, 75%) to customize your steering curve and perfectly counteract the game's internal exponential steering physics!
+[*][b]Speed Steering Boost:[/b] Compensates steering at speed (up to 3x multiplier) so you can still turn at 200 mph.
+[/list]
+
+[size=4][b]Required mods[/b][/size]
+[list=1]
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/2380]RED4ext[/url]
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/1511]redscript[/url]
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/4198]ArchiveXL[/url]
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/4885]Mod Settings[/url] v0.2.21 or later
+[/list]
+
+[size=4][b]Required drivers[/b][/size]
+[list]
+[*][url=https://www.logitech.com/innovation/g-hub.html]Logitech G HUB[/url] (or Moza Pit House for Moza wheels)
+[/list]
+
+[size=4][b]Install[/b][/size]
+[list=1]
+[*]Click the [b]Vortex[/b] download button on this page.
+[*]Vortex will ask about a file conflict on mod_settings.dll. Choose this mod to win the conflict (load after Mod Settings). The included file is a small patch on top of upstream Mod Settings.
+[/list]
+[i](Manual Download is also available if you don't use Vortex, just extract the zip directly into your Cyberpunk 2077 folder and overwrite when asked).[/i]
+
+[size=4][b]Configuration / Setup[/b][/size]
+It is highly recommended to set your wheel's rotation angle / operating range to [b]720 degrees[/b] in your wheel software (Moza Pit House, Logitech G HUB, Fanatec Control Panel, etc.) for the best steering response.
+
+[size=4][b]Troubleshooting[/b][/size]
+[list]
+[*][b]Wheel detected but the car doesn't move.[/b] Make sure RED4ext is installed and current.
+[*][b]Settings page is missing.[/b] Mod Settings or ArchiveXL aren't installed correctly.
+[*][b]Three orphan toggles in settings.[/b] Vortex installed stock Mod Settings on top of the patched build that ships with this mod. Re-deploy in Vortex and let this mod win the file conflict.
+[/list]
+
+[size=4][b]Credits[/b][/size]
+[list]
+[*][url=https://github.com/WopsS/RED4ext]RED4ext[/url] by WopsS
+[*][url=https://github.com/jac3km4/redscript]redscript[/url] by jac3km4
+[*][url=https://github.com/jackhumbert/mod_settings]Mod Settings[/url] by jackhumbert
+[*][url=https://github.com/psiberx/cp2077-archive-xl]ArchiveXL[/url] by psiberx
+[/list]
+
+[size=4][b]Source Code[/b][/size]
+[url=https://github.com/natpoh/cp2077-wheel-mod-moza]Source code is available on GitHub[/url]. Pull requests and feedback are welcome!
