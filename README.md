@@ -1,10 +1,10 @@
 # Direct Wheel — Moza & Direct Drive Racing Wheel Support for Cyberpunk 2077
 
-Full racing wheel support for Cyberpunk 2077 v2.31 with **force feedback**, **speed-sensitive steering compensation**, and **TweakDB steering physics overrides**.
+Full racing wheel support for Cyberpunk 2077 v2.32 with **force feedback**, **speed-sensitive steering compensation**, and **TweakDB steering physics overrides**.
 
 Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
-### 📥 [Download direct_wheel_moza_v2.31.9.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel_moza_v2.31.9.zip)
+### 📥 [Download direct_wheel-2.32.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-2.32.0.zip)
 
 ---
 
@@ -31,7 +31,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ## Requirements
 
-1. **Cyberpunk 2077 v2.31** (latest patch)
+1. **Cyberpunk 2077 v2.32** (latest patch)
 2. **[RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380)** — native plugin loader
 3. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** — in-game settings UI (patched version included)
 5. **Logitech G HUB** or **Logitech Gaming Software** — must be running (provides the steering SDK)
@@ -42,7 +42,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ### Quick Install (zip)
 
-1. Download `direct_wheel_moza_v2.31.9.zip`
+1. Download `direct_wheel-2.32.0.zip`
 2. Extract **directly into your Cyberpunk 2077 game folder**, for example:
    ```
    D:\SteamLibrary\steamapps\common\Cyberpunk 2077\
