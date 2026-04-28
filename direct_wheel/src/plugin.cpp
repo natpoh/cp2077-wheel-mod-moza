@@ -39,9 +39,9 @@ namespace direct_wheel
             f.digital.buttons = s.buttons;
             f.digital.pov     = s.pov;
 
-            // Invert steering if configured.
+            // Invert steering if configured (axis is -1..+1, center = 0).
             if (config::Current().input.invertSteering)
-                f.axes.steer = 1.0f - f.axes.steer;
+                f.axes.steer = -f.axes.steer;
 
             // Invert pedal logic if configured. 
             if (config::Current().input.invertThrottle)
