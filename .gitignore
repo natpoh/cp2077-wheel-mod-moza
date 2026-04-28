@@ -74,3 +74,4 @@ $RECYCLE.BIN/
 *.backup
 steering_debug/*.log
 steering_debug/db.sqlite3
+.claude/
