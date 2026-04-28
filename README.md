@@ -115,7 +115,7 @@ Adjust **FFB strength** first (overall), then tune individual effects.
 
 Different wheel bases assign gas/brake/clutch to different DirectInput axes. If your wheel connects but pedals don't work, you need to remap the axes in `config.json`.
 
-**Step 1 — Identify your axes** using `input_probe.exe` (included in `tools/` on GitHub or `bin/` in the zip):
+**Step 1 — Identify your axes** using [`input_probe.exe`](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/tools/input_probe/input_probe.exe) (download from GitHub):
 
 ```
 > bin\input_probe.exe

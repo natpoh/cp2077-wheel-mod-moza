@@ -16,7 +16,7 @@ The mod was designed to work with DirectInput-compatible wheels. Tested and conf
 [*]Fanatec / Thrustmaster (requires manual mapping)
 [/list]
 [b]How to map axes for non-Logitech wheels:[/b]
-Run [b]bin\input_probe.exe[/b] (included in the mod zip). It will show you the exact names of your steering, throttle, and brake axes. Open [b]red4ext\plugins\direct_wheel\config.json[/b] and type those names into the "axes" section!
+Download [url=https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/tools/input_probe/input_probe.exe][b]input_probe.exe[/b][/url] from GitHub and run it. It will show you the exact names of your steering, throttle, and brake axes. Open [b]red4ext\plugins\direct_wheel\config.json[/b] and type those names into the "axes" section!
 
 [b]Logitech:[/b]
 [list]
