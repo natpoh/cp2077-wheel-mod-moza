@@ -415,6 +415,12 @@ namespace direct_wheel::rtti
             RegisterGlobal(rtti, "DirectWheel_SetClutchAsBrake",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetBool<&config::SetClutchAsBrake>),
                            "Bool", {{ "Bool", "v" }});
+            RegisterGlobal(rtti, "DirectWheel_SetInvertThrottle",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetBool<&config::SetInvertThrottle>),
+                           "Bool", {{ "Bool", "v" }});
+            RegisterGlobal(rtti, "DirectWheel_SetInvertBrake",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetBool<&config::SetInvertBrake>),
+                           "Bool", {{ "Bool", "v" }});
 
             RegisterGlobal(rtti, "DirectWheel_SetFfbEnabled",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetBool<&config::SetFfbEnabled>),

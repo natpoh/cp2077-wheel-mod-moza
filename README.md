@@ -184,7 +184,7 @@ r6/scripts/direct_wheel/
 
 ## Credits
 
-- Based on [Logitech G-series Wheel Support](https://www.nexusmods.com/cyberpunk2077/mods/29172) by the original author
+- Forked from [cp2077-wheel-mod](https://github.com/clevergrant/cp2077-wheel-mod) by clevergrant
 - RED4ext SDK by [WopsS](https://github.com/WopsS/RED4ext.SDK)
 - Cyber Engine Tweaks by [yamashi / maximegmd](https://github.com/maximegmd/CyberEngineTweaks)
 

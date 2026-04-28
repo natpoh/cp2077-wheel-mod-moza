@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.32.0 — 2026-04-28
+
+- Added separate "Invert throttle" and "Invert brake" toggles to Mod Settings. Inverts the raw input from the corresponding axes before applying any logic (like "Clutch as brake"). This makes the mod plug-and-play for inverted pedal hardware (like some Moza/Fanatec setups) that report 1.0 when physically released and 0.0 when pressed.
+
 ## 2.31.0 — 2026-04-25
 
 First public release. Tested against Cyberpunk 2077 patch 2.31 (build 5294808).

@@ -39,6 +39,12 @@ namespace direct_wheel
             f.digital.buttons = s.buttons;
             f.digital.pov     = s.pov;
 
+            // Invert pedal logic if configured. 
+            if (config::Current().input.invertThrottle)
+                f.axes.throttle = 1.0f - f.axes.throttle;
+            if (config::Current().input.invertBrake)
+                f.axes.brake = 1.0f - f.axes.brake;
+
             // Clutch-as-brake: the G923's brake pedal is physically stiff; the
             // softer clutch pedal is easier to modulate. CP2077 has no manual
             // transmission so the clutch axis is otherwise ignored. When the

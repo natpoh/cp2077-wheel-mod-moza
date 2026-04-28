@@ -107,6 +107,8 @@ namespace direct_wheel::config
             out << "  \"input\": {\n";
             out << "    \"enabled\": "       << (c.input.enabled ? "true" : "false")       << ",\n";
             out << "    \"clutchAsBrake\": " << (c.input.clutchAsBrake ? "true" : "false") << ",\n";
+            out << "    \"invertThrottle\": "<< (c.input.invertThrottle ? "true" : "false") << ",\n";
+            out << "    \"invertBrake\": "   << (c.input.invertBrake ? "true" : "false")   << ",\n";
             {
                 std::string esc;
                 EscapeJsonTo(esc, c.input.responseCurve);
@@ -283,6 +285,8 @@ namespace direct_wheel::config
 
             ExtractBool  (text, "input",    "enabled",                c.input.enabled);
             ExtractBool  (text, "input",    "clutchAsBrake",          c.input.clutchAsBrake);
+            ExtractBool  (text, "input",    "invertThrottle",         c.input.invertThrottle);
+            ExtractBool  (text, "input",    "invertBrake",            c.input.invertBrake);
             ExtractString(text, "input",    "responseCurve",          c.input.responseCurve);
             ExtractInt   (text, "input",    "speedSensitiveSteeringPct", c.input.speedSensitiveSteeringPct);
             ExtractInt   (text, "input",    "steeringCurve25",        c.input.steeringCurve25);
@@ -438,6 +442,8 @@ namespace direct_wheel::config
 
     void SetInputEnabled(bool v)            { Mutate([&](Config& c){ c.input.enabled = v; }); }
     void SetClutchAsBrake(bool v)           { Mutate([&](Config& c){ c.input.clutchAsBrake = v; }); }
+    void SetInvertThrottle(bool v)          { Mutate([&](Config& c){ c.input.invertThrottle = v; }); }
+    void SetInvertBrake(bool v)             { Mutate([&](Config& c){ c.input.invertBrake = v; }); }
 
     void SetResponseCurve(std::string_view v)
     {

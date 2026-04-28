@@ -13,6 +13,8 @@ namespace direct_wheel::config
     {
         bool        enabled = true;
         bool        clutchAsBrake = false;
+        bool        invertThrottle = false;
+        bool        invertBrake = false;
         std::string responseCurve = "default"; // default | subdued | sharp
         int32_t     speedSensitiveSteeringPct = 50; // 0=off, 100=max boost at speed
         int32_t     steeringCurve25 = 40;  // output at 25% input
@@ -164,6 +166,8 @@ namespace direct_wheel::config
     // the updated config back to disk.
     void SetInputEnabled(bool v);
     void SetClutchAsBrake(bool v);
+    void SetInvertThrottle(bool v);
+    void SetInvertBrake(bool v);
     void SetResponseCurve(std::string_view v);
 
     void SetFfbEnabled(bool v);

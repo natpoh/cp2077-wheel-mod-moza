@@ -80,6 +80,20 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Invert throttle pedal")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let invertThrottle: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Invert brake pedal")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let invertBrake: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Speed steering boost (%)")
   @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed. 0 = off, 50 = 2x at cruise, 100 = 3x at cruise.")
   @runtimeProperty("ModSettings.min", "0")
@@ -434,6 +448,8 @@ public class DirectWheelSettings extends IScriptable {
   public func Push() -> Void {
     DirectWheel_SetInputEnabled(this.inputEnabled);
     DirectWheel_SetClutchAsBrake(this.clutchAsBrake);
+    DirectWheel_SetInvertThrottle(this.invertThrottle);
+    DirectWheel_SetInvertBrake(this.invertBrake);
 
     DirectWheel_SetFfbEnabled(this.ffbEnabled);
     DirectWheel_SetFfbDebugLogging(this.ffbDebugLogging);
