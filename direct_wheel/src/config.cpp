@@ -107,6 +107,7 @@ namespace direct_wheel::config
             out << "  \"input\": {\n";
             out << "    \"enabled\": "       << (c.input.enabled ? "true" : "false")       << ",\n";
             out << "    \"clutchAsBrake\": " << (c.input.clutchAsBrake ? "true" : "false") << ",\n";
+            out << "    \"invertSteering\": " << (c.input.invertSteering ? "true" : "false") << ",\n";
             out << "    \"invertThrottle\": "<< (c.input.invertThrottle ? "true" : "false") << ",\n";
             out << "    \"invertBrake\": "   << (c.input.invertBrake ? "true" : "false")   << ",\n";
             {
@@ -285,6 +286,7 @@ namespace direct_wheel::config
 
             ExtractBool  (text, "input",    "enabled",                c.input.enabled);
             ExtractBool  (text, "input",    "clutchAsBrake",          c.input.clutchAsBrake);
+            ExtractBool  (text, "input",    "invertSteering",         c.input.invertSteering);
             ExtractBool  (text, "input",    "invertThrottle",         c.input.invertThrottle);
             ExtractBool  (text, "input",    "invertBrake",            c.input.invertBrake);
             ExtractString(text, "input",    "responseCurve",          c.input.responseCurve);
@@ -442,6 +444,7 @@ namespace direct_wheel::config
 
     void SetInputEnabled(bool v)            { Mutate([&](Config& c){ c.input.enabled = v; }); }
     void SetClutchAsBrake(bool v)           { Mutate([&](Config& c){ c.input.clutchAsBrake = v; }); }
+    void SetInvertSteering(bool v)          { Mutate([&](Config& c){ c.input.invertSteering = v; }); }
     void SetInvertThrottle(bool v)          { Mutate([&](Config& c){ c.input.invertThrottle = v; }); }
     void SetInvertBrake(bool v)             { Mutate([&](Config& c){ c.input.invertBrake = v; }); }
 

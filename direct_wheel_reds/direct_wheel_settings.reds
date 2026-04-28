@@ -80,6 +80,13 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Invert steering")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let invertSteering: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Invert throttle pedal")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let invertThrottle: Bool = false;
@@ -448,6 +455,7 @@ public class DirectWheelSettings extends IScriptable {
   public func Push() -> Void {
     DirectWheel_SetInputEnabled(this.inputEnabled);
     DirectWheel_SetClutchAsBrake(this.clutchAsBrake);
+    DirectWheel_SetInvertSteering(this.invertSteering);
     DirectWheel_SetInvertThrottle(this.invertThrottle);
     DirectWheel_SetInvertBrake(this.invertBrake);
 

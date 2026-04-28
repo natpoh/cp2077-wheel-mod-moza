@@ -21,6 +21,7 @@ public static native func DirectWheel_DetectedModelName() -> String;
 
 public static native func DirectWheel_SetInputEnabled(v: Bool) -> Bool;
 public static native func DirectWheel_SetClutchAsBrake(v: Bool) -> Bool;
+public static native func DirectWheel_SetInvertSteering(v: Bool) -> Bool;
 public static native func DirectWheel_SetInvertThrottle(v: Bool) -> Bool;
 public static native func DirectWheel_SetInvertBrake(v: Bool) -> Bool;
 
