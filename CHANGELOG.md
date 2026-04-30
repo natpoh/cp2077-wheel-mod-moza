@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.34.0 — 2026-04-30
+
+- **Device Selector:** Added in-game device index sliders for wheel and pedals. Users with split-device setups (e.g. Moza wheel + separate USB pedals) can now select each device independently without editing config files. 0 = auto-detect, 1..N = specific device.
+- **Axis Mapping:** Throttle and brake axes are now selectable from a dropdown in Mod Settings (lX, lY, lZ, lRx, lRy, lRz, Slider0, Slider1). No more editing `config.json` for non-Logitech wheels.
+- **input_probe:** Updated to show all connected devices simultaneously with real-time axis values, including device numbering that matches the in-game selector.
+- **Thread-safe device reset:** `ResetDevices()` now uses a deferred flag instead of immediately releasing DirectInput handles, preventing race conditions and crashes when changing settings.
+
+## 2.33.0 — 2026-04-30
+
+- Scaled up the base centering-spring multipliers by ~3.3x in the physics engine. Weak belt-driven wheels (like Thrustmaster T300RS) can now reach the hardware's 100% saturation limit. Users with powerful Direct Drive bases should lower the Spring Force slider in Mod Settings to 30-40% to compensate.
+
 ## 2.32.0 — 2026-04-28
 
 - Added separate "Invert throttle" and "Invert brake" toggles to Mod Settings. Inverts the raw input from the corresponding axes before applying any logic (like "Clutch as brake"). This makes the mod plug-and-play for inverted pedal hardware (like some Moza/Fanatec setups) that report 1.0 when physically released and 0.0 when pressed.

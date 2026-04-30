@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cctype>
 #include <chrono>
 #include <climits>
 #include <cmath>
@@ -27,6 +28,7 @@ namespace direct_wheel::wheel
         {
             IDirectInput8W* pDI = nullptr;
             IDirectInputDevice8W* pWheel = nullptr;
+            IDirectInputDevice8W* pPedals = nullptr;  // optional separate pedal device
             std::atomic<bool> ready{false};
             std::atomic<bool> hasFFB{false};
             std::atomic<float> globalStrength{1.0f};
@@ -50,6 +52,8 @@ namespace direct_wheel::wheel
             // Jolt state: collision triggers a short high-magnitude pulse
             std::atomic<float> joltMagnitude{0.f};
             std::atomic<uint32_t> joltTicksLeft{0};
+
+            std::atomic<bool> pendingReset{false};
         };
 
         State& S() { static State s; return s; }
@@ -181,7 +185,8 @@ namespace direct_wheel::wheel
                                 utf8Name, sizeof(utf8Name), nullptr, nullptr);
             bool isVirtual = IsVirtualDevice(pdidInstance->tszProductName);
 
-            log::InfoF("[direct_wheel] enumerated device: \"%s\" ffb=%s virtual=%s",
+            log::InfoF("[direct_wheel] device #%d: \"%s\" ffb=%s virtual=%s",
+                       (int)g_candidates.size() + 1,
                        utf8Name,
                        hasFFB ? "yes" : "no",
                        isVirtual ? "yes" : "no");
@@ -196,15 +201,41 @@ namespace direct_wheel::wheel
         }
 
         // After enumeration, pick the best device from g_candidates.
-        // Returns the index, or -1 if empty.
-        int SelectBestDevice()
+        // If config::axes.wheelDeviceName is non-empty, select the first
+        // candidate whose product name contains that substring (case-insensitive).
+        // Otherwise fall back to the FFB-score heuristic.
+        // Returns the index, or -1 if empty / no match.
+        int SelectBestDevice(const std::string& wheelNameHint)
         {
+            // Helper: case-insensitive substring search
+            auto ci_contains = [](const std::string& h, const std::string& n) -> bool {
+                if (n.empty()) return true;
+                auto it = std::search(h.begin(), h.end(), n.begin(), n.end(),
+                    [](char a, char b){ return std::tolower((unsigned char)a) == std::tolower((unsigned char)b); });
+                return it != h.end();
+            };
+
+            // Name-pinned selection
+            if (!wheelNameHint.empty())
+            {
+                for (int i = 0; i < static_cast<int>(g_candidates.size()); ++i)
+                {
+                    char utf8[256] = {};
+                    WideCharToMultiByte(CP_UTF8, 0, g_candidates[i].info.tszProductName, -1,
+                                        utf8, sizeof(utf8), nullptr, nullptr);
+                    if (ci_contains(std::string(utf8), wheelNameHint))
+                        return i;
+                }
+                log::WarnF("[direct_wheel] wheelDeviceName \"%s\" not matched — falling back to heuristic",
+                           wheelNameHint.c_str());
+            }
+
+            // Score-based heuristic: FFB real > non-FFB real > FFB virtual > non-FFB virtual
             int bestIdx = -1;
             int bestScore = -1;
             for (int i = 0; i < static_cast<int>(g_candidates.size()); ++i)
             {
                 const auto& c = g_candidates[i];
-                // Score: FFB real > non-FFB real > FFB virtual > non-FFB virtual
                 int score = 0;
                 if (!c.isVirtual) score += 10;
                 if (c.hasFFB)     score += 5;
@@ -357,6 +388,11 @@ namespace direct_wheel::wheel
             st.pWheel->Release();
             st.pWheel = nullptr;
         }
+        if (st.pPedals) {
+            st.pPedals->Unacquire();
+            st.pPedals->Release();
+            st.pPedals = nullptr;
+        }
         if (st.pDI) {
             st.pDI->Release();
             st.pDI = nullptr;
@@ -374,6 +410,61 @@ namespace direct_wheel::wheel
         tl = st.caps;
         return tl;
     }
+    namespace {
+        struct BinderState {
+            int target = -1;
+            struct DevState {
+                IDirectInputDevice8W* pDev = nullptr;
+                DIJOYSTATE2 baseState{};
+                char name[256]{};
+            };
+            std::vector<DevState> devs;
+            std::atomic<bool> active{false};
+            std::chrono::steady_clock::time_point startTime;
+        };
+        BinderState g_binder;
+    }
+
+    static void DoResetDevices();  // forward declaration
+
+    void BeginAxisBinding(int target)
+    {
+        auto& st = S();
+        if (!st.pDI) return;
+        
+        g_binder.target = target;
+        for (auto& ds : g_binder.devs) {
+            if (ds.pDev) { ds.pDev->Unacquire(); ds.pDev->Release(); }
+        }
+        g_binder.devs.clear();
+        
+        st.pDI->EnumDevices(DI8DEVCLASS_GAMECTRL, [](const DIDEVICEINSTANCEW* inst, VOID*) -> BOOL {
+            IDirectInputDevice8W* pDev = nullptr;
+            if (SUCCEEDED(S().pDI->CreateDevice(inst->guidInstance, &pDev, nullptr))) {
+                pDev->SetDataFormat(&c_dfDIJoystick2);
+                pDev->SetCooperativeLevel(GetDesktopWindow(), DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
+                if (SUCCEEDED(pDev->Acquire())) {
+                    DIJOYSTATE2 js{};
+                    if (SUCCEEDED(pDev->GetDeviceState(sizeof(DIJOYSTATE2), &js))) {
+                        BinderState::DevState ds;
+                        ds.pDev = pDev;
+                        ds.baseState = js;
+                        WideCharToMultiByte(CP_UTF8, 0, inst->tszProductName, -1, ds.name, sizeof(ds.name), nullptr, nullptr);
+                        g_binder.devs.push_back(ds);
+                    } else {
+                        pDev->Release();
+                    }
+                } else {
+                    pDev->Release();
+                }
+            }
+            return DIENUM_CONTINUE;
+        }, nullptr, DIEDFL_ATTACHEDONLY);
+        
+        g_binder.startTime = std::chrono::steady_clock::now();
+        g_binder.active.store(true, std::memory_order_release);
+        log::InfoF("[direct_wheel] Started axis auto-binding for target %d (listening on %d devices, 5s timeout)", target, (int)g_binder.devs.size());
+    }
 
     void Pump()
     {
@@ -383,6 +474,66 @@ namespace direct_wheel::wheel
                 return;
             }
         }
+        if (g_binder.active.load(std::memory_order_acquire)) {
+
+            // Timeout after 5 seconds
+            auto elapsed = std::chrono::steady_clock::now() - g_binder.startTime;
+            if (elapsed > std::chrono::seconds(5)) {
+                log::Warn("[direct_wheel] Axis binding timed out (5s) — no axis movement detected");
+                g_binder.active.store(false, std::memory_order_release);
+                for (auto& cleanupDs : g_binder.devs) {
+                    if (cleanupDs.pDev) { cleanupDs.pDev->Unacquire(); cleanupDs.pDev->Release(); }
+                }
+                g_binder.devs.clear();
+                g_binder.target = -1;
+                return;
+            }
+
+            for (auto& ds : g_binder.devs) {
+                if (FAILED(ds.pDev->Poll())) ds.pDev->Acquire();
+                DIJOYSTATE2 cur{};
+                if (SUCCEEDED(ds.pDev->GetDeviceState(sizeof(DIJOYSTATE2), &cur))) {
+                    const LONG kThreshold = 8000;  // ~12% of 65535
+                    std::string foundAxis;
+                    if (std::abs(cur.lX - ds.baseState.lX) > kThreshold) foundAxis = "lX";
+                    else if (std::abs(cur.lY - ds.baseState.lY) > kThreshold) foundAxis = "lY";
+                    else if (std::abs(cur.lZ - ds.baseState.lZ) > kThreshold) foundAxis = "lZ";
+                    else if (std::abs(cur.lRx - ds.baseState.lRx) > kThreshold) foundAxis = "lRx";
+                    else if (std::abs(cur.lRy - ds.baseState.lRy) > kThreshold) foundAxis = "lRy";
+                    else if (std::abs(cur.lRz - ds.baseState.lRz) > kThreshold) foundAxis = "lRz";
+                    else if (std::abs(cur.rglSlider[0] - ds.baseState.rglSlider[0]) > kThreshold) foundAxis = "slider0";
+                    else if (std::abs(cur.rglSlider[1] - ds.baseState.rglSlider[1]) > kThreshold) foundAxis = "slider1";
+                    
+                    if (!foundAxis.empty()) {
+                        log::InfoF("[direct_wheel] Auto-bound axis %s on device \"%s\" for target %d", foundAxis.c_str(), ds.name, g_binder.target);
+                        
+                        config::SetPedalDeviceName(ds.name);
+                        
+                        if (g_binder.target == 0) config::SetAxisThrottle(foundAxis);
+                        else if (g_binder.target == 1) config::SetAxisBrake(foundAxis);
+                        else if (g_binder.target == 2) config::SetAxisClutch(foundAxis);
+                        
+                        g_binder.active.store(false, std::memory_order_release);
+                        for (auto& cleanupDs : g_binder.devs) {
+                            if (cleanupDs.pDev) { cleanupDs.pDev->Unacquire(); cleanupDs.pDev->Release(); }
+                        }
+                        g_binder.devs.clear();
+                        g_binder.target = -1;
+                        
+                        ResetDevices();
+                        return;
+                    }
+                }
+            }
+            // While binding, we don't pump normal wheel physics
+            return;
+        }
+
+        // Handle pending reset from the settings thread (safe: we're on the pump thread)
+        if (st.pendingReset.exchange(false, std::memory_order_acq_rel)) {
+            DoResetDevices();
+            return; // will re-enumerate on next tick
+        }
 
         if (!st.pWheel) {
             g_candidates.clear();
@@ -390,7 +541,7 @@ namespace direct_wheel::wheel
 
             if (g_candidates.empty()) return;
 
-            const int bestIdx = SelectBestDevice();
+            const int bestIdx = SelectBestDevice(config::Current().axes.wheelDeviceName);
             if (bestIdx < 0) return;
 
             const auto& chosen = g_candidates[bestIdx];
@@ -443,6 +594,46 @@ namespace direct_wheel::wheel
             input_bindings::SetDeviceLayout(utf8Name);
         }
 
+        // Open separate pedal device if configured and not yet open.
+        // We re-check every pump tick (in case the pedals are plugged in
+        // after the wheel). Uses NONEXCLUSIVE|BACKGROUND — pedals need no FFB.
+        const auto cfgPedal = config::Current().axes.pedalDeviceName;
+        if (!cfgPedal.empty() && !st.pPedals)
+        {
+            g_candidates.clear();
+            st.pDI->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, nullptr, DIEDFL_ATTACHEDONLY);
+
+            for (const auto& cand : g_candidates)
+            {
+                char utf8Name2[256] = {};
+                WideCharToMultiByte(CP_UTF8, 0, cand.info.tszProductName, -1,
+                                    utf8Name2, sizeof(utf8Name2), nullptr, nullptr);
+
+                // Case-insensitive substring match
+                std::string haystack(utf8Name2);
+                std::string needle(cfgPedal);
+                auto ci_contains = [](const std::string& h, const std::string& n) {
+                    if (n.empty()) return true;
+                    auto it = std::search(h.begin(), h.end(), n.begin(), n.end(),
+                        [](char a, char b){ return std::tolower((unsigned char)a) == std::tolower((unsigned char)b); });
+                    return it != h.end();
+                };
+
+                if (!ci_contains(haystack, needle)) continue;
+
+                IDirectInputDevice8W* dev = nullptr;
+                if (FAILED(st.pDI->CreateDevice(cand.info.guidInstance, &dev, nullptr))) continue;
+                dev->SetDataFormat(&c_dfDIJoystick2);
+                dev->SetCooperativeLevel(GetDesktopWindow(), DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
+                HRESULT hrAcq = dev->Acquire();
+                log::InfoF("[direct_wheel] pedal device matched: \"%s\" Acquire=0x%08lX",
+                           utf8Name2, (unsigned long)hrAcq);
+                st.pPedals = dev;
+                break;
+            }
+            g_candidates.clear();
+        }
+
         // Deferred FFB init: if we started without EXCLUSIVE access,
         // retry every tick until the game window appears.
         if (st.pWheel && !st.hasFFB.load() && !st.pConstantEffect) {
@@ -471,14 +662,24 @@ namespace direct_wheel::wheel
             return;
         }
 
+        // Read pedal state from separate device (if configured and open)
+        DIJOYSTATE2 jsPedals = js;  // fallback: same device
+        if (st.pPedals)
+        {
+            if (FAILED(st.pPedals->Poll()))
+                st.pPedals->Acquire();
+            if (FAILED(st.pPedals->GetDeviceState(sizeof(DIJOYSTATE2), &jsPedals)))
+                jsPedals = js;  // on failure, fall back to wheel device
+        }
+
         const auto axes = config::Current().axes;
 
         Snapshot s;
         s.connected = true;
-        s.steer    = NormalizeSteer(config::AxisMap::Read(js, axes.steer));
-        s.throttle = NormalizePedal(config::AxisMap::Read(js, axes.throttle));
-        s.brake    = NormalizePedal(config::AxisMap::Read(js, axes.brake));
-        s.clutch   = NormalizePedal(config::AxisMap::Read(js, axes.clutch));
+        s.steer    = NormalizeSteer(config::AxisMap::Read(js,       axes.steer));
+        s.throttle = NormalizePedal(config::AxisMap::Read(jsPedals, axes.throttle));
+        s.brake    = NormalizePedal(config::AxisMap::Read(jsPedals, axes.brake));
+        s.clutch   = NormalizePedal(config::AxisMap::Read(jsPedals, axes.clutch));
         s.pov = static_cast<uint16_t>(js.rgdwPOV[0] & 0xFFFF);
 
         uint32_t bits = 0;
@@ -498,6 +699,69 @@ namespace direct_wheel::wheel
         auto& st = S();
         std::lock_guard lk(st.snapMtx);
         return st.snap;
+    }
+
+    // Returns pipe-separated list of all attached game controller product names.
+    // Performs a quick enumeration — called only on user request (device picker),
+    // not on every tick. Thread-safe: only reads pDI, does not modify state.
+    std::string GetConnectedDeviceList()
+    {
+        auto& st = S();
+        if (!st.pDI) return "";
+
+        struct Ctx { IDirectInput8W* pDI; std::string result; };
+        Ctx ctx{ st.pDI, "" };
+
+        st.pDI->EnumDevices(DI8DEVCLASS_GAMECTRL,
+            [](const DIDEVICEINSTANCEW* inst, VOID* pCtx) -> BOOL {
+                auto* c = static_cast<Ctx*>(pCtx);
+                char utf8[256] = {};
+                WideCharToMultiByte(CP_UTF8, 0, inst->tszProductName, -1,
+                                    utf8, sizeof(utf8), nullptr, nullptr);
+                if (!c->result.empty()) c->result += '|';
+                c->result += utf8;
+                return DIENUM_CONTINUE;
+            },
+            &ctx, DIEDFL_ATTACHEDONLY);
+
+        return ctx.result;
+    }
+
+    // Drop wheel + pedal device handles so Pump() re-opens them on the
+    // next tick with the updated wheelDeviceName / pedalDeviceName config.
+    void ResetDevices()
+    {
+        // Just set a flag — the pump thread will do the actual reset safely.
+        S().pendingReset.store(true, std::memory_order_release);
+        log::Info("[direct_wheel] ResetDevices: pending reset requested");
+    }
+
+    // Actually release and re-open devices. Called from the pump thread only.
+    static void DoResetDevices()
+    {
+        auto& st = S();
+        st.ready.store(false, std::memory_order_release);
+
+        // Release FFB effects before dropping the device
+        if (st.pConstantEffect) { st.pConstantEffect->Release(); st.pConstantEffect = nullptr; }
+        if (st.pSpringEffect)   { st.pSpringEffect->Release();   st.pSpringEffect   = nullptr; }
+        if (st.pDamperEffect)   { st.pDamperEffect->Release();   st.pDamperEffect   = nullptr; }
+        if (st.pFrictionEffect) { st.pFrictionEffect->Release(); st.pFrictionEffect = nullptr; }
+        if (st.pSineEffect)     { st.pSineEffect->Release();     st.pSineEffect     = nullptr; }
+
+        if (st.pWheel) {
+            st.pWheel->Unacquire();
+            st.pWheel->Release();
+            st.pWheel = nullptr;
+        }
+        if (st.pPedals) {
+            st.pPedals->Unacquire();
+            st.pPedals->Release();
+            st.pPedals = nullptr;
+        }
+        st.hasFFB.store(false, std::memory_order_release);
+        centering_state::Reset();
+        log::Info("[direct_wheel] DoResetDevices: devices released, will re-enumerate on next Pump()");
     }
 
     static uint64_t s_cfCount = 0;
@@ -667,9 +931,9 @@ namespace direct_wheel::wheel
         float constantPct = cfg2.ffb.constantForcePct / 100.0f;
 
         float springCoef = std::clamp(
-            centeringBaseline * 0.3f * speedSq * gripFactor
-            + speedRatio * 0.15f * constantPct               // Constant Force: smooth centering
-            + yawRamp * 0.2f * (yawFeedbackPct / 100.0f),   // Cornering feedback
+            centeringBaseline * 1.0f * speedSq * gripFactor
+            + speedRatio * 0.5f * constantPct               // Constant Force: smooth centering
+            + yawRamp * 0.5f * (yawFeedbackPct / 100.0f),   // Cornering feedback
             0.f, 1.0f);
         if (isReversing) springCoef *= 0.4f;
         PlaySpring(springCoef);

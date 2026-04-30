@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace direct_wheel::wheel
 {
@@ -34,6 +35,20 @@ namespace direct_wheel::wheel
     void Pump();            // LogiUpdate + publish snapshot; driven by plugin pump thread
     Snapshot CurrentSnapshot();
     const Caps& GetCaps();
+
+    // Returns a pipe-separated list of all currently attached game controller
+    // product names, e.g. "Moza KS Wheel|G Pro Racing Pedals|vJoy Device".
+    // Safe to call from any thread after Init(); returns "" before first Pump().
+    std::string GetConnectedDeviceList();
+
+    // Starts auto-binding loop in Pump(). Watches all controllers for axis movement
+    // > 25% and binds it to the specified target (0=throttle, 1=brake, 2=clutch).
+    void BeginAxisBinding(int target);
+
+    // Disconnect and reopen the wheel/pedal devices so a new
+    // wheelDeviceName / pedalDeviceName config takes effect immediately
+    // without restarting the game.
+    void ResetDevices();
 
     // FFB. Constant takes -1..+1 (sign is direction); others are 0..1.
     // Percentages -100..+100 are derived from the float inputs.

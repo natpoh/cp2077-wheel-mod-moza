@@ -61,6 +61,12 @@ public static native func DirectWheel_SetLedVisualizerWhileMusic(v: Bool) -> Boo
 // it as a Windows SendInput event on rising/falling edges.
 public static native func DirectWheel_SetInputBinding(inputId: Int32, action: Int32) -> Bool;
 
+// Axis mapping — axis name is one of: lX, lY, lZ, lRx, lRy, lRz, slider0, slider1
+public static native func DirectWheel_SetAxisSteer(axis: String) -> Bool;
+public static native func DirectWheel_SetAxisThrottle(axis: String) -> Bool;
+public static native func DirectWheel_SetAxisBrake(axis: String) -> Bool;
+public static native func DirectWheel_SetAxisClutch(axis: String) -> Bool;
+
 // Tracks the player's currently-mounted vehicle. The plugin's vehicle-
 // input detour fires for every visible vehicle each tick; without this
 // filter, our steering/throttle/brake writes would propagate to all of
@@ -95,3 +101,15 @@ public static native func DirectWheel_OnVehicleHit(v: ref<VehicleObject>, latera
 // (e.g. `asphalt`, `dirt`, `metal`). C++ logs the transition and
 // eventually drives surface-aware FFB off the category.
 public static native func DirectWheel_OnWheelMaterial(wheelIdx: Int32, material: CName) -> Bool;
+
+// Device picker — returns pipe-separated list of attached controllers.
+public static native func DirectWheel_GetConnectedDeviceList() -> String;
+public static native func DirectWheel_SetWheelDeviceName(name: String) -> Bool;
+public static native func DirectWheel_SetPedalDeviceName(name: String) -> Bool;
+public static native func DirectWheel_SetWheelDeviceIndex(idx: Int32) -> Bool;
+public static native func DirectWheel_SetPedalDeviceIndex(idx: Int32) -> Bool;
+public static native func DirectWheel_GetDeviceCount() -> Int32;
+public static native func DirectWheel_ResetDevices() -> Bool;
+
+// Axis auto-binding: target 0=throttle, 1=brake, 2=clutch.
+public static native func DirectWheel_BeginAxisBinding(target: Int32) -> Bool;

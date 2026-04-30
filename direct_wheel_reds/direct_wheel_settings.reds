@@ -142,6 +142,42 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let steeringCurve75: Int32 = 87;
 
+  // ---- Axis mapping -------------------------------------------------------
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Axis mapping")
+  @runtimeProperty("ModSettings.category.order", "150")
+  @runtimeProperty("ModSettings.displayName", "Wheel device (0 = Auto)")
+  @runtimeProperty("ModSettings.description", "Which controller to use for steering + FFB. 0 = auto-detect, 1..N = specific device. Check the log for device numbers.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "8")
+  @runtimeProperty("ModSettings.step", "1")
+  let wheelDeviceIndex: Int32 = 0;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Axis mapping")
+  @runtimeProperty("ModSettings.category.order", "150")
+  @runtimeProperty("ModSettings.displayName", "Pedal device (0 = Same as wheel)")
+  @runtimeProperty("ModSettings.description", "Separate USB pedal device for throttle/brake. 0 = use wheel device, 1..N = specific device. Check the log for device numbers.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "8")
+  @runtimeProperty("ModSettings.step", "1")
+  let pedalDeviceIndex: Int32 = 0;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Axis mapping")
+  @runtimeProperty("ModSettings.category.order", "150")
+  @runtimeProperty("ModSettings.displayName", "Throttle axis")
+  @runtimeProperty("ModSettings.description", "Which DirectInput axis to read as throttle. Default: lZ (Logitech). Moza pedals often use lY.")
+  let throttleAxis: DirectWheelAxis = DirectWheelAxis.lZ;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Axis mapping")
+  @runtimeProperty("ModSettings.category.order", "150")
+  @runtimeProperty("ModSettings.displayName", "Brake axis")
+  @runtimeProperty("ModSettings.description", "Which DirectInput axis to read as brake. Default: lRz (Logitech). Some pedals use lRx.")
+  let brakeAxis: DirectWheelAxis = DirectWheelAxis.lRz;
+
   // ---- Force feedback - General -------------------------------------------
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
@@ -482,6 +518,11 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetLedEnabled(this.ledEnabled);
     DirectWheel_SetLedVisualizerWhileMusic(this.ledVisualizerWhileMusic);
 
+    DirectWheel_SetWheelDeviceIndex(this.wheelDeviceIndex);
+    DirectWheel_SetPedalDeviceIndex(this.pedalDeviceIndex);
+    DirectWheel_SetAxisThrottle(DirectWheelAxisToString(this.throttleAxis));
+    DirectWheel_SetAxisBrake(DirectWheelAxisToString(this.brakeAxis));
+
     // Input IDs match the PhysicalInput enum in
     // direct_wheel/src/input_bindings.h. D-pad + A/B/X/Y (ids 2-9) are
     // in-vehicle bindings here; the plugin overrides them with
@@ -506,6 +547,10 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetInputBinding(17, EnumInt(this.bindScrollCW));
     DirectWheel_SetInputBinding(18, EnumInt(this.bindScrollCCW));
     DirectWheel_SetInputBinding(19, EnumInt(this.bindXbox));
+
+    // Trigger a safe device re-enumeration so device index changes take effect.
+    // ResetDevices only sets a flag; the pump thread handles the actual reset.
+    DirectWheel_ResetDevices();
   }
 }
 
@@ -522,6 +567,33 @@ public class DirectWheelSettings extends IScriptable {
 // the dropdown label inherits the redscript identifier so we use the
 // gameplay-meaningful name here even though the C++ side keeps the older
 // "Backward" naming for historical reasons.
+
+// DirectInput axis identifiers. These correspond to DIJOYSTATE2 fields.
+// The dropdown in Mod Settings will show these names directly.
+enum DirectWheelAxis {
+  lX = 0,
+  lY = 1,
+  lZ = 2,
+  lRx = 3,
+  lRy = 4,
+  lRz = 5,
+  Slider0 = 6,
+  Slider1 = 7,
+}
+
+public static func DirectWheelAxisToString(axis: DirectWheelAxis) -> String {
+  switch axis {
+    case DirectWheelAxis.lX:      return "lX";
+    case DirectWheelAxis.lY:      return "lY";
+    case DirectWheelAxis.lZ:      return "lZ";
+    case DirectWheelAxis.lRx:     return "lRx";
+    case DirectWheelAxis.lRy:     return "lRy";
+    case DirectWheelAxis.lRz:     return "lRz";
+    case DirectWheelAxis.Slider0: return "slider0";
+    case DirectWheelAxis.Slider1: return "slider1";
+    default:                      return "lX";
+  }
+}
 
 enum DirectWheelAction {
   None = 0,
@@ -605,3 +677,4 @@ protected cb func OnGameAttached() -> Bool {
   }
   return result;
 }
+

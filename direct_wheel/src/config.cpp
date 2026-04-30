@@ -163,7 +163,11 @@ namespace direct_wheel::config
                 esc.clear(); EscapeJsonTo(esc, c.axes.brake);
                 out << "    \"brake\": " << esc << ",\n";
                 esc.clear(); EscapeJsonTo(esc, c.axes.clutch);
-                out << "    \"clutch\": " << esc << "\n";
+                out << "    \"clutch\": " << esc << ",\n";
+                esc.clear(); EscapeJsonTo(esc, c.axes.wheelDeviceName);
+                out << "    \"wheelDeviceName\": " << esc << ",\n";
+                esc.clear(); EscapeJsonTo(esc, c.axes.pedalDeviceName);
+                out << "    \"pedalDeviceName\": " << esc << "\n";
             }
             out << "  },\n";
 
@@ -324,6 +328,8 @@ namespace direct_wheel::config
             ExtractString(text, "axes",     "throttle",               c.axes.throttle);
             ExtractString(text, "axes",     "brake",                  c.axes.brake);
             ExtractString(text, "axes",     "clutch",                 c.axes.clutch);
+            ExtractString(text, "axes",     "wheelDeviceName",        c.axes.wheelDeviceName);
+            ExtractString(text, "axes",     "pedalDeviceName",        c.axes.pedalDeviceName);
 
             auto vehExtract = [&](const char* section, PerVehicle& pv) {
                 ExtractFloat(text, section, "steeringMultiplier", pv.steeringMultiplier);
@@ -495,5 +501,21 @@ namespace direct_wheel::config
         Mutate([&](Config& c) {
             c.bindings[static_cast<size_t>(inputId)] = action;
         });
+    }
+
+    // Axis map setters
+    void SetAxisSteer(std::string_view v)    { Mutate([&](Config& c){ c.axes.steer    = std::string(v); }); }
+    void SetAxisThrottle(std::string_view v) { Mutate([&](Config& c){ c.axes.throttle = std::string(v); }); }
+    void SetAxisBrake(std::string_view v)    { Mutate([&](Config& c){ c.axes.brake    = std::string(v); }); }
+    void SetAxisClutch(std::string_view v)   { Mutate([&](Config& c){ c.axes.clutch   = std::string(v); }); }
+    void SetWheelDeviceName(std::string_view v)
+    {
+        std::string s(v);
+        Mutate([&](Config& c){ c.axes.wheelDeviceName = s; });
+    }
+    void SetPedalDeviceName(std::string_view v)
+    {
+        std::string s(v);
+        Mutate([&](Config& c){ c.axes.pedalDeviceName = s; });
     }
 }

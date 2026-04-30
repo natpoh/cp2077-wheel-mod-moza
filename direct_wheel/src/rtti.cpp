@@ -228,6 +228,139 @@ namespace direct_wheel::rtti
             if (aOut) *aOut = true;
         }
 
+        // -------- Axis mapping natives ----------------------------------------
+        void SetAxisSteerNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            auto v = ReadString(aFrame); aFrame->code++;
+            config::SetAxisSteer(v);
+            if (aOut) *aOut = true;
+        }
+        void SetAxisThrottleNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            auto v = ReadString(aFrame); aFrame->code++;
+            config::SetAxisThrottle(v);
+            if (aOut) *aOut = true;
+        }
+        void SetAxisBrakeNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            auto v = ReadString(aFrame); aFrame->code++;
+            config::SetAxisBrake(v);
+            if (aOut) *aOut = true;
+        }
+        void SetAxisClutchNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            auto v = ReadString(aFrame); aFrame->code++;
+            config::SetAxisClutch(v);
+            if (aOut) *aOut = true;
+        }
+
+        // -------- Device picker natives -------------------------------------
+        // Used by the in-game settings page to build wheel/pedal selectors.
+
+        // Returns a pipe-separated list of all attached HID game controllers,
+        // e.g. "Moza KS Wheel|G Pro Racing Pedals|vJoy Device".
+        // Split on '|' in redscript to populate a dropdown.
+        void GetConnectedDeviceList(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, RED4ext::CString* aOut, int64_t)
+        {
+            aFrame->code++;
+            if (aOut) *aOut = RED4ext::CString(wheel::GetConnectedDeviceList().c_str());
+        }
+
+        void SetWheelDeviceName(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            auto v = ReadString(aFrame); aFrame->code++;
+            config::SetWheelDeviceName(v);
+            wheel::ResetDevices(); // take effect immediately without game restart
+            if (aOut) *aOut = true;
+        }
+
+        void SetPedalDeviceName(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            auto v = ReadString(aFrame); aFrame->code++;
+            config::SetPedalDeviceName(v);
+            wheel::ResetDevices();
+            if (aOut) *aOut = true;
+        }
+
+        // Index-based device selection for Mod Settings sliders.
+        // 0 = Auto (use heuristic), 1..N = pick device by index from enumerated list.
+        void SetWheelDeviceIndex(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            int32_t idx = 0;
+            RED4ext::GetParameter(aFrame, &idx);
+            aFrame->code++;
+            if (idx <= 0) {
+                config::SetWheelDeviceName("");
+            } else {
+                auto list = wheel::GetConnectedDeviceList();
+                // split by '|'
+                std::vector<std::string> names;
+                size_t pos = 0;
+                while (pos < list.size()) {
+                    auto sep = list.find('|', pos);
+                    names.push_back(list.substr(pos, sep - pos));
+                    if (sep == std::string::npos) break;
+                    pos = sep + 1;
+                }
+                if (idx <= (int32_t)names.size()) {
+                    config::SetWheelDeviceName(names[idx - 1]);
+                    log::InfoF("[direct_wheel] Wheel device set to index %d: \"%s\"", idx, names[idx - 1].c_str());
+                }
+            }
+            if (aOut) *aOut = true;
+        }
+
+        void SetPedalDeviceIndex(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            int32_t idx = 0;
+            RED4ext::GetParameter(aFrame, &idx);
+            aFrame->code++;
+            if (idx <= 0) {
+                config::SetPedalDeviceName("");
+            } else {
+                auto list = wheel::GetConnectedDeviceList();
+                std::vector<std::string> names;
+                size_t pos = 0;
+                while (pos < list.size()) {
+                    auto sep = list.find('|', pos);
+                    names.push_back(list.substr(pos, sep - pos));
+                    if (sep == std::string::npos) break;
+                    pos = sep + 1;
+                }
+                if (idx <= (int32_t)names.size()) {
+                    config::SetPedalDeviceName(names[idx - 1]);
+                    log::InfoF("[direct_wheel] Pedal device set to index %d: \"%s\"", idx, names[idx - 1].c_str());
+                }
+            }
+            if (aOut) *aOut = true;
+        }
+
+        void GetDeviceCount(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, int32_t* aOut, int64_t)
+        {
+            aFrame->code++;
+            auto list = wheel::GetConnectedDeviceList();
+            if (list.empty()) { if (aOut) *aOut = 0; return; }
+            int32_t count = 1;
+            for (char c : list) if (c == '|') count++;
+            if (aOut) *aOut = count;
+        }
+
+        void BeginAxisBindingNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            int32_t target = 0;
+            RED4ext::GetParameter(aFrame, &target);
+            aFrame->code++;
+            wheel::BeginAxisBinding(target);
+            if (aOut) *aOut = true;
+        }
+
+        void ResetDevicesNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            aFrame->code++;
+            wheel::ResetDevices();
+            if (aOut) *aOut = true;
+        }
+
         // -------- Player-vehicle mount tracking -----------------------------
         //
         // Called from redscript VehicleComponent mount/unmount wrappers so
@@ -491,6 +624,44 @@ namespace direct_wheel::rtti
             RegisterGlobal(rtti, "DirectWheel_SetInputBinding",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInputBinding),
                            "Bool", {{ "Int32", "inputId" }, { "Int32", "action" }});
+
+            RegisterGlobal(rtti, "DirectWheel_SetAxisSteer",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetAxisSteerNative),
+                           "Bool", {{ "String", "axis" }});
+            RegisterGlobal(rtti, "DirectWheel_SetAxisThrottle",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetAxisThrottleNative),
+                           "Bool", {{ "String", "axis" }});
+            RegisterGlobal(rtti, "DirectWheel_SetAxisBrake",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetAxisBrakeNative),
+                           "Bool", {{ "String", "axis" }});
+            RegisterGlobal(rtti, "DirectWheel_SetAxisClutch",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetAxisClutchNative),
+                           "Bool", {{ "String", "axis" }});
+
+            RegisterGlobal(rtti, "DirectWheel_GetConnectedDeviceList",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetConnectedDeviceList),
+                           "String", {});
+            RegisterGlobal(rtti, "DirectWheel_SetWheelDeviceName",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetWheelDeviceName),
+                           "Bool", {{ "String", "name" }});
+            RegisterGlobal(rtti, "DirectWheel_SetPedalDeviceName",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetPedalDeviceName),
+                           "Bool", {{ "String", "name" }});
+            RegisterGlobal(rtti, "DirectWheel_SetWheelDeviceIndex",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetWheelDeviceIndex),
+                           "Bool", {{ "Int32", "idx" }});
+            RegisterGlobal(rtti, "DirectWheel_SetPedalDeviceIndex",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetPedalDeviceIndex),
+                           "Bool", {{ "Int32", "idx" }});
+            RegisterGlobal(rtti, "DirectWheel_GetDeviceCount",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetDeviceCount),
+                           "Int32", {});
+            RegisterGlobal(rtti, "DirectWheel_BeginAxisBinding",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&BeginAxisBindingNative),
+                           "Bool", {{ "Int32", "target" }});
+            RegisterGlobal(rtti, "DirectWheel_ResetDevices",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&ResetDevicesNative),
+                           "Bool", {});
 
             RegisterGlobal(rtti, "DirectWheel_MenuOpen",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&MenuOpen),

@@ -1,10 +1,10 @@
 # Direct Wheel — Moza & Direct Drive Racing Wheel Support for Cyberpunk 2077
 
-Full racing wheel support for Cyberpunk 2077 v2.31 with **force feedback**, **speed-sensitive steering compensation**, and **TweakDB steering physics overrides**.
+Full racing wheel support for Cyberpunk 2077 v2.32 with **force feedback**, **speed-sensitive steering compensation**, and **TweakDB steering physics overrides**.
 
 Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
-### 📥 [Download direct_wheel_moza_v2.31.9.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel_moza_v2.31.9.zip)
+### 📥 [Download direct_wheel-2.34.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-2.34.0.zip)
 
 ---
 
@@ -14,6 +14,8 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 - **Steering, Throttle, Brake, Clutch** — full axis mapping via Logitech SDK / DirectInput
 - **Clutch-as-Brake** — use the softer clutch pedal as brake (toggle in settings)
 - **Speed Steering Boost** — compensates for the game's built-in steering reduction at high speed. Multiplies steering input up to **3x** at cruise speed so the same physical wheel rotation produces consistent in-game turns regardless of velocity
+- **Device Selector** — pick wheel and pedal devices independently for split-device setups (e.g. Moza wheel + Logitech pedals). Set by device index (0 = auto-detect, 1..N = specific device)
+- **Axis Mapping** — choose throttle/brake axes from a dropdown in Mod Settings — no more editing `config.json`
 
 ### 💪 Force Feedback
 - **Centering spring** — physics-based, scales with speed
@@ -31,7 +33,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ## Requirements
 
-1. **Cyberpunk 2077 v2.31** (latest patch)
+1. **Cyberpunk 2077 v2.32** (latest patch)
 2. **[RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380)** — native plugin loader
 3. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** — in-game settings UI (patched version included)
 5. **Logitech G HUB** or **Logitech Gaming Software** — must be running (provides the steering SDK)
@@ -42,7 +44,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ### Quick Install (zip)
 
-1. Download `direct_wheel_moza_v2.31.9.zip`
+1. Download `direct_wheel-2.34.0.zip`
 2. Extract **directly into your Cyberpunk 2077 game folder**, for example:
    ```
    D:\SteamLibrary\steamapps\common\Cyberpunk 2077\
@@ -82,6 +84,17 @@ All settings are in-game: **Main Menu → Settings → Mod Settings → G-series
 | **Equalizer: 50% input** | 70 | Custom steering curve. Output at 50% physical rotation |
 | **Equalizer: 75% input** | 87 | Custom steering curve. Output at 75% physical rotation |
 
+### Axis Mapping Section
+
+| Slider | Default | Description |
+|---|---|---|
+| Wheel device (0 = Auto) | 0 | Which controller to use for steering + FFB. 0 = auto-detect, 1..N = specific device by index |
+| Pedal device (0 = Same as wheel) | 0 | Separate USB pedal device for throttle/brake. 0 = use wheel device |
+| Throttle axis | lZ | DirectInput axis for throttle. Logitech = lZ, some Moza = lY |
+| Brake axis | lRz | DirectInput axis for brake |
+
+> To see which device is at which index, run `tools/input_probe.exe` — it lists all devices with numbers.
+
 ### Force Feedback Section
 
 | Slider | Default | Description |
@@ -111,58 +124,7 @@ Adjust **FFB strength** first (overall), then tune individual effects.
 2. Check that RED4ext is installed correctly
 3. Look at logs: `red4ext/logs/direct_wheel-*.log`
 
-### Non-Logitech Wheels (Moza, Fanatec, Thrustmaster, etc.)
-
-Different wheel bases assign gas/brake/clutch to different DirectInput axes. If your wheel connects but pedals don't work, you need to remap the axes in `config.json`.
-
-**Step 1 — Identify your axes** using [`input_probe.exe`](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/tools/input_probe/input_probe.exe) (download from GitHub):
-
-```
-> bin\input_probe.exe
-Found device: DirectInput Wheel (Moza)
-Wheel connected and acquired. Reading axes (Press Ctrl+C to exit):
---------------------------------------------------------
-X:32767  Y:0  Z:65535  Rx:0  Ry:0  Rz:65535  S0:65535  S1:0
-```
-
-Press each pedal one at a time and note which value changes:
-- **Steering** = the value that moves when you turn the wheel (usually `X`)
-- **Throttle** = the value that drops when you press gas
-- **Brake** = the value that drops when you press brake
-- **Clutch** = the value that drops when you press clutch
-
-**Step 2 — Edit `config.json`** (in `red4ext/plugins/direct_wheel/`):
-
-```json
-{
-  "axes": {
-    "steer": "lX",
-    "throttle": "lY",
-    "brake": "lRz",
-    "clutch": "slider0"
-  }
-}
-```
-
-Axis name mapping:
-| input_probe label | config.json name |
-|---|---|
-| X | `lX` |
-| Y | `lY` |
-| Z | `lZ` |
-| Rx | `lRx` |
-| Ry | `lRy` |
-| Rz | `lRz` |
-| S0 | `slider0` |
-| S1 | `slider1` |
-
-**Default** (Logitech G29/G920/G923): `steer=lX, throttle=lZ, brake=lRz, clutch=slider0`
-
-**Moza R3**: `steer=lX, throttle=lY, brake=lRz, clutch=slider0`
-
-**Moza R5**: `steer=lX, throttle=lZ, brake=lRz, clutch=slider0` (same as Logitech)
-
-> Other wheels (Fanatec, Thrustmaster, etc.) - run `input_probe.exe` to check your axes.
+> Other wheels (Fanatec, Thrustmaster, etc.) - run `input_probe.exe` to check your axes, then select the correct axis in **Mod Settings → G-series Wheel → Axis mapping**.
 
 ---
 

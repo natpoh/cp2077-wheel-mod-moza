@@ -57,7 +57,7 @@ namespace direct_wheel::config
         // Per-effect strength sliders (0..100). Allow the user to
         // individually scale each DirectInput FFB effect type.
         int32_t constantForcePct = 50;
-        int32_t springForcePct   = 60;
+        int32_t springForcePct   = 15;
         int32_t damperForcePct   = 45;
         int32_t frictionForcePct = 25;
         int32_t sineForcePct     = 10;
@@ -104,6 +104,21 @@ namespace direct_wheel::config
         std::string throttle = "lZ";
         std::string brake    = "lRz";
         std::string clutch   = "slider0";
+
+        // Optional device name overrides (case-insensitive substring match).
+        // When non-empty, the plugin selects the first device whose product
+        // name contains this string, bypassing the FFB-score heuristic.
+        //
+        // wheelDeviceName  — device that provides the steering axis + FFB.
+        //   Example: "KS Wheel", "Moza R12", "G923".
+        //
+        // pedalDeviceName  — separate USB device that provides
+        //   throttle/brake/clutch axes. When set, steer + FFB still come
+        //   from the wheel device; pedal axes are read from this device.
+        //   Example: "G Pro Racing Pedals", "Logitech G Pro", "FANATEC".
+        //   Leave empty (default) to read all axes from the wheel device.
+        std::string wheelDeviceName;
+        std::string pedalDeviceName;
 
         // Resolve a named axis to a raw LONG value from a DIJOYSTATE2.
         static long Read(const DIJOYSTATE2& js, const std::string& axisName);
@@ -200,4 +215,12 @@ namespace direct_wheel::config
     // Single-input binding: inputId in [0, kBindingCount), action as the
     // Action int from input_bindings.h.
     void SetInputBinding(int32_t inputId, int32_t action);
+
+    // Axis map setters
+    void SetAxisSteer(std::string_view v);
+    void SetAxisThrottle(std::string_view v);
+    void SetAxisBrake(std::string_view v);
+    void SetAxisClutch(std::string_view v);
+    void SetWheelDeviceName(std::string_view v);
+    void SetPedalDeviceName(std::string_view v);
 }
