@@ -511,25 +511,23 @@ namespace direct_wheel::vehicle_hook
                     boost = 1.0f + speedRatio * 2.0f * (cfg.input.speedSensitiveSteeringPct / 100.0f);
                 }
 
-                // Steering Equalizer (Custom Curve)
-                // We map the physical wheel input (0 to 1) using 3 control points
-                // at 25%, 50%, 75% to allow custom non-linear response curves.
+                // Steering Equalizer (sqrt curve)
+                //
+                // The game applies a quadratic steering curve internally:
+                //   actual_steer ≈ input² / max_steer
+                // This makes small wheel angles feel dead (at 10° only 3.6%
+                // of the linear response reaches the wheels). The inverse of
+                // x² is √x, so we apply sqrt to perfectly linearise the
+                // response across the full range:
+                //   sqrt(0.0278) = 0.167 → game squares it → 0.0278 ✓
+                //   sqrt(0.25)   = 0.50  → game squares it → 0.25   ✓
+                //   sqrt(0.50)   = 0.707 → game squares it → 0.50   ✓
+                //
+                // Speed boost is applied as a post-sqrt multiplier so that
+                // at high speed the linearised signal is amplified further
+                // to compensate for the game's speed-dependent attenuation.
                 float absSteer = std::fabs(wheelSteer);
-                float mappedSteer = 0.0f;
-                
-                const float c25 = Clamp((cfg.input.steeringCurve25 / 100.0f) * boost, 0.0f, 1.0f);
-                const float c50 = Clamp((cfg.input.steeringCurve50 / 100.0f) * boost, 0.0f, 1.0f);
-                const float c75 = Clamp((cfg.input.steeringCurve75 / 100.0f) * boost, 0.0f, 1.0f);
-
-                if (absSteer <= 0.25f) {
-                    mappedSteer = (absSteer / 0.25f) * c25;
-                } else if (absSteer <= 0.50f) {
-                    mappedSteer = c25 + ((absSteer - 0.25f) / 0.25f) * (c50 - c25);
-                } else if (absSteer <= 0.75f) {
-                    mappedSteer = c50 + ((absSteer - 0.50f) / 0.25f) * (c75 - c50);
-                } else {
-                    mappedSteer = c75 + ((absSteer - 0.75f) / 0.25f) * (1.0f - c75);
-                }
+                float mappedSteer = Clamp(std::sqrt(absSteer) * boost, 0.0f, 1.0f);
                 
                 wheelSteer = (wheelSteer >= 0.f) ? mappedSteer : -mappedSteer;
 

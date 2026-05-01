@@ -109,37 +109,21 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let speedSensitiveSteeringPct: Int32 = 50;
 
+  // Legacy equalizer control points — replaced by automatic sqrt curve
+  // (v2.35.0+). The sqrt inverse perfectly linearises the game's quadratic
+  // steering response, making manual tuning unnecessary. Hidden from the UI
+  // but kept for backward compat with saved user.ini files.
+
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Wheel input")
-  @runtimeProperty("ModSettings.category.order", "100")
-  @runtimeProperty("ModSettings.displayName", "Equalizer: output at 25% input (%)")
-  @runtimeProperty("ModSettings.description", "Custom steering curve shape. Sets the final steering response when the physical wheel is turned 25%.")
-  @runtimeProperty("ModSettings.min", "0")
-  @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "1")
-  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  @runtimeProperty("ModSettings.hidden", "true")
   let steeringCurve25: Int32 = 50;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Wheel input")
-  @runtimeProperty("ModSettings.category.order", "100")
-  @runtimeProperty("ModSettings.displayName", "Equalizer: output at 50% input (%)")
-  @runtimeProperty("ModSettings.description", "Custom steering curve shape. Sets the final steering response when the physical wheel is turned 50%.")
-  @runtimeProperty("ModSettings.min", "0")
-  @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "1")
-  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  @runtimeProperty("ModSettings.hidden", "true")
   let steeringCurve50: Int32 = 71;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
-  @runtimeProperty("ModSettings.category", "Wheel input")
-  @runtimeProperty("ModSettings.category.order", "100")
-  @runtimeProperty("ModSettings.displayName", "Equalizer: output at 75% input (%)")
-  @runtimeProperty("ModSettings.description", "Custom steering curve shape. Sets the final steering response when the physical wheel is turned 75%.")
-  @runtimeProperty("ModSettings.min", "0")
-  @runtimeProperty("ModSettings.max", "100")
-  @runtimeProperty("ModSettings.step", "1")
-  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  @runtimeProperty("ModSettings.hidden", "true")
   let steeringCurve75: Int32 = 86;
 
   // ---- Axis mapping -------------------------------------------------------
