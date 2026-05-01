@@ -13,7 +13,8 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 ### 🎮 Wheel Input
 - **Steering, Throttle, Brake, Clutch** — full axis mapping via Logitech SDK / DirectInput
 - **Clutch-as-Brake** — use the softer clutch pedal as brake (toggle in settings)
-- **Speed Steering Boost** — compensates for the game's built-in steering reduction at high speed. Multiplies steering input up to **2x** at cruise speed so the same physical wheel rotation produces consistent in-game turns regardless of velocity
+- **Steering Linearization** — the game applies a quadratic curve internally (`actual_steer ≈ input²`), making small wheel angles feel dead. The mod automatically applies a √x (square root) inverse so your steering response is perfectly linear across the full wheel range
+- **Speed Steering Boost** — compensates for the game's built-in steering reduction at high speed. Multiplies the linearized steering signal up to **2x** at 100 mph so the same physical wheel rotation produces consistent in-game turns regardless of velocity
 - **Device Selector** — pick wheel and pedal devices independently for split-device setups (e.g. Moza wheel + Logitech pedals). Set by device index (0 = auto-detect, 1..N = specific device)
 - **Axis Mapping** — choose throttle/brake axes from a dropdown in Mod Settings — no more editing `config.json`
 
@@ -79,10 +80,7 @@ All settings are in-game: **Main Menu → Settings → Mod Settings → G-series
 |---|---|---|
 | Enable wheel input | ON | Master toggle for steering/throttle/brake injection |
 | Treat clutch as brake | ON | Use clutch pedal as brake (softer pedal) |
-| **Speed steering boost (%)** | 50 | Compensates steering at high speed via Equalizer. 0=off, 50=2x multiplier at 100mph |
-| **Equalizer: 25% input** | 50 | Custom steering curve. Output at 25% physical rotation |
-| **Equalizer: 50% input** | 71 | Custom steering curve. Output at 50% physical rotation |
-| **Equalizer: 75% input** | 86 | Custom steering curve. Output at 75% physical rotation |
+| **Speed steering boost (%)** | 50 | Compensates steering at high speed. 0=off, 50=1.5x at 100 mph, 100=2x max |
 
 ### Axis Mapping Section
 
@@ -111,7 +109,7 @@ All settings are in-game: **Main Menu → Settings → Mod Settings → G-series
 ## Tuning Guide
 
 ### Steering feels dead at high speed
-Increase **Speed steering boost** (try 70–100%) and **Wheel turn add boost** (try 12–20).
+Increase **Speed steering boost** (try 70–100%).
 
 ### Steering is too twitchy at high speed
 Decrease **Speed steering boost** (try 20–40%).
@@ -130,7 +128,9 @@ Adjust **FFB strength** first (overall), then tune individual effects.
 
 ## How It Works
 
-The mod works via a **RED4ext plugin** (`direct_wheel.dll`) that hooks `vehicle::BaseObject::UpdateVehicleCameraInput` to inject wheel axis values each frame. It also runs FFB effects (centering spring, friction, sine, jolt) via DirectInput. The **Speed Steering Boost** multiplies the raw steer input before injection.
+The mod works via a **RED4ext plugin** (`direct_wheel.dll`) that hooks `vehicle::BaseObject::UpdateVehicleCameraInput` to inject wheel axis values each frame. It also runs FFB effects (centering spring, friction, sine, jolt) via DirectInput.
+
+**Steering pipeline:** The game applies a quadratic curve to steering input (`actual_steer ≈ input²`), which makes small wheel angles feel dead (at 10° you only get 3.6% of the linear response). The mod applies the mathematical inverse — `√x` (square root) — before the game processes it, so `√x` → game squares it → `x`. This perfectly linearizes your steering across the full range. The **Speed Steering Boost** then multiplies this linearized signal to compensate for the game's speed-dependent steering attenuation.
 
 ---
 
