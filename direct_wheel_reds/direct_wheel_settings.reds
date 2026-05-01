@@ -102,7 +102,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Speed steering boost (%)")
-  @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed. 0 = off, 50 = 2x at cruise, 100 = 3x at cruise.")
+  @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed by acting on the Equalizer curve. 0 = off, 50 = 2x multiplier at 100 mph.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
@@ -118,7 +118,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
-  let steeringCurve25: Int32 = 40;
+  let steeringCurve25: Int32 = 50;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Wheel input")
@@ -129,7 +129,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
-  let steeringCurve50: Int32 = 70;
+  let steeringCurve50: Int32 = 71;
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
   @runtimeProperty("ModSettings.category", "Wheel input")
@@ -140,7 +140,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
-  let steeringCurve75: Int32 = 87;
+  let steeringCurve75: Int32 = 86;
 
   // ---- Axis mapping -------------------------------------------------------
 

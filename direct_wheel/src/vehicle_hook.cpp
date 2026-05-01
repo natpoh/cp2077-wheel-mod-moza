@@ -498,14 +498,28 @@ namespace direct_wheel::vehicle_hook
                 const float wheelThrottle = Clamp(frame.axes.throttle,  0.0f, 1.0f);
                 const float wheelBrake    = Clamp(frame.axes.brake,     0.0f, 1.0f);
 
+                // Speed Steering Boost: the game internally reduces steering
+                // effectiveness at high speed. We apply a multiplier to the
+                // equalizer curve so that at higher speeds, the same physical
+                // wheel rotation produces a stronger initial steering response.
+                // Formula: multiplier = 1 + speedRatio * 2.0 * (pct/100)
+                // At pct=50, 100 mph (44.704 m/s): 2.0x boost to the curve.
+                float boost = 1.0f;
+                if (cfg.input.speedSensitiveSteeringPct > 0 && vehicleSpeed > 0.5f) {
+                    const float refSpeedMps = 44.704f; // 100 mph
+                    const float speedRatio = vehicleSpeed / refSpeedMps;
+                    boost = 1.0f + speedRatio * 2.0f * (cfg.input.speedSensitiveSteeringPct / 100.0f);
+                }
+
                 // Steering Equalizer (Custom Curve)
                 // We map the physical wheel input (0 to 1) using 3 control points
                 // at 25%, 50%, 75% to allow custom non-linear response curves.
                 float absSteer = std::fabs(wheelSteer);
                 float mappedSteer = 0.0f;
-                const float c25 = cfg.input.steeringCurve25 / 100.0f;
-                const float c50 = cfg.input.steeringCurve50 / 100.0f;
-                const float c75 = cfg.input.steeringCurve75 / 100.0f;
+                
+                const float c25 = Clamp((cfg.input.steeringCurve25 / 100.0f) * boost, 0.0f, 1.0f);
+                const float c50 = Clamp((cfg.input.steeringCurve50 / 100.0f) * boost, 0.0f, 1.0f);
+                const float c75 = Clamp((cfg.input.steeringCurve75 / 100.0f) * boost, 0.0f, 1.0f);
 
                 if (absSteer <= 0.25f) {
                     mappedSteer = (absSteer / 0.25f) * c25;
@@ -518,19 +532,6 @@ namespace direct_wheel::vehicle_hook
                 }
                 
                 wheelSteer = (wheelSteer >= 0.f) ? mappedSteer : -mappedSteer;
-
-                // Speed Steering Boost: the game internally reduces steering
-                // effectiveness at high speed. This multiplier compensates,
-                // so the same physical wheel rotation produces consistent
-                // in-game turn regardless of speed. Formula:
-                //   multiplier = 1 + speedRatio * 2.0 * (pct/100)
-                // At pct=50, cruise: 2.0x steer. At pct=100, cruise: 3.0x.
-                if (cfg.input.speedSensitiveSteeringPct > 0 && vehicleSpeed > 0.5f) {
-                    const float cruiseMps = 20.0f; // ~72 km/h
-                    const float speedRatio = Clamp(vehicleSpeed / cruiseMps, 0.f, 1.5f);
-                    const float boost = 1.0f + speedRatio * 2.0f * (cfg.input.speedSensitiveSteeringPct / 100.0f);
-                    wheelSteer = Clamp(wheelSteer * boost, -1.0f, 1.0f);
-                }
 
                 g_debugRawSteer.store(frame.axes.steer, std::memory_order_relaxed);
                 g_debugWheelSteer.store(wheelSteer, std::memory_order_relaxed);

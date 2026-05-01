@@ -18,9 +18,9 @@ namespace direct_wheel::config
         bool        invertBrake = false;
         std::string responseCurve = "default"; // default | subdued | sharp
         int32_t     speedSensitiveSteeringPct = 50; // 0=off, 100=max boost at speed
-        int32_t     steeringCurve25 = 40;  // output at 25% input
-        int32_t     steeringCurve50 = 70;  // output at 50% input
-        int32_t     steeringCurve75 = 87;  // output at 75% input
+        int32_t     steeringCurve25 = 50;  // output at 25% input
+        int32_t     steeringCurve50 = 71;  // output at 50% input
+        int32_t     steeringCurve75 = 86;  // output at 75% input
         float       maxWheelTurnDeg = 0.f;            // 0 = don't override
         float       wheelTurnMaxAddPerSecond = 0.f;   // 0 = don't override
         float       wheelTurnMaxSubPerSecond = 0.f;   // 0 = don't override

@@ -54,6 +54,7 @@ namespace direct_wheel::wheel
             std::atomic<uint32_t> joltTicksLeft{0};
 
             std::atomic<bool> pendingReset{false};
+            std::atomic<uint32_t> deferredFFBAttempts{0};
         };
 
         State& S() { static State s; return s; }
@@ -635,16 +636,29 @@ namespace direct_wheel::wheel
         }
 
         // Deferred FFB init: if we started without EXCLUSIVE access,
-        // retry every tick until the game window appears.
-        if (st.pWheel && !st.hasFFB.load() && !st.pConstantEffect) {
+        // retry until the game window appears. Cap at 3 attempts so
+        // devices that genuinely lack DirectInput FFB (Moza, Simagic,
+        // etc.) don't churn Unacquire/Acquire every tick forever.
+        constexpr uint32_t kMaxDeferredFFBAttempts = 3;
+        if (st.pWheel && !st.hasFFB.load() && !st.pConstantEffect
+            && st.deferredFFBAttempts.load() < kMaxDeferredFFBAttempts) {
             HWND hwnd = FindOwnGameWindow();
             if (hwnd) {
+                uint32_t attempt = st.deferredFFBAttempts.fetch_add(1) + 1;
                 st.pWheel->Unacquire();
                 HRESULT hrCoop = st.pWheel->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
-                log::InfoF("[direct_wheel] Deferred SetCooperativeLevel(EXCLUSIVE|BACKGROUND) hr=0x%08lX", (unsigned long)hrCoop);
+                log::InfoF("[direct_wheel] Deferred FFB attempt %u/%u: SetCooperativeLevel(EXCLUSIVE|BACKGROUND) hr=0x%08lX",
+                           attempt, kMaxDeferredFFBAttempts, (unsigned long)hrCoop);
                 HRESULT hrAcq = st.pWheel->Acquire();
-                log::InfoF("[direct_wheel] Deferred Acquire hr=0x%08lX", (unsigned long)hrAcq);
+                log::InfoF("[direct_wheel] Deferred FFB attempt %u/%u: Acquire hr=0x%08lX",
+                           attempt, kMaxDeferredFFBAttempts, (unsigned long)hrAcq);
                 InitFFB(st);
+                if (!st.hasFFB.load() && attempt >= kMaxDeferredFFBAttempts) {
+                    log::Warn("[direct_wheel] FFB init failed after max retries — device does not support "
+                              "DirectInput force feedback (E_NOTIMPL). Wheel axes will still work. "
+                              "If your wheelbase uses a proprietary SDK (Moza Pit House, Simagic, etc.) "
+                              "its own centering / FFB profile will remain active.");
+                }
             }
         }
 
@@ -760,6 +774,7 @@ namespace direct_wheel::wheel
             st.pPedals = nullptr;
         }
         st.hasFFB.store(false, std::memory_order_release);
+        st.deferredFFBAttempts.store(0, std::memory_order_release);
         centering_state::Reset();
         log::Info("[direct_wheel] DoResetDevices: devices released, will re-enumerate on next Pump()");
     }

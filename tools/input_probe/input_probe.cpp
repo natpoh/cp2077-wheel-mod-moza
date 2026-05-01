@@ -66,6 +66,7 @@ int main() {
 
     if (g_devices.empty()) {
         std::cerr << "No game controllers found!\n";
+        system("pause");
         return 1;
     }
 
