@@ -107,7 +107,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
-  let speedSensitiveSteeringPct: Int32 = 50;
+  let speedSensitiveSteeringPct: Int32 = 45;
 
   // Legacy equalizer control points — replaced by automatic sqrt curve
   // (v2.35.0+). The sqrt inverse perfectly linearises the game's quadratic

@@ -80,7 +80,7 @@ All settings are in-game: **Main Menu → Settings → Mod Settings → G-series
 |---|---|---|
 | Enable wheel input | ON | Master toggle for steering/throttle/brake injection |
 | Treat clutch as brake | ON | Use clutch pedal as brake (softer pedal) |
-| **Speed steering boost (%)** | 50 | Compensates steering at high speed. 0=off, 50=1.5x at 100 mph, 100=2x max |
+| **Speed steering boost (%)** | 45 | Compensates steering at high speed. 0=off, 50=1.5x at 100 mph, 100=2x max |
 
 ### Axis Mapping Section
 
