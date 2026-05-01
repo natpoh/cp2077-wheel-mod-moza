@@ -28,7 +28,6 @@ The mod auto-detects what hardware your Logitech wheel actually has (force feedb
 
 [size=4][b]New Features[/b][/size]
 [list]
-[*][b]Custom Steering Equalizer:[/b] 3-point equalizer (25%, 50%, 75%) to customize your steering curve and perfectly counteract the game's internal exponential steering physics!
 [*][b]Speed Steering Boost:[/b] Compensates steering at speed by amplifying the Equalizer curve up to a 2x multiplier at 100 mph, so you can still turn perfectly at high speeds.
 [*][b]Invert Pedals:[/b] Separate settings to invert throttle and brake pedals directly in the mod menu.
 [*][b]Device & Axis Mapping:[/b] Select wheel and pedal devices independently (for split-device USB setups) and pick throttle/brake axes from an in-game dropdown — no more editing config.json!
