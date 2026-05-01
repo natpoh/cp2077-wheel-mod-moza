@@ -502,13 +502,14 @@ namespace direct_wheel::vehicle_hook
                 // effectiveness at high speed. We apply a multiplier to the
                 // equalizer curve so that at higher speeds, the same physical
                 // wheel rotation produces a stronger initial steering response.
-                // Formula: multiplier = 1 + speedRatio * 2.0 * (pct/100)
-                // At pct=50, 100 mph (44.704 m/s): 2.0x boost to the curve.
+                // Formula: multiplier = 1 + speedRatio * (pct/100)
+                // At pct=100, 100 mph (44.704 m/s): 2.0x boost (max).
+                // At pct=50,  100 mph: 1.5x boost.
                 float boost = 1.0f;
                 if (cfg.input.speedSensitiveSteeringPct > 0 && vehicleSpeed > 0.5f) {
                     const float refSpeedMps = 44.704f; // 100 mph
                     const float speedRatio = vehicleSpeed / refSpeedMps;
-                    boost = 1.0f + speedRatio * 2.0f * (cfg.input.speedSensitiveSteeringPct / 100.0f);
+                    boost = 1.0f + speedRatio * (cfg.input.speedSensitiveSteeringPct / 100.0f);
                 }
 
                 // Steering Equalizer (sqrt curve)

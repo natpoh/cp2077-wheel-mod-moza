@@ -4,7 +4,7 @@ Full racing wheel support for Cyberpunk 2077 v2.32 with **force feedback**, **sp
 
 Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
-### 📥 [Download direct_wheel-2.35.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-2.35.0.zip)
+### 📥 [Download direct_wheel-2.36.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-2.36.0.zip)
 
 ---
 
@@ -13,7 +13,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 ### 🎮 Wheel Input
 - **Steering, Throttle, Brake, Clutch** — full axis mapping via Logitech SDK / DirectInput
 - **Clutch-as-Brake** — use the softer clutch pedal as brake (toggle in settings)
-- **Speed Steering Boost** — compensates for the game's built-in steering reduction at high speed. Multiplies steering input up to **3x** at cruise speed so the same physical wheel rotation produces consistent in-game turns regardless of velocity
+- **Speed Steering Boost** — compensates for the game's built-in steering reduction at high speed. Multiplies steering input up to **2x** at cruise speed so the same physical wheel rotation produces consistent in-game turns regardless of velocity
 - **Device Selector** — pick wheel and pedal devices independently for split-device setups (e.g. Moza wheel + Logitech pedals). Set by device index (0 = auto-detect, 1..N = specific device)
 - **Axis Mapping** — choose throttle/brake axes from a dropdown in Mod Settings — no more editing `config.json`
 
@@ -44,7 +44,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ### Quick Install (zip)
 
-1. Download `direct_wheel-2.35.0.zip`
+1. Download `direct_wheel-2.36.0.zip`
 2. Extract **directly into your Cyberpunk 2077 game folder**, for example:
    ```
    D:\SteamLibrary\steamapps\common\Cyberpunk 2077\

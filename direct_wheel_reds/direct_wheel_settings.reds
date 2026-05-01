@@ -102,7 +102,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Speed steering boost (%)")
-  @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed by acting on the Equalizer curve. 0 = off, 50 = 2x multiplier at 100 mph.")
+  @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed by acting on the Equalizer curve. 0 = off, 50 = 1.5x at 100 mph, 100 = 2x max.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
