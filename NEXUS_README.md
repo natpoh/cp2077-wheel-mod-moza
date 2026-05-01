@@ -23,8 +23,9 @@ The mod was designed to work with DirectInput-compatible wheels. Tested and conf
 The mod auto-detects what hardware your Logitech wheel actually has (force feedback motor, rev-strip LEDs, lower-cluster buttons) and only shows the relevant settings.
 
 ## New Features
-- **Custom Steering Equalizer:** 3-point equalizer (25%, 50%, 75%) to customize your steering curve and perfectly counteract the game's internal exponential steering physics! 
-- **Speed Steering Boost:** Compensates steering at speed by amplifying the Equalizer curve up to a 2x multiplier at 100 mph, so you can still turn perfectly at high speeds.
+- **Automatic Steering Linearization:** The game applies a quadratic curve to steering (actual_steer ≈ input²), which kills small-angle precision — at 10° wheel turn you only get 3.6% of the expected response. The mod applies the mathematical inverse (√x) before the game processes it, so √x → game squares it → x. Your steering is perfectly linear across the full wheel range, no manual tuning needed.
+- **Speed Steering Boost:** Compensates steering at speed by amplifying the linearized signal up to a 2x multiplier at 100 mph, so you can still turn perfectly at high speeds.
+- **Invert Pedals:** Separate settings to invert throttle and brake pedals directly in the mod menu.
 - **Device & Axis Mapping:** Select wheel and pedal devices independently (for split-device setups), and pick throttle/brake axes from a dropdown — no more editing `config.json`. Use the included `input_probe.exe` to identify your device numbers and axes.
 
 ## Required mods
