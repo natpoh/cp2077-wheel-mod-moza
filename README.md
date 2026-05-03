@@ -80,8 +80,8 @@ All settings are in-game: **Main Menu → Settings → Mod Settings → G-series
 | Enable wheel input | ON | Master toggle for steering/throttle/brake injection |
 | Treat clutch as brake | ON | Use clutch pedal as brake (softer pedal) |
 | Speed steering boost (%) | 45 | Compensates steering at high speed. 0=off, 50=1.5x at 100 mph, 100=2x max |
-| Steering turn speed | 1 | Engine physics limit for turn speed. **Recommendation: set higher than 1 (STOCK) for accurate and fast responsiveness.** *(Requires game restart to apply)* |
-| Steering re-center speed | 1 | Engine physics limit for return-to-center speed. **Recommendation: set higher than 1 (STOCK).** *(Requires game restart to apply)* |
+| Steering turn speed | 1 | Engine physics limit for turn speed. **For wheel play, set to 6+.** *(Requires game restart to apply)* |
+| Steering re-center speed | 1 | Engine physics limit for return-to-center speed. **For wheel play, set to 6+.** *(Requires game restart to apply)* |
 
 ### Axis Mapping Section
 
