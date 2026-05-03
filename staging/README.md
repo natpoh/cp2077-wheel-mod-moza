@@ -37,7 +37,6 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 1. **Cyberpunk 2077 v2.32** (latest patch)
 2. **[RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380)** — native plugin loader
 3. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** — in-game settings UI (patched version included)
-5. **Logitech G HUB** or **Logitech Gaming Software** — must be running (provides the steering SDK)
 
 ---
 

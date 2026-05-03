@@ -12,6 +12,8 @@
 #include "led.h"
 #include "mod_settings_seed.h"
 
+#include <RED4ext/TweakDB.hpp>
+
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -63,8 +65,22 @@ namespace direct_wheel
         {
             using namespace std::chrono_literals;
             log::Info("[direct_wheel] pump thread started (250 Hz)");
+            bool tdbPatched = false;
+
             while (g_pumpRunning.load(std::memory_order_acquire))
             {
+                if (!tdbPatched)
+                {
+                    auto* tdb = RED4ext::TweakDB::Get();
+                    if (tdb && tdb->flats.size > 1000)
+                    {
+                        if (rtti::ApplySteeringMultAllRecords())
+                        {
+                            tdbPatched = true;
+                        }
+                    }
+                }
+
                 wheel::Pump();
                 const sources::Frame frame = BuildFrame(wheel::CurrentSnapshot());
                 sources::Publish(frame);

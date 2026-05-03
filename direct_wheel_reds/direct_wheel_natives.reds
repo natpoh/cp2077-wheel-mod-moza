@@ -48,6 +48,10 @@ public static native func DirectWheel_SetSpeedSensitiveSteeringPct(pct: Int32) -
 public static native func DirectWheel_SetSteeringCurve25(pct: Int32) -> Bool;
 public static native func DirectWheel_SetSteeringCurve50(pct: Int32) -> Bool;
 public static native func DirectWheel_SetSteeringCurve75(pct: Int32) -> Bool;
+public static native func DirectWheel_SetSteeringTurnSpeedIdx(idx: Int32) -> Bool;
+public static native func DirectWheel_SetSteeringRecenterSpeedIdx(idx: Int32) -> Bool;
+public static native func DirectWheel_GetSteeringTurnSpeedIdx() -> Int32;
+public static native func DirectWheel_GetSteeringRecenterSpeedIdx() -> Int32;
 
 // Rev-strip LED bar on top of the wheel (G29/G920/G923). VisualizerWhileMusic
 // swaps the speed-driven rev bar for a WASAPI-loopback audio visualizer

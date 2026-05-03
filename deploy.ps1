@@ -45,7 +45,7 @@ function Fail($msg)    {
 
 # ---------- version ---------------------------------------------------------
 
-$version = "2.36.0"
+$version = "2.37.0"
 try {
   $modInfo = Get-Content -Raw "mod_info.json" | ConvertFrom-Json
   if ($modInfo.version) { $version = $modInfo.version }
@@ -205,16 +205,7 @@ if ($Game) {
     Info "Deployed patched mod_settings.dll -> $modSettingsTarget"
   }
 
-  # Logitech Gaming Software / G HUB runtime check. The Logitech SDK the DLL
-  # is built against talks to either LGS or G HUB through a shared user-mode
-  # service; without it LogiSteeringInitialize will fail in-process and the
-  # pump thread will log retry warnings.
-  $ghub = Get-Process -Name "lghub","LCore" -ErrorAction SilentlyContinue
-  if (-not $ghub) {
-    Warn "Neither G HUB (lghub.exe) nor LGS (LCore.exe) is running. Start one before launching CP2077."
-  } else {
-    Info "Logitech runtime detected: $($ghub[0].ProcessName)"
-  }
+  # (Legacy: We used to check for Logitech G HUB here, but the mod now uses raw DirectInput and works without it).
 
   foreach ($r in $redsFiles) {
     $dest = Join-Path $scriptDir (Split-Path $r -Leaf)
@@ -275,9 +266,7 @@ if ($Game) {
   Write-Host '  2. Check logs for load confirmation:'
   Write-Host ("       " + (Join-Path $Game 'red4ext\logs\direct_wheel-*.log'))
   Write-Host ("     Look for:   [direct_wheel] loaded v" + $version)
-  Write-Host '                 [direct_wheel] Logitech Steering Wheel SDK v...'
   Write-Host '                 [direct_wheel] wheel bound at SDK slot 0: "G923 ..."'
-  Write-Host '                 [direct_wheel] firing direct_wheel handshake (LED sweep + 4 triplets + centering breath)'
   Write-Host '                 [direct_wheel:hook] UpdateVehicleCameraInput fired for the first time (live-hook signal once you enter a vehicle)'
   Write-Host '     If the game fails to launch with an RED4ext MessageBox, the UpdateVehicleCameraInput hash did not resolve - update RED4ext itself (its address database ships per game patch).'
   Write-Host '  3. Check redscript compile log (if the Settings page or mount/menu wrappers break):'

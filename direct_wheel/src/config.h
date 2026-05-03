@@ -22,8 +22,16 @@ namespace direct_wheel::config
         int32_t     steeringCurve50 = 71;  // output at 50% input
         int32_t     steeringCurve75 = 86;  // output at 75% input
         float       maxWheelTurnDeg = 0.f;            // 0 = don't override
-        float       wheelTurnMaxAddPerSecond = 0.f;   // 0 = don't override
-        float       wheelTurnMaxSubPerSecond = 0.f;   // 0 = don't override
+        float       wheelTurnMaxAddPerSecond = 0.f;   // 0 = don't override (legacy)
+        float       wheelTurnMaxSubPerSecond = 0.f;   // 0 = don't override (legacy)
+
+        // Steering response multiplier indices (inspired by Cyber Vehicle Overhaul).
+        // Applied as TweakDB multipliers on wheelTurnMaxAddPerSecond and
+        // wheelTurnMaxSubPerSecond per vehicle at mount time.
+        // Index 0..8 maps to: 0.5, 1, 1.5, 3, 10, 50, 100, 500, 1000.
+        // Default = 1 (index 1 = 1.0x = stock).
+        int32_t     steeringTurnSpeedIdx    = 1; // 0..8, index into multiplier table
+        int32_t     steeringRecenterSpeedIdx = 1; // 0..8, index into multiplier table
     };
 
     struct Ffb
@@ -204,6 +212,8 @@ namespace direct_wheel::config
     void SetSteeringCurve25(int32_t v);
     void SetSteeringCurve50(int32_t v);
     void SetSteeringCurve75(int32_t v);
+    void SetSteeringTurnSpeedIdx(int32_t v);
+    void SetSteeringRecenterSpeedIdx(int32_t v);
 
     void SetHandshakePlayOnStart(bool v);
 

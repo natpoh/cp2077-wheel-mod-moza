@@ -109,6 +109,28 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let speedSensitiveSteeringPct: Int32 = 45;
 
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Steering turn speed")
+  @runtimeProperty("ModSettings.description", "How fast in-game wheels turn when you steer. 0=x0.5  1=STOCK  2=x1.5  3=x3  4=x10  5=x50  6=x100  7=x500  8=x1000. Higher = less input delay.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "8")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringTurnSpeedIdx: Int32 = 1;
+
+  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Steering re-center speed")
+  @runtimeProperty("ModSettings.description", "How fast in-game wheels snap back to center. 0=x0.5  1=STOCK  2=x1.5  3=x3  4=x10  5=x50  6=x100  7=x500  8=x1000. Higher = less return delay.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "8")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringRecenterSpeedIdx: Int32 = 1;
+
   // Legacy equalizer control points — replaced by automatic sqrt curve
   // (v2.35.0+). The sqrt inverse perfectly linearises the game's quadratic
   // steering response, making manual tuning unnecessary. Hidden from the UI
@@ -496,6 +518,8 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetSteeringCurve25(this.steeringCurve25);
     DirectWheel_SetSteeringCurve50(this.steeringCurve50);
     DirectWheel_SetSteeringCurve75(this.steeringCurve75);
+    DirectWheel_SetSteeringTurnSpeedIdx(this.steeringTurnSpeedIdx);
+    DirectWheel_SetSteeringRecenterSpeedIdx(this.steeringRecenterSpeedIdx);
 
     DirectWheel_SetHandshakePlayOnStart(this.handshakePlayOnStart);
 

@@ -8,9 +8,9 @@ namespace direct_wheel
     inline constexpr const wchar_t* kPluginName = L"direct_wheel";
     inline constexpr const wchar_t* kPluginAuthor = L"Grant Perdue";
     inline constexpr int kVersionMajor = 2;
-    inline constexpr int kVersionMinor = 36;
+    inline constexpr int kVersionMinor = 37;
     inline constexpr int kVersionPatch = 0;
-    inline constexpr const char* kVersionString = "2.36.0";
+    inline constexpr const char* kVersionString = "2.37.0";
 
     struct PluginContext
     {

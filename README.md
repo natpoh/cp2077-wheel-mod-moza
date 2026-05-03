@@ -37,7 +37,6 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 1. **Cyberpunk 2077 v2.32** (latest patch)
 2. **[RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380)** — native plugin loader
 3. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** — in-game settings UI (patched version included)
-5. **Logitech G HUB** or **Logitech Gaming Software** — must be running (provides the steering SDK)
 
 ---
 
@@ -80,7 +79,9 @@ All settings are in-game: **Main Menu → Settings → Mod Settings → G-series
 |---|---|---|
 | Enable wheel input | ON | Master toggle for steering/throttle/brake injection |
 | Treat clutch as brake | ON | Use clutch pedal as brake (softer pedal) |
-| **Speed steering boost (%)** | 45 | Compensates steering at high speed. 0=off, 50=1.5x at 100 mph, 100=2x max |
+| Speed steering boost (%) | 45 | Compensates steering at high speed. 0=off, 50=1.5x at 100 mph, 100=2x max |
+| Steering turn speed | 1 | Engine physics limit for turn speed. **Recommendation: set higher than 1 (STOCK) for accurate and fast responsiveness.** |
+| Steering re-center speed | 1 | Engine physics limit for return-to-center speed. **Recommendation: set higher than 1 (STOCK).** |
 
 ### Axis Mapping Section
 
