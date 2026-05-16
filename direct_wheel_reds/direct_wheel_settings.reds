@@ -27,11 +27,9 @@
 //      the moment of process start. Plug or unplug the wheel = restart the
 //      game once for the section list to catch up.
 //
-// `ModSettings.hidden` requires our patched build of mod_settings (a
-// small patch on top of jackhumbert/mod_settings v0.2.21, see
-// vendor/mod_settings/). Plain upstream mod_settings ignores the hidden
-// runtime property and the three capability flags would render as visible
-// Bool toggles. deploy.ps1 ships our patched DLL alongside direct_wheel.dll.
+// `ModSettings.hidden` is an experimental property. Upstream mod_settings
+// currently ignores it and the three capability flags will render as visible
+// Bool toggles, but this property is kept in case future versions support it.
 //
 // mod_settings dependency evaluation reads from its OWN internal
 // RuntimeVariable<T> storage, NOT from the instance passed to
@@ -44,32 +42,32 @@ public class DirectWheelSettings extends IScriptable {
 
   // ---- Hidden capability flags (auto-set in OnGameAttached) --------------
   //
-  // ModSettings.hidden = "true" makes these invisible in the settings UI.
-  // Requires our patched mod_settings build (vendor/mod_settings/). Other
-  // fields reference these as `ModSettings.dependency` targets to hide
+  // ModSettings.hidden = "true" is meant to make these invisible in the settings UI.
+  // Plain upstream mod_settings ignores this, so these render as visible toggles.
+  // Other fields reference these as `ModSettings.dependency` targets to hide
   // entire sections on wheels without the relevant hardware.
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.hidden", "true")
   let hasFfbHardware: Bool = true;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.hidden", "true")
   let hasRevLeds: Bool = true;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.hidden", "true")
   let hasRightCluster: Bool = true;
 
   // ---- Wheel input --------------------------------------------------------
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Enable wheel input")
   let inputEnabled: Bool = true;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Treat clutch as brake")
@@ -77,28 +75,28 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let clutchAsBrake: Bool = true;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Invert steering")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let invertSteering: Bool = false;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Invert throttle pedal")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let invertThrottle: Bool = false;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Invert brake pedal")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let invertBrake: Bool = false;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Speed steering boost (%)")
@@ -109,7 +107,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let speedSensitiveSteeringPct: Int32 = 45;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Steering turn speed")
@@ -120,7 +118,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let steeringTurnSpeedIdx: Int32 = 1;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Steering re-center speed")
@@ -136,21 +134,21 @@ public class DirectWheelSettings extends IScriptable {
   // steering response, making manual tuning unnecessary. Hidden from the UI
   // but kept for backward compat with saved user.ini files.
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.hidden", "true")
   let steeringCurve25: Int32 = 50;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.hidden", "true")
   let steeringCurve50: Int32 = 71;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.hidden", "true")
   let steeringCurve75: Int32 = 86;
 
   // ---- Axis mapping -------------------------------------------------------
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Axis mapping")
   @runtimeProperty("ModSettings.category.order", "150")
   @runtimeProperty("ModSettings.displayName", "Wheel device (0 = Auto)")
@@ -160,7 +158,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.step", "1")
   let wheelDeviceIndex: Int32 = 0;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Axis mapping")
   @runtimeProperty("ModSettings.category.order", "150")
   @runtimeProperty("ModSettings.displayName", "Pedal device (0 = Same as wheel)")
@@ -170,14 +168,14 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.step", "1")
   let pedalDeviceIndex: Int32 = 0;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Axis mapping")
   @runtimeProperty("ModSettings.category.order", "150")
   @runtimeProperty("ModSettings.displayName", "Throttle axis")
   @runtimeProperty("ModSettings.description", "Which DirectInput axis to read as throttle. Default: lZ (Logitech). Moza pedals often use lY.")
   let throttleAxis: DirectWheelAxis = DirectWheelAxis.lZ;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Axis mapping")
   @runtimeProperty("ModSettings.category.order", "150")
   @runtimeProperty("ModSettings.displayName", "Brake axis")
@@ -186,14 +184,14 @@ public class DirectWheelSettings extends IScriptable {
 
   // ---- Force feedback - General -------------------------------------------
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Force feedback")
   @runtimeProperty("ModSettings.category.order", "200")
   @runtimeProperty("ModSettings.displayName", "Enable force feedback")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let ffbEnabled: Bool = true;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Force feedback")
   @runtimeProperty("ModSettings.category.order", "200")
   @runtimeProperty("ModSettings.displayName", "FFB strength (%)")
@@ -204,7 +202,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let ffbTorquePct: Int32 = 100;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Force feedback")
   @runtimeProperty("ModSettings.category.order", "200")
   @runtimeProperty("ModSettings.displayName", "Stationary threshold (m/s)")
@@ -220,7 +218,7 @@ public class DirectWheelSettings extends IScriptable {
   // These three sliders all feed into the DirectInput Spring effect.
   // Together they control how strongly the wheel pulls back to center.
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "FFB - Centering (Spring)")
   @runtimeProperty("ModSettings.category.order", "210")
   @runtimeProperty("ModSettings.displayName", "Spring Force (%)")
@@ -231,7 +229,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let springForcePct: Int32 = 60;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "FFB - Centering (Spring)")
   @runtimeProperty("ModSettings.category.order", "210")
   @runtimeProperty("ModSettings.displayName", "Constant Force - centering addition (%)")
@@ -242,7 +240,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let constantForcePct: Int32 = 50;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "FFB - Centering (Spring)")
   @runtimeProperty("ModSettings.category.order", "210")
   @runtimeProperty("ModSettings.displayName", "Cornering feedback - spring stiffness (%)")
@@ -255,7 +253,7 @@ public class DirectWheelSettings extends IScriptable {
 
   // ---- FFB - Steering feel ------------------------------------------------
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "FFB - Steering feel")
   @runtimeProperty("ModSettings.category.order", "220")
   @runtimeProperty("ModSettings.displayName", "Damper - rotation resistance (%)")
@@ -266,7 +264,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let damperForcePct: Int32 = 45;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "FFB - Steering feel")
   @runtimeProperty("ModSettings.category.order", "220")
   @runtimeProperty("ModSettings.displayName", "Active Torque - yaw push (%)")
@@ -277,7 +275,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let activeTorqueStrengthPct: Int32 = 45;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "FFB - Steering feel")
   @runtimeProperty("ModSettings.category.order", "220")
   @runtimeProperty("ModSettings.displayName", "Friction - road texture (%)")
@@ -290,7 +288,7 @@ public class DirectWheelSettings extends IScriptable {
 
   // ---- FFB - Road effects -------------------------------------------------
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "FFB - Road effects")
   @runtimeProperty("ModSettings.category.order", "230")
   @runtimeProperty("ModSettings.displayName", "Road vibration - surface buzz (%)")
@@ -301,7 +299,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let sineForcePct: Int32 = 10;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "FFB - Road effects")
   @runtimeProperty("ModSettings.category.order", "230")
   @runtimeProperty("ModSettings.displayName", "Collision jolt - impact kick (%)")
@@ -314,14 +312,14 @@ public class DirectWheelSettings extends IScriptable {
 
   // ---- Rev-strip LEDs -----------------------------------------------------
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Rev-strip LEDs")
   @runtimeProperty("ModSettings.category.order", "300")
   @runtimeProperty("ModSettings.displayName", "Enable rev-strip LEDs")
   @runtimeProperty("ModSettings.dependency", "hasRevLeds")
   let ledEnabled: Bool = true;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Rev-strip LEDs")
   @runtimeProperty("ModSettings.category.order", "300")
   @runtimeProperty("ModSettings.displayName", "Rev strip as visualizer while music is playing")
@@ -343,91 +341,91 @@ public class DirectWheelSettings extends IScriptable {
   // Cyberpunk profile. Otherwise G HUB + plugin both fire keyboard
   // events and you'll get doubled keypresses.
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "Left paddle shifter")
   let bindPaddleLeft: DirectWheelAction = DirectWheelAction.ShootPrimary;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "Right paddle shifter")
   let bindPaddleRight: DirectWheelAction = DirectWheelAction.ShootPrimary;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "D-pad Up")
   let bindDpadUp: DirectWheelAction = DirectWheelAction.MenuUp;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "D-pad Down")
   let bindDpadDown: DirectWheelAction = DirectWheelAction.MenuDown;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "D-pad Left")
   let bindDpadLeft: DirectWheelAction = DirectWheelAction.MenuLeft;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "D-pad Right")
   let bindDpadRight: DirectWheelAction = DirectWheelAction.MenuRight;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "A button")
   let bindButtonA: DirectWheelAction = DirectWheelAction.MenuConfirm;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "B button (in-vehicle)")
   let bindButtonB: DirectWheelAction = DirectWheelAction.Handbrake;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "X button (in-vehicle)")
   let bindButtonX: DirectWheelAction = DirectWheelAction.Horn;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "Y button (in-vehicle)")
   let bindButtonY: DirectWheelAction = DirectWheelAction.Autodrive;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "Start button")
   let bindStart: DirectWheelAction = DirectWheelAction.Pause;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "Select / View button")
   let bindSelect: DirectWheelAction = DirectWheelAction.OpenMap;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "LSB (left stick click)")
   let bindLSB: DirectWheelAction = DirectWheelAction.OpenPhone;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "RSB (right stick click)")
   let bindRSB: DirectWheelAction = DirectWheelAction.RadioMenu;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "Xbox / Guide button")
@@ -435,44 +433,106 @@ public class DirectWheelSettings extends IScriptable {
 
   // ---- Lower-cluster bindings (G29 / G923 / G PRO; absent on G920) -------
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Lower-cluster bindings")
   @runtimeProperty("ModSettings.category.order", "500")
   @runtimeProperty("ModSettings.displayName", "Plus (+) button")
   @runtimeProperty("ModSettings.dependency", "hasRightCluster")
   let bindPlus: DirectWheelAction = DirectWheelAction.CameraCycleForward;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Lower-cluster bindings")
   @runtimeProperty("ModSettings.category.order", "500")
   @runtimeProperty("ModSettings.displayName", "Minus (-) button")
   @runtimeProperty("ModSettings.dependency", "hasRightCluster")
   let bindMinus: DirectWheelAction = DirectWheelAction.Headlights;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Lower-cluster bindings")
   @runtimeProperty("ModSettings.category.order", "500")
   @runtimeProperty("ModSettings.displayName", "Scroll click (Return)")
   @runtimeProperty("ModSettings.dependency", "hasRightCluster")
   let bindScrollClick: DirectWheelAction = DirectWheelAction.HolsterWeapon;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Lower-cluster bindings")
   @runtimeProperty("ModSettings.category.order", "500")
   @runtimeProperty("ModSettings.displayName", "Scroll clockwise")
   @runtimeProperty("ModSettings.dependency", "hasRightCluster")
   let bindScrollCW: DirectWheelAction = DirectWheelAction.NextWeapon;
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Lower-cluster bindings")
   @runtimeProperty("ModSettings.category.order", "500")
   @runtimeProperty("ModSettings.displayName", "Scroll counter-clockwise")
   @runtimeProperty("ModSettings.dependency", "hasRightCluster")
   let bindScrollCCW: DirectWheelAction = DirectWheelAction.PrevWeapon;
+  // ---- Extra Generic Buttons (Moza, Fanatec, Simagic, etc) ---------------
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 1 (Moza N)")
+  let bindExtra1: DirectWheelAction = DirectWheelAction.None;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 2 (Moza WIP)")
+  let bindExtra2: DirectWheelAction = DirectWheelAction.None;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 3 (Moza FL)")
+  let bindExtra3: DirectWheelAction = DirectWheelAction.None;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 4 (Moza CAM)")
+  let bindExtra4: DirectWheelAction = DirectWheelAction.None;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 5 (Moza S1)")
+  let bindExtra5: DirectWheelAction = DirectWheelAction.None;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 6 (Moza S2)")
+  let bindExtra6: DirectWheelAction = DirectWheelAction.None;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 7 (Moza P)")
+  let bindExtra7: DirectWheelAction = DirectWheelAction.None;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 8 (Moza BOX)")
+  let bindExtra8: DirectWheelAction = DirectWheelAction.None;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 9 (Moza PL)")
+  let bindExtra9: DirectWheelAction = DirectWheelAction.None;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category.order", "550")
+  @runtimeProperty("ModSettings.displayName", "Extra 10")
+  let bindExtra10: DirectWheelAction = DirectWheelAction.None;
+
 
   // ---- Startup ------------------------------------------------------------
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Startup")
   @runtimeProperty("ModSettings.category.order", "600")
   @runtimeProperty("ModSettings.displayName", "Pon pon shi greeting")
@@ -481,7 +541,7 @@ public class DirectWheelSettings extends IScriptable {
 
   // ---- Debug --------------------------------------------------------------
 
-  @runtimeProperty("ModSettings.mod", "G-series Wheel")
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Debug")
   @runtimeProperty("ModSettings.category.order", "700")
   @runtimeProperty("ModSettings.displayName", "Debug logging")
@@ -555,6 +615,16 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetInputBinding(17, EnumInt(this.bindScrollCW));
     DirectWheel_SetInputBinding(18, EnumInt(this.bindScrollCCW));
     DirectWheel_SetInputBinding(19, EnumInt(this.bindXbox));
+    DirectWheel_SetInputBinding(20, EnumInt(this.bindExtra1));
+    DirectWheel_SetInputBinding(21, EnumInt(this.bindExtra2));
+    DirectWheel_SetInputBinding(22, EnumInt(this.bindExtra3));
+    DirectWheel_SetInputBinding(23, EnumInt(this.bindExtra4));
+    DirectWheel_SetInputBinding(24, EnumInt(this.bindExtra5));
+    DirectWheel_SetInputBinding(25, EnumInt(this.bindExtra6));
+    DirectWheel_SetInputBinding(26, EnumInt(this.bindExtra7));
+    DirectWheel_SetInputBinding(27, EnumInt(this.bindExtra8));
+    DirectWheel_SetInputBinding(28, EnumInt(this.bindExtra9));
+    DirectWheel_SetInputBinding(29, EnumInt(this.bindExtra10));
 
     // Trigger a safe device re-enumeration so device index changes take effect.
     // ResetDevices only sets a flag; the pump thread handles the actual reset.
@@ -685,4 +755,6 @@ protected cb func OnGameAttached() -> Bool {
   }
   return result;
 }
+
+
 

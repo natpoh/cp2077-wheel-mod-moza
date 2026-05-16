@@ -27,11 +27,9 @@
 //      the moment of process start. Plug or unplug the wheel = restart the
 //      game once for the section list to catch up.
 //
-// `ModSettings.hidden` requires our patched build of mod_settings (a
-// small patch on top of jackhumbert/mod_settings v0.2.21, see
-// vendor/mod_settings/). Plain upstream mod_settings ignores the hidden
-// runtime property and the three capability flags would render as visible
-// Bool toggles. deploy.ps1 ships our patched DLL alongside direct_wheel.dll.
+// `ModSettings.hidden` is an experimental property. Upstream mod_settings
+// currently ignores it and the three capability flags will render as visible
+// Bool toggles, but this property is kept in case future versions support it.
 //
 // mod_settings dependency evaluation reads from its OWN internal
 // RuntimeVariable<T> storage, NOT from the instance passed to
@@ -44,9 +42,9 @@ public class DirectWheelSettings extends IScriptable {
 
   // ---- Hidden capability flags (auto-set in OnGameAttached) --------------
   //
-  // ModSettings.hidden = "true" makes these invisible in the settings UI.
-  // Requires our patched mod_settings build (vendor/mod_settings/). Other
-  // fields reference these as `ModSettings.dependency` targets to hide
+  // ModSettings.hidden = "true" is meant to make these invisible in the settings UI.
+  // Plain upstream mod_settings ignores this, so these render as visible toggles.
+  // Other fields reference these as `ModSettings.dependency` targets to hide
   // entire sections on wheels without the relevant hardware.
 
   @runtimeProperty("ModSettings.mod", "G-series Wheel")
@@ -113,7 +111,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Steering turn speed")
-  @runtimeProperty("ModSettings.description", "How fast in-game wheels turn when you steer. 0=x0.5  1=STOCK  2=x1.5  3=x3  4=x10  5=x50  6=x100  7=x500  8=x1000. Higher = less input delay.")
+  @runtimeProperty("ModSettings.description", "How fast in-game wheels turn when you steer. 0=x0.5  1=STOCK  2=x1.5  3=x3  4=x10  5=x50  6=x100  7=x500  8=x1000. Higher = less input delay. **Requires game restart.**")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "8")
   @runtimeProperty("ModSettings.step", "1")
@@ -124,7 +122,7 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Steering re-center speed")
-  @runtimeProperty("ModSettings.description", "How fast in-game wheels snap back to center. 0=x0.5  1=STOCK  2=x1.5  3=x3  4=x10  5=x50  6=x100  7=x500  8=x1000. Higher = less return delay.")
+  @runtimeProperty("ModSettings.description", "How fast in-game wheels snap back to center. 0=x0.5  1=STOCK  2=x1.5  3=x3  4=x10  5=x50  6=x100  7=x500  8=x1000. Higher = less return delay. **Requires game restart.**")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "8")
   @runtimeProperty("ModSettings.step", "1")

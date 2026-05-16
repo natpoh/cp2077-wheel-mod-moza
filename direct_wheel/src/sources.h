@@ -23,7 +23,7 @@ namespace direct_wheel::sources
 
     struct DigitalFrame
     {
-        uint32_t buttons = 0;       // bit per DInput button, low 32
+        uint64_t buttons = 0;       // bit per DInput button, low 64
         uint16_t pov     = 0xFFFF;  // POV[0] raw value, 0xFFFF = center
     };
 

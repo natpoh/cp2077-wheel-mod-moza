@@ -170,7 +170,7 @@ namespace direct_wheel::config
         // PhysicalInput; value is input_bindings::Action as int32_t. Array
         // size is hardcoded at 20 to match PhysicalInput::kCount. Keep in
         // sync if we add wheel controls.
-        static constexpr size_t kBindingCount = 20;
+        static constexpr size_t kBindingCount = 30;
         std::array<int32_t, kBindingCount> bindings{};
     };
 

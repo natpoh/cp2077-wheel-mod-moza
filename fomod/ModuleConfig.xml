@@ -18,8 +18,7 @@
   <requiredInstallFiles>
     <file source="build\gwheel.dll"
           destination="red4ext\plugins\gwheel\gwheel.dll"/>
-    <file source="mod_settings\mod_settings.dll"
-          destination="red4ext\plugins\mod_settings\mod_settings.dll"/>
+
     <file source="gwheel_reds\gwheel_natives.reds"
           destination="r6\scripts\gwheel\gwheel_natives.reds"/>
     <file source="gwheel_reds\gwheel_settings.reds"

@@ -51,7 +51,6 @@ The mod auto-detects what hardware your Logitech wheel actually has (force feedb
 [size=4][b]Install[/b][/size]
 [list=1]
 [*]Click the [b]Vortex[/b] download button on this page.
-[*]Vortex will ask about a file conflict on mod_settings.dll. Choose this mod to win the conflict (load after Mod Settings). The included file is a small patch on top of upstream Mod Settings.
 [/list]
 [i](Manual Download is also available if you don't use Vortex, just extract the zip directly into your Cyberpunk 2077 folder and overwrite when asked).[/i]
 
@@ -62,7 +61,6 @@ It is highly recommended to set your wheel's rotation angle / operating range to
 [list]
 [*][b]Wheel detected but the car doesn't move.[/b] Make sure RED4ext is installed and current.
 [*][b]Settings page is missing.[/b] Mod Settings or ArchiveXL aren't installed correctly.
-[*][b]Three orphan toggles in settings.[/b] Vortex installed stock Mod Settings on top of the patched build that ships with this mod. Re-deploy in Vortex and let this mod win the file conflict.
 [/list]
 
 [size=4][b]Credits[/b][/size]

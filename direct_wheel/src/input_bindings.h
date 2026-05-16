@@ -33,6 +33,16 @@ namespace direct_wheel::input_bindings
         ScrollCW,
         ScrollCCW,
         Xbox,
+        Extra1,
+        Extra2,
+        Extra3,
+        Extra4,
+        Extra5,
+        Extra6,
+        Extra7,
+        Extra8,
+        Extra9,
+        Extra10,
         kCount
     };
 

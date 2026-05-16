@@ -696,9 +696,9 @@ namespace direct_wheel::wheel
         s.clutch   = NormalizePedal(config::AxisMap::Read(jsPedals, axes.clutch));
         s.pov = static_cast<uint16_t>(js.rgdwPOV[0] & 0xFFFF);
 
-        uint32_t bits = 0;
-        for (int i = 0; i < 32; ++i) {
-            if (js.rgbButtons[i] & 0x80) bits |= (1u << i);
+        uint64_t bits = 0;
+        for (int i = 0; i < 64; ++i) {
+            if (js.rgbButtons[i] & 0x80) bits |= (1ull << i);
         }
         s.buttons = bits;
 

@@ -65,6 +65,16 @@ namespace direct_wheel::input_bindings
             BT(20),        // ScrollCW
             BT(21),        // ScrollCCW
             BT(10),        // Xbox
+            UM(),          // Extra1
+            UM(),          // Extra2
+            UM(),          // Extra3
+            UM(),          // Extra4
+            UM(),          // Extra5
+            UM(),          // Extra6
+            UM(),          // Extra7
+            UM(),          // Extra8
+            UM(),          // Extra9
+            UM(),          // Extra10
         }};
 
         // ------------------------------------------------------------------
@@ -114,6 +124,16 @@ namespace direct_wheel::input_bindings
             UM(),          // ScrollCW
             UM(),          // ScrollCCW
             UM(),          // Xbox
+            UM(),          // Extra1
+            UM(),          // Extra2
+            UM(),          // Extra3
+            UM(),          // Extra4
+            UM(),          // Extra5
+            UM(),          // Extra6
+            UM(),          // Extra7
+            UM(),          // Extra8
+            UM(),          // Extra9
+            UM(),          // Extra10
         }};
 
         // ------------------------------------------------------------------
@@ -130,6 +150,39 @@ namespace direct_wheel::input_bindings
         // face buttons). Most slots will be Unmapped.
         // ------------------------------------------------------------------
         constexpr DeviceLayout kDrivingForceLayout = kG27Layout;
+
+        // ------------------------------------------------------------------
+        // Moza Racing — VERIFIED empirically 2026-05-16 via user images.
+        // Bases (R5, R9, etc.) pass through identical button mappings
+        // when using the KS wheel or similar GT wheels.
+        // D-pad is exposed as direct buttons (5,6,7,8).
+        // ------------------------------------------------------------------
+        constexpr DeviceLayout kMozaLayout = {{
+            BT(12),        // PaddleLeft (Button 13)
+            BT(13),        // PaddleRight (Button 14)
+            BT(4),         // DpadUp (Button 5)
+            BT(6),         // DpadDown (Button 7)
+            BT(7),         // DpadLeft (Button 8)
+            BT(5),         // DpadRight (Button 6)
+            BT(0),         // A (Button 1)
+            BT(1),         // B (Button 2)
+            BT(2),         // X (Button 3)
+            BT(3),         // Y (Button 4)
+            BT(34),        // Start (Button 35 "START")
+            BT(37),        // Select (Button 38 "MENU")
+            BT(22),        // LSB (Button 23 "RADIO")
+            BT(35),        // RSB (Button 36 "Right Stick Press")
+            BT(18),        // Extra1 (Moza N - Button 19)
+            BT(19),        // Extra2 (Moza WIP - Button 20)
+            BT(20),        // Extra3 (Moza FL - Button 21)
+            BT(21),        // Extra4 (Moza CAM - Button 22)
+            BT(23),        // Extra5 (Moza S1 - Button 24)
+            BT(24),        // Extra6 (Moza S2 - Button 25)
+            BT(31),        // Extra7 (Moza P - Button 32)
+            BT(32),        // Extra8 (Moza BOX - Button 33)
+            BT(33),        // Extra9 (Moza PL - Button 34)
+            UM(),          // Extra10
+        }};
 
         // ------------------------------------------------------------------
         // Device registry. Order matters: first friendly-name substring
@@ -155,6 +208,7 @@ namespace direct_wheel::input_bindings
             { "Driving Force",                      "Driving Force",   &kDrivingForceLayout,  false },
             { "MOMO",                               "MOMO",            &kDrivingForceLayout,  false },
             { "Wingman",                            "Wingman",         &kDrivingForceLayout,  false },
+            { "MOZA",                               "MOZA Base",       &kMozaLayout,          true  },
         };
 
         bool ContainsCaseInsensitive(const char* haystack, const char* needle)
@@ -370,7 +424,7 @@ namespace direct_wheel::input_bindings
             const DeviceLayout*     layout = &kG923XboxLayout; // default until SetDeviceLayout
 
             // Edge-detection state, owned by the pump thread.
-            uint32_t                prevButtons = 0;
+            uint64_t                prevButtons = 0;
             DWORD                   prevPov     = 0xFFFFFFFF;
             bool                    havePrev    = false;
         };
@@ -577,13 +631,13 @@ namespace direct_wheel::input_bindings
         }
 
         bool IsPhysicallyPressed(const DeviceLayout& layout, PhysicalInput p,
-                                 uint32_t buttons, DWORD pov)
+                                 uint64_t buttons, DWORD pov)
         {
             const auto& m = layout[p];
             switch (m.source)
             {
             case Source::Button:
-                return (buttons & (1u << m.value)) != 0;
+                return (buttons & (1ull << m.value)) != 0;
             case Source::PovDirection:
                 return pov == m.value;
             case Source::Unmapped:
@@ -616,6 +670,16 @@ namespace direct_wheel::input_bindings
             "ScrollCW",
             "ScrollCCW",
             "Xbox",
+            "Extra1",
+            "Extra2",
+            "Extra3",
+            "Extra4",
+            "Extra5",
+            "Extra6",
+            "Extra7",
+            "Extra8",
+            "Extra9",
+            "Extra10",
         }};
 
         const char* InputName(int32_t id)
@@ -714,7 +778,7 @@ namespace direct_wheel::input_bindings
         auto& st = S();
         if (!config::Current().input.enabled) return;
 
-        const uint32_t buttons = frame.digital.buttons;
+        const uint64_t buttons = frame.digital.buttons;
         // digital.pov is the DInput POV raw in the low 16 bits. 0xFFFF = center.
         // We compare directly against direction values (0, 9000, 18000, 27000)
         // which never collide with 0xFFFF.

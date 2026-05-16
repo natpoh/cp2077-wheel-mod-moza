@@ -12,7 +12,7 @@ namespace direct_wheel::wheel
         float    throttle = 0.f; //  0..1
         float    brake    = 0.f; //  0..1
         float    clutch   = 0.f; //  0..1
-        uint32_t buttons  = 0;   // bit per button, low 32
+        uint64_t buttons  = 0;   // bit per button, low 64
         uint16_t pov      = 0xFFFF;
         bool     connected = false;
     };

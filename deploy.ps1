@@ -84,9 +84,7 @@ foreach ($f in $fomodConfigFiles) {
   if (-not (Test-Path $f)) { Fail "Missing FOMOD config fragment: $f" }
 }
 
-# Patched mod_settings.dll fork (vendor/mod_settings/). Built by build.ps1
-# alongside direct_wheel.dll; the existence check happens after Invoke-Build below.
-$patchedModSettingsDll = Join-Path $repoRoot "vendor\mod_settings\build\Release\mod_settings.dll"
+
 
 # ---------- build (if needed) ----------------------------------------------
 
@@ -121,13 +119,7 @@ if (-not (Test-Path $dllPath)) {
 $dllSize = (Get-Item $dllPath).Length
 Info "Using DLL: $dllPath ($dllSize bytes)"
 
-# Sanity-check the patched mod_settings.dll. build.ps1 should have produced
-# it as a side effect; if it's missing now, build.ps1 has a bug.
-if (-not (Test-Path $patchedModSettingsDll)) {
-  Fail "Patched mod_settings.dll missing at $patchedModSettingsDll after build. build.ps1 should have produced it."
-}
-$msDllSize = (Get-Item $patchedModSettingsDll).Length
-Info "Using patched mod_settings.dll: $patchedModSettingsDll ($msDllSize bytes)"
+
 
 # ---------- clean -----------------------------------------------------------
 
@@ -192,18 +184,7 @@ if ($Game) {
   Copy-Item -Force $dllPath (Join-Path $pluginDir "direct_wheel.dll")
   Info "Deployed DLL -> $(Join-Path $pluginDir 'direct_wheel.dll')"
 
-  # Patched mod_settings DLL: $patchedModSettingsDll resolved + existence-checked
-  # in pre-flight above. Overwrite the user's existing mod_settings.dll in place;
-  # the patch is API-compatible with upstream so other mods using mod_settings
-  # keep working.
-  $modSettingsTarget = Join-Path $Game "red4ext\plugins\mod_settings\mod_settings.dll"
-  $modSettingsDir    = Split-Path $modSettingsTarget -Parent
-  if (-not (Test-Path $modSettingsDir)) {
-    Warn "mod_settings folder doesn't exist at $modSettingsDir - install jackhumbert/mod_settings first, then re-run."
-  } else {
-    Copy-Item -Force $patchedModSettingsDll $modSettingsTarget
-    Info "Deployed patched mod_settings.dll -> $modSettingsTarget"
-  }
+
 
   # (Legacy: We used to check for Logitech G HUB here, but the mod now uses raw DirectInput and works without it).
 
@@ -292,10 +273,10 @@ New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "build")       
 New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "fomod")         | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "fomod_configs") | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "direct_wheel_reds")   | Out-Null
-New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "mod_settings")  | Out-Null
+
 
 Copy-Item -Force $dllPath                          (Join-Path $stagingDir "build\direct_wheel.dll")
-Copy-Item -Force $patchedModSettingsDll            (Join-Path $stagingDir "mod_settings\mod_settings.dll")
+
 Copy-Item -Force "fomod\info.xml"                  (Join-Path $stagingDir "fomod\info.xml")
 Copy-Item -Force "fomod\ModuleConfig.xml"          (Join-Path $stagingDir "fomod\ModuleConfig.xml")
 foreach ($c in $fomodConfigFiles) {
