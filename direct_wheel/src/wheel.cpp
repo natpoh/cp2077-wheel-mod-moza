@@ -237,6 +237,20 @@ namespace direct_wheel::wheel
             for (int i = 0; i < static_cast<int>(g_candidates.size()); ++i)
             {
                 const auto& c = g_candidates[i];
+
+                if (wheelNameHint.empty())
+                {
+                    // If Auto-detecting, completely ignore virtual devices (vJoy, etc.)
+                    // and standard gamepads (Xbox controllers). They typically have
+                    // resting trigger values that translate to 100% throttle,
+                    // causing the car to drive itself when no real wheel is present.
+                    if (c.isVirtual) continue;
+                    
+                    const int devType = GET_DIDEVICE_TYPE(c.info.dwDevType);
+                    if (devType == DI8DEVTYPE_GAMEPAD || devType == DI8DEVTYPE_1STPERSON)
+                        continue;
+                }
+
                 int score = 0;
                 if (!c.isVirtual) score += 10;
                 if (c.hasFFB)     score += 5;
@@ -668,11 +682,19 @@ namespace direct_wheel::wheel
                 // Keep trying to re-acquire (FOREGROUND mode loses access on alt-tab)
                 hr = st.pWheel->Acquire();
             }
-            if (FAILED(hr)) return;
+            if (FAILED(hr)) {
+                Snapshot s; // all zeros, connected=false
+                std::lock_guard lk(st.snapMtx);
+                st.snap = s;
+                return;
+            }
         }
 
         DIJOYSTATE2 js;
         if (FAILED(st.pWheel->GetDeviceState(sizeof(DIJOYSTATE2), &js))) {
+            Snapshot s; // all zeros, connected=false
+            std::lock_guard lk(st.snapMtx);
+            st.snap = s;
             return;
         }
 
