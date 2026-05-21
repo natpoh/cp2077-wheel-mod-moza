@@ -45,7 +45,7 @@ function Fail($msg)    {
 
 # ---------- version ---------------------------------------------------------
 
-$version = "2.37.0"
+$version = "3.0.0"
 try {
   $modInfo = Get-Content -Raw "mod_info.json" | ConvertFrom-Json
   if ($modInfo.version) { $version = $modInfo.version }
@@ -268,14 +268,15 @@ if (Test-Path $stagingDir) { Remove-Item -Recurse -Force $stagingDir }
 New-Item -ItemType Directory -Force -Path $stagingDir | Out-Null
 New-Item -ItemType Directory -Force -Path $distDir    | Out-Null
 
-# Layout for the FOMOD - source paths match what ModuleConfig.xml references.
-New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "build")         | Out-Null
+# Create standard game directory layout for manual installs.
+New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "red4ext\plugins\direct_wheel") | Out-Null
+New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "r6\scripts\direct_wheel")      | Out-Null
+
+# FOMOD metadata and configs (Vortex uses this).
 New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "fomod")         | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "fomod_configs") | Out-Null
-New-Item -ItemType Directory -Force -Path (Join-Path $stagingDir "direct_wheel_reds")   | Out-Null
 
-
-Copy-Item -Force $dllPath                          (Join-Path $stagingDir "build\direct_wheel.dll")
+Copy-Item -Force $dllPath                          (Join-Path $stagingDir "red4ext\plugins\direct_wheel\direct_wheel.dll")
 
 Copy-Item -Force "fomod\info.xml"                  (Join-Path $stagingDir "fomod\info.xml")
 Copy-Item -Force "fomod\ModuleConfig.xml"          (Join-Path $stagingDir "fomod\ModuleConfig.xml")
@@ -283,7 +284,7 @@ foreach ($c in $fomodConfigFiles) {
   Copy-Item -Force $c (Join-Path $stagingDir $c)
 }
 foreach ($r in $redsFiles) {
-  Copy-Item -Force $r (Join-Path $stagingDir (Split-Path $r -Leaf | ForEach-Object { "direct_wheel_reds\$_" }))
+  Copy-Item -Force $r (Join-Path $stagingDir (Split-Path $r -Leaf | ForEach-Object { "r6\scripts\direct_wheel\$_" }))
 }
 
 # Include README + CHANGELOG as top-level files so Vortex shows them.

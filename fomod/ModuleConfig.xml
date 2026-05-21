@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
 
-  <moduleName>Logitech G-series Wheel Mod</moduleName>
+  <moduleName>Direct Wheel Mod</moduleName>
 
   <!-- No top-level moduleDependencies. Vortex already enforces game
        association before the FOMOD runs, and `state="Active"` checks
@@ -16,21 +16,21 @@
        startup handshake on/off. Everything else is fixed payload. -->
 
   <requiredInstallFiles>
-    <file source="build\gwheel.dll"
-          destination="red4ext\plugins\gwheel\gwheel.dll"/>
+    <file source="red4ext\plugins\direct_wheel\direct_wheel.dll"
+          destination="red4ext\plugins\direct_wheel\direct_wheel.dll"/>
 
-    <file source="gwheel_reds\gwheel_natives.reds"
-          destination="r6\scripts\gwheel\gwheel_natives.reds"/>
-    <file source="gwheel_reds\gwheel_settings.reds"
-          destination="r6\scripts\gwheel\gwheel_settings.reds"/>
-    <file source="gwheel_reds\gwheel_mount.reds"
-          destination="r6\scripts\gwheel\gwheel_mount.reds"/>
-    <file source="gwheel_reds\gwheel_events.reds"
-          destination="r6\scripts\gwheel\gwheel_events.reds"/>
-    <file source="gwheel_reds\gwheel_surface.reds"
-          destination="r6\scripts\gwheel\gwheel_surface.reds"/>
-    <file source="gwheel_reds\gwheel_vehicle_signals.reds"
-          destination="r6\scripts\gwheel\gwheel_vehicle_signals.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_natives.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_natives.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_settings.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_settings.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_mount.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_mount.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_events.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_events.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_surface.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_surface.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_vehicle_signals.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_vehicle_signals.reds"/>
   </requiredInstallFiles>
 
   <installSteps order="Explicit">
@@ -45,7 +45,7 @@
               <description>On game start, briefly pulse the wheel's LEDs and force-feedback motors and run a centering spring to return the wheel to 0 degrees. Toggle anytime in the in-game Mod Settings menu.</description>
               <files>
                 <file source="fomod_configs\config_handshake_on.json"
-                      destination="red4ext\plugins\gwheel\config.json"/>
+                      destination="red4ext\plugins\direct_wheel\config.json"/>
               </files>
               <typeDescriptor>
                 <type name="Recommended"/>
@@ -56,7 +56,7 @@
               <description>Skip the startup pulses. The wheel stays silent on game start. Toggle anytime in the in-game Mod Settings menu.</description>
               <files>
                 <file source="fomod_configs\config_handshake_off.json"
-                      destination="red4ext\plugins\gwheel\config.json"/>
+                      destination="red4ext\plugins\direct_wheel\config.json"/>
               </files>
               <typeDescriptor>
                 <type name="Optional"/>

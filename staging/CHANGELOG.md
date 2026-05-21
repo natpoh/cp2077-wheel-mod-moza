@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0 — 2026-05-20
+
+- **Major Packaging Fix:** Restructured the release zip so that manual extraction works correctly out of the box (`r6` and `red4ext` folders are now properly populated).
+- Fixed a critical bug in the FOMOD installer where Vortex was unable to find the mod files due to outdated file paths.
+- Fixed an issue where the patched `mod_settings.dll` was sometimes missing from the zip.
+
 ## 2.34.0 — 2026-04-30
 
 - **Device Selector:** Added in-game device index sliders for wheel and pedals. Users with split-device setups (e.g. Moza wheel + separate USB pedals) can now select each device independently without editing config files. 0 = auto-detect, 1..N = specific device.

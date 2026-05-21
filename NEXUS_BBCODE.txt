@@ -1,6 +1,6 @@
 [size=5][b]Cyberpunk 2077 — Moza & Direct Drive Wheel Support[/b][/size]
 
-[b]v2.37.0[/b] for Cyberpunk 2077 game patch 2.32.
+[b]v3.0.0[/b] for Cyberpunk 2077 game patch 2.31.
 
 Full racing wheel support for Cyberpunk 2077. Drive with a [b]Moza[/b] or any other [b]Direct Drive[/b] steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
 
@@ -52,7 +52,7 @@ The mod auto-detects what hardware your Logitech wheel actually has (force feedb
 [list=1]
 [*]Click the [b]Vortex[/b] download button on this page.
 [/list]
-[i](Manual Download is also available if you don't use Vortex, just extract the zip directly into your Cyberpunk 2077 folder and overwrite when asked).[/i]
+[i](Manual Download is also available if you don't use Vortex. Just extract the zip directly into your Cyberpunk 2077 game folder).[/i]
 
 [size=4][b]Configuration / Setup[/b][/size]
 It is highly recommended to set your wheel's rotation angle / operating range to [b]720 degrees[/b] in your wheel software (Moza Pit House, Logitech G HUB, Fanatec Control Panel, etc.) for the best steering response.

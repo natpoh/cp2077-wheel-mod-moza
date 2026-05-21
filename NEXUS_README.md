@@ -1,6 +1,6 @@
 # Cyberpunk 2077 — Moza & Direct Drive Wheel Support
 
-**v2.37.0** for Cyberpunk 2077 game patch 2.32.
+**v3.0.0** for Cyberpunk 2077 game patch 2.31.
 
 Full racing wheel support for Cyberpunk 2077. Drive with a **Moza** or any other **Direct Drive** steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
 
@@ -43,9 +43,8 @@ The mod auto-detects what hardware your Logitech wheel actually has (force feedb
 ## Install
 
 1. Click the **Vortex** download button on this page (the green button in the Files tab).
-1. Vortex will ask about a file conflict on `mod_settings.dll`. Choose this mod to win the conflict (load after Mod Settings). The included file is a small patch on top of upstream Mod Settings.
 
-(Manual Download is also available if you don't use Vortex, but Mod Manager Download is the supported path. If you go manual, you handle the file conflict on `mod_settings.dll` yourself by overwriting upstream Mod Settings' DLL with the one from this zip.)
+*(Manual Download is also available if you don't use Vortex. Just extract the zip directly into your Cyberpunk 2077 game folder).*
 
 ## G HUB
 
@@ -59,7 +58,6 @@ I highly recommend setting your operating range / rotation angle to **720 degree
 
 - **Wheel detected but the car doesn't move.** Make sure RED4ext is installed and current.
 - **Settings page is missing.** Mod Settings or ArchiveXL aren't installed correctly. The wheel will still work on defaults.
-- **Three orphan toggles named `hasFfbHardware` / `hasRevLeds` / `hasRightCluster` show up in settings.** Vortex installed stock Mod Settings on top of the patched build that ships with this mod. Re-deploy in Vortex and let this mod win the file conflict.
 - **Doubled keypresses on D-pad or A/B/X/Y.** G HUB and this mod are both binding the same keys. Reset the wheel-button entries in your G HUB Cyberpunk profile back to their default bindings.
 
 ## Credits

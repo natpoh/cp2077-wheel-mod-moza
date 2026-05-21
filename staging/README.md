@@ -1,10 +1,10 @@
 # Direct Wheel — Moza & Direct Drive Racing Wheel Support for Cyberpunk 2077
 
-Full racing wheel support for Cyberpunk 2077 v2.32 with **force feedback**, **speed-sensitive steering compensation**, and **TweakDB steering physics overrides**.
+Full racing wheel support for Cyberpunk 2077 v2.31 with **force feedback**, **speed-sensitive steering compensation**, and **TweakDB steering physics overrides**.
 
 Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
-### 📥 [Download direct_wheel-2.36.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-2.36.0.zip)
+### 📥 [Download direct_wheel-3.0.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-3.0.0.zip)
 
 ---
 
@@ -34,9 +34,9 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ## Requirements
 
-1. **Cyberpunk 2077 v2.32** (latest patch)
+1. **Cyberpunk 2077 v2.31** (latest patch)
 2. **[RED4ext](https://www.nexusmods.com/cyberpunk2077/mods/2380)** — native plugin loader
-3. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** — in-game settings UI (patched version included)
+3. **[Mod Settings](https://www.nexusmods.com/cyberpunk2077/mods/4885)** — in-game settings UI
 
 ---
 
@@ -44,7 +44,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ### Quick Install (zip)
 
-1. Download `direct_wheel-2.36.0.zip`
+1. Download `direct_wheel-3.0.0.zip`
 2. Extract **directly into your Cyberpunk 2077 game folder**, for example:
    ```
    D:\SteamLibrary\steamapps\common\Cyberpunk 2077\
@@ -54,8 +54,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
    Cyberpunk 2077/
    ├── r6/scripts/direct_wheel/*.reds                                    ← Redscript
    └── red4ext/plugins/
-       ├── direct_wheel/direct_wheel.dll                                 ← Main plugin
-       └── mod_settings/mod_settings.dll                                 ← Settings UI
+       └── direct_wheel/direct_wheel.dll                                 ← Main plugin
    ```
 4. **Start G HUB** (or LGS) before launching the game
 5. Launch Cyberpunk 2077
@@ -69,7 +68,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ## Configuration
 
-All settings are in-game: **Main Menu → Settings → Mod Settings → G-series Wheel**
+All settings are in-game: **Main Menu → Settings → Mod Settings → WHEEL MOD**
 
 > **Note:** It is highly recommended to set your wheel's operating range (rotation angle) to **720 degrees** in your wheel software (Logitech G HUB, Moza Pit House, Fanatec Control Panel, etc.) for the best steering response.
 
