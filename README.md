@@ -4,7 +4,7 @@ Full racing wheel support for Cyberpunk 2077 v2.31 with **force feedback**, **sp
 
 Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
-### 📥 [Download direct_wheel-3.0.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-3.0.0.zip)
+### 📥 [Download direct_wheel-3.0.1.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-3.0.1.zip)
 
 ---
 
@@ -44,7 +44,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ### Quick Install (zip)
 
-1. Download `direct_wheel-3.0.0.zip`
+1. Download `direct_wheel-3.0.1.zip`
 2. Extract **directly into your Cyberpunk 2077 game folder**, for example:
    ```
    D:\SteamLibrary\steamapps\common\Cyberpunk 2077\
@@ -153,3 +153,4 @@ r6/scripts/direct_wheel/
 ## License
 
 MIT
+

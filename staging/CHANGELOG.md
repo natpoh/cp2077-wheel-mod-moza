@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1 — 2026-05-21
+
+- **Separated Steering Speed:** The steering acceleration logic has been entirely removed from the C++ DLL and moved to a standalone Redscript mod (`cp2077-steering-speed-mod`) powered by TweakXL. This makes the main wheel mod lighter and more robust.
+
 ## 3.0.0 — 2026-05-20
 
 - **Major Packaging Fix:** Restructured the release zip so that manual extraction works correctly out of the box (`r6` and `red4ext` folders are now properly populated).
@@ -76,3 +80,4 @@ First public release. Tested against Cyberpunk 2077 patch 2.31 (build 5294808).
 - No surface-material FFB mapping yet. The raycast and material-CName plumbing in `direct_wheel_surface.reds` works end-to-end, but mapping CNames to FFB baselines is dormant. Vanilla CP2077 doesn't appear to assign physmats to off-road geometry, so dirt / sand / gravel never surface; on-road materials by themselves don't produce a useful signal. See `direct_wheel/src/wheel.cpp::SurfaceBaselineForMaterial` for where to wire it in if you can capture useful CNames.
 - No handbrake-axis injection. The wheel's handbrake position is read but the corresponding game struct field offset hasn't been identified.
 - No menu-state-aware binding override (see Wheel button bindings above).
+

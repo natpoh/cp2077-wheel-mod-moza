@@ -10,7 +10,7 @@ namespace direct_wheel
     inline constexpr int kVersionMajor = 3;
     inline constexpr int kVersionMinor = 0;
     inline constexpr int kVersionPatch = 0;
-    inline constexpr const char* kVersionString = "3.0.0";
+    inline constexpr const char* kVersionString = "3.0.1";
 
     struct PluginContext
     {
@@ -23,3 +23,4 @@ namespace direct_wheel
     void OnLoad(RED4ext::v1::PluginHandle aHandle, const RED4ext::v1::Sdk* aSdk);
     void OnUnload();
 }
+

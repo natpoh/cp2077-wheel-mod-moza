@@ -6,8 +6,4 @@ namespace direct_wheel::rtti
     // from OnLoad after the Sdk pointer is stored.
     void Register();
 
-    // Call once from pump thread when TweakDB is fully loaded to apply
-    // configured steering multipliers to all VehicleDriveModelData records.
-    // Returns true if records were found and patched.
-    bool ApplySteeringMultAllRecords();
 }

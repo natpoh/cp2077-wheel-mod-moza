@@ -12,7 +12,7 @@
 #include "device_table.h"
 
 #include <RED4ext/RED4ext.hpp>
-#include <RED4ext/TweakDB.hpp>
+
 
 #include <cstdio>
 #include <string>
@@ -182,21 +182,6 @@ namespace direct_wheel::rtti
             if (aOut) *aOut = config::Current().ffb.debugLogging;
         }
 
-        // -------- Steering response getters ---------------------------------
-        // Used by the mount event handler in redscript to read the current
-        // slider values for TweakDB application.
-
-        void GetSteeringTurnSpeedIdxNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, int32_t* aOut, int64_t)
-        {
-            aFrame->code++;
-            if (aOut) *aOut = config::Current().input.steeringTurnSpeedIdx;
-        }
-
-        void GetSteeringRecenterSpeedIdxNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, int32_t* aOut, int64_t)
-        {
-            aFrame->code++;
-            if (aOut) *aOut = config::Current().input.steeringRecenterSpeedIdx;
-        }
 
         // -------- Config setters --------------------------------------------
 
@@ -498,143 +483,6 @@ namespace direct_wheel::rtti
             if (aOut) *aOut = true;
         }
 
-        // -------- TweakDB steering multiplier helpers -------------------------
-        //
-        // Slider index 0..8 -> geometric multiplier progression.
-        // Index 1 = 1.0x (stock), so no TweakDB modification occurs by default.
-        static constexpr float kSteeringMultTable[] = {
-            0.5f, 1.0f, 1.5f, 3.0f, 10.0f, 50.0f, 100.0f, 500.0f, 1000.0f
-        };
-
-        float SteeringMultFromIdx(int32_t idx)
-        {
-            if (idx < 0 || idx > 8) return 1.0f;
-            return kSteeringMultTable[idx];
-        }
-
-        // Per-record original values, keyed by TweakDBID.value (uint64_t).
-        // Populated once at ApplySteeringMultAllRecords() on game init.
-        struct OrigVals { float add; float sub; };
-        static std::unordered_map<uint64_t, OrigVals> s_origVals;
-        static bool s_tweakApplied = false;
-
-        // Write a float flat value by creating a new FlatValue and pointing
-        // the flat ID at it. NEVER modify in-place because TweakDB pools
-        // flat values — the same FlatValue can back camera FOV, physics
-        // constants, etc. Mutating it corrupts unrelated systems.
-        //
-        // CRITICAL: AddFlat uses SortedUniqueArray::Insert which SKIPS
-        // duplicates. We must RemoveFlat first so the new offset sticks.
-        bool TweakDBSetFloat(RED4ext::TweakDB* tdb, RED4ext::TweakDBID flatId, float newVal)
-        {
-            auto* rtti = RED4ext::CRTTISystem::Get();
-            auto* floatType = rtti->GetType("Float");
-            RED4ext::CStackType stackVal;
-            stackVal.type = floatType;
-            stackVal.value = &newVal;
-            int32_t newOffset = tdb->CreateFlatValue(stackVal);
-            if (newOffset < 0)
-            {
-                log::Warn("[direct_wheel:tweak] CreateFlatValue failed");
-                return false;
-            }
-            // Remove old flat entry so Insert doesn't skip it as duplicate
-            tdb->RemoveFlat(flatId);
-            flatId.SetTDBOffset(newOffset);
-            tdb->AddFlat(flatId);
-            return true;
-        }
-    } // end anonymous namespace
-
-    // Apply (or restore) steering multipliers to ALL VehicleDriveModelData records.
-    // Called at game init AND whenever the user changes the index slider.
-    bool ApplySteeringMultAllRecords()
-    {
-        auto* tdb = RED4ext::TweakDB::Get();
-        if (!tdb) return false;
-
-        auto cfg = config::Current();
-        float turnMult     = SteeringMultFromIdx(cfg.input.steeringTurnSpeedIdx);
-        float recenterMult = SteeringMultFromIdx(cfg.input.steeringRecenterSpeedIdx);
-
-        auto* rtti = RED4ext::CRTTISystem::Get();
-        // Covers both VehicleDriveModelData_Record and BikeDriveModelData_Record
-        const char* kTypes[] = {
-            "gamedataVehicleDriveModelData_Record",
-            "gamedataBikeDriveModelData_Record",
-        };
-
-        int patchedCount = 0;
-        for (const char* typeName : kTypes)
-        {
-            auto* type = rtti->GetClass(typeName);
-            if (!type) continue;
-
-            RED4ext::DynArray<RED4ext::Handle<RED4ext::IScriptable>> records;
-            tdb->TryGetRecordsByType(type, records);
-
-            for (uint32_t i = 0; i < records.Size(); ++i)
-            {
-                auto& handle = records[i];
-                if (!handle.instance) continue;
-
-                auto* rec = static_cast<RED4ext::gamedataTweakDBRecord*>(handle.instance);
-                RED4ext::TweakDBID recId = rec->recordID;
-                if (recId.value == 0) continue;
-
-                RED4ext::TweakDBID addId(recId, ".wheelTurnMaxAddPerSecond");
-                RED4ext::TweakDBID subId(recId, ".wheelTurnMaxSubPerSecond");
-
-                // Read & cache originals on first pass
-                if (s_origVals.find(recId.value) == s_origVals.end())
-                {
-                    float origAdd = 0.f, origSub = 0.f;
-                    tdb->TryGetValue<float>(addId, origAdd);
-                    tdb->TryGetValue<float>(subId, origSub);
-                    // Skip records with no steering data (e.g. tanks)
-                    if (origAdd == 0.f && origSub == 0.f) continue;
-                    s_origVals[recId.value] = { origAdd, origSub };
-                }
-
-                const auto& orig = s_origVals[recId.value];
-                float newAdd = orig.add * turnMult;
-                float newSub = orig.sub * recenterMult;
-
-                TweakDBSetFloat(tdb, addId, newAdd);
-                TweakDBSetFloat(tdb, subId, newSub);
-                tdb->UpdateRecord(recId);
-                ++patchedCount;
-            }
-        }
-
-        s_tweakApplied = (turnMult != 1.0f || recenterMult != 1.0f);
-        log::InfoF("[direct_wheel:tweak] ApplySteeringMultAllRecords: patched %d records "
-                   "(turnMult=%.1fx recenterMult=%.1fx)",
-                   patchedCount, turnMult, recenterMult);
-        
-        return patchedCount > 0;
-    }
-
-    namespace
-    {
-        void SetSteeringTurnSpeedIdxNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
-        {
-            int32_t v = 0; RED4ext::GetParameter(aFrame, &v); aFrame->code++;
-            config::SetSteeringTurnSpeedIdx(v);
-            // Re-apply to all records with new multiplier.
-            // NOTE: This takes effect for vehicles spawned AFTER this call.
-            // Already-spawned vehicles need to be despawned and respawned.
-            ApplySteeringMultAllRecords();
-            if (aOut) *aOut = true;
-        }
-
-        void SetSteeringRecenterSpeedIdxNative(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
-        {
-            int32_t v = 0; RED4ext::GetParameter(aFrame, &v); aFrame->code++;
-            config::SetSteeringRecenterSpeedIdx(v);
-            ApplySteeringMultAllRecords();
-            if (aOut) *aOut = true;
-        }
 
         // -------- Registration ----------------------------------------------
 
@@ -767,18 +615,6 @@ namespace direct_wheel::rtti
             RegisterGlobal(rtti, "DirectWheel_SetSteeringCurve75",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetSteeringCurve75>),
                            "Bool", {{ "Int32", "v" }});
-            RegisterGlobal(rtti, "DirectWheel_SetSteeringTurnSpeedIdx",
-                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetSteeringTurnSpeedIdxNative),
-                           "Bool", {{ "Int32", "idx" }});
-            RegisterGlobal(rtti, "DirectWheel_SetSteeringRecenterSpeedIdx",
-                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetSteeringRecenterSpeedIdxNative),
-                           "Bool", {{ "Int32", "idx" }});
-            RegisterGlobal(rtti, "DirectWheel_GetSteeringTurnSpeedIdx",
-                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetSteeringTurnSpeedIdxNative),
-                           "Int32", {});
-            RegisterGlobal(rtti, "DirectWheel_GetSteeringRecenterSpeedIdx",
-                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetSteeringRecenterSpeedIdxNative),
-                           "Int32", {});
 
             RegisterGlobal(rtti, "DirectWheel_SetLedEnabled",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetBool<&config::SetLedEnabled>),

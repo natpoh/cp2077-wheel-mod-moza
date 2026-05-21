@@ -1,6 +1,6 @@
 # Cyberpunk 2077 — Moza & Direct Drive Wheel Support
 
-**v3.0.0** for Cyberpunk 2077 game patch 2.31.
+**v3.0.1** for Cyberpunk 2077 game patch 2.31.
 
 Full racing wheel support for Cyberpunk 2077. Drive with a **Moza** or any other **Direct Drive** steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
 
@@ -74,3 +74,4 @@ Source code is available on [GitHub](https://github.com/natpoh/cp2077-wheel-mod-
 ## Reporting issues
 
 Include your wheel model, Cyberpunk patch version, RED4ext version, and your most recent `red4ext/logs/direct_wheel-*.log` file.
+

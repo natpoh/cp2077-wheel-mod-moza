@@ -118,9 +118,7 @@ namespace direct_wheel::config
             out << "    \"speedSensitiveSteeringPct\": " << c.input.speedSensitiveSteeringPct << ",\n";
             out << "    \"steeringCurve25\": "          << c.input.steeringCurve25          << ",\n";
             out << "    \"steeringCurve50\": "          << c.input.steeringCurve50          << ",\n";
-            out << "    \"steeringCurve75\": "          << c.input.steeringCurve75          << ",\n";
-            out << "    \"steeringTurnSpeedIdx\": "     << c.input.steeringTurnSpeedIdx     << ",\n";
-            out << "    \"steeringRecenterSpeedIdx\": " << c.input.steeringRecenterSpeedIdx << "\n";
+            out << "    \"steeringCurve75\": "          << c.input.steeringCurve75          << "\n";
             out << "  },\n";
 
             out << "  \"ffb\": {\n";
@@ -300,8 +298,7 @@ namespace direct_wheel::config
             ExtractInt   (text, "input",    "steeringCurve25",        c.input.steeringCurve25);
             ExtractInt   (text, "input",    "steeringCurve50",        c.input.steeringCurve50);
             ExtractInt   (text, "input",    "steeringCurve75",        c.input.steeringCurve75);
-            ExtractInt   (text, "input",    "steeringTurnSpeedIdx",   c.input.steeringTurnSpeedIdx);
-            ExtractInt   (text, "input",    "steeringRecenterSpeedIdx", c.input.steeringRecenterSpeedIdx);
+
 
             ExtractBool  (text, "ffb",      "enabled",                c.ffb.enabled);
             ExtractBool  (text, "ffb",      "debugLogging",           c.ffb.debugLogging);
@@ -482,8 +479,7 @@ namespace direct_wheel::config
     void SetSteeringCurve25(int32_t v)           { Mutate([&](Config& c){ c.input.steeringCurve25 = std::clamp(v, 0, 100); }); }
     void SetSteeringCurve50(int32_t v)           { Mutate([&](Config& c){ c.input.steeringCurve50 = std::clamp(v, 0, 100); }); }
     void SetSteeringCurve75(int32_t v)           { Mutate([&](Config& c){ c.input.steeringCurve75 = std::clamp(v, 0, 100); }); }
-    void SetSteeringTurnSpeedIdx(int32_t v)       { Mutate([&](Config& c){ c.input.steeringTurnSpeedIdx = std::clamp(v, 0, 8); }); }
-    void SetSteeringRecenterSpeedIdx(int32_t v)   { Mutate([&](Config& c){ c.input.steeringRecenterSpeedIdx = std::clamp(v, 0, 8); }); }
+
 
     void SetHandshakePlayOnStart(bool v)    { Mutate([&](Config& c){ c.handshake.playOnStart = v; }); }
 

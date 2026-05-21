@@ -45,7 +45,7 @@ function Fail($msg)    {
 
 # ---------- version ---------------------------------------------------------
 
-$version = "3.0.0"
+$version = "3.0.1"
 try {
   $modInfo = Get-Content -Raw "mod_info.json" | ConvertFrom-Json
   if ($modInfo.version) { $version = $modInfo.version }
@@ -305,3 +305,4 @@ Write-Host "  Deploy (Vortex auto-prompts), then launch the game."
 Write-Host ""
 Write-Host "For fast dev iteration, skip Vortex:" -ForegroundColor Cyan
 Write-Host "  .\deploy.ps1 -Game `"<path-to-cyberpunk-install>`""
+
