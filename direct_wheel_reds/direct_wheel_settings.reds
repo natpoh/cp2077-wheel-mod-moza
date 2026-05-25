@@ -708,6 +708,15 @@ enum DirectWheelAction {
   MenuDown = 34,
   MenuLeft = 35,
   MenuRight = 36,
+
+  // Flight Controls
+  Flight_Toggle = 37,
+  Flight_ModeSwitchForward = 38,
+  Flight_ModeSwitchBackward = 39,
+  Flight_LiftUp = 40,
+  Flight_LiftDown = 41,
+  Flight_LinearBrake = 42,
+  Flight_AngularBrake = 43,
 }
 
 // Attach our settings instance to the player puppet so it lives for the

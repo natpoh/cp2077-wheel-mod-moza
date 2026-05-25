@@ -7,7 +7,7 @@ Reference for filling out the Nexus mod-upload form for v2.31.0. Settings on thi
 | Field | Value |
 | --- | --- |
 | **Mod Name** | `Logitech G-series Steering Wheel` |
-| **Version** | `3.0.1` |
+| **Version** | `3.0.2` |
 | **Game** | Cyberpunk 2077 |
 | **Category** | Vehicles (or Gameplay if Vehicles isn't accepted; this mod doesn't fit Modders Resources) |
 | **Author** | Grant Perdue |
@@ -78,15 +78,15 @@ In the **Credits** section, list:
 Upload the FOMOD zip:
 
 ```
-dist/direct_wheel-3.0.1.zip
+dist/direct_wheel-3.0.2.zip
 ```
 
 In the file's metadata:
 
 - **File name**: `Logitech G-series Wheel Mod`
-- **File version**: `3.0.1`
-- **Update version**: `3.0.1`
-- **Description**: `Full mod, FOMOD installer. v3.0.1 for game patch 2.31.`
+- **File version**: `3.0.2`
+- **Update version**: `3.0.2`
+- **Description**: `Full mod, FOMOD installer. v3.0.2 for game patch 2.31.`
 
 ## Images (need at least one)
 

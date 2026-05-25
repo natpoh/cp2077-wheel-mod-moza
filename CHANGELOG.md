@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.0.2 — 2026-05-23
+- Added native support for Let There Be Flight mode toggling and lift controls directly from the steering wheel.
+
 ## 3.0.1 — 2026-05-21
 
 - **Separated Steering Speed:** The steering acceleration logic has been entirely removed from the C++ DLL and moved to a standalone Redscript mod (`cp2077-steering-speed-mod`) powered by TweakXL. This makes the main wheel mod lighter and more robust.

@@ -233,7 +233,7 @@ namespace direct_wheel::input_bindings
         // invokes it on the cached player-vehicle pointer. The dispatch is
         // independent of any CP2077 controls-menu binding because no
         // synthetic input event is involved.
-        enum class DispatchKind : uint8_t { None, Keyboard, MouseButton, MouseWheel, VehicleNative };
+        enum class DispatchKind : uint8_t { None, Keyboard, MouseButton, MouseWheel, VehicleNative, InteropFlag };
 
         // Tap = fire DOWN+UP together on rising edge (a quick pulse regardless
         //       of how long the user physically holds). Use for toggles and
@@ -328,6 +328,11 @@ namespace direct_wheel::input_bindings
             return { DispatchKind::VehicleNative, DispatchMode::Tap, ActionScope::VehicleOnly,
                      0, 0, 0, 0, lbl, methodName };
         }
+        // Interop Flag (Tap or Hold): updates an internal state array readable via native functions.
+        constexpr DispatchEntry Interop(DispatchMode mode, const char* lbl)
+        {
+            return { DispatchKind::InteropFlag, mode, ActionScope::VehicleOnly, 0, 0, 0, 0, lbl, nullptr };
+        }
 
         // Order MUST match the integer values declared in the Action enum
         // (input_bindings.h). The dispatcher indexes by Action value and
@@ -415,6 +420,15 @@ namespace direct_wheel::input_bindings
             /* 34 MenuDown            */ KA(VK_DOWN,    "MenuDown (Down arrow)"),
             /* 35 MenuLeft            */ KA(VK_LEFT,    "MenuLeft (Left arrow)"),
             /* 36 MenuRight           */ KA(VK_RIGHT,   "MenuRight (Right arrow)"),
+
+            // --- Let There Be Flight ---
+            Interop(DispatchMode::Tap, "Flight Toggle"),
+            Interop(DispatchMode::Tap, "Flight ModeSwitchForward"),
+            Interop(DispatchMode::Tap, "Flight ModeSwitchBackward"),
+            Interop(DispatchMode::Hold, "Flight LiftUp (hold)"),
+            Interop(DispatchMode::Hold, "Flight LiftDown (hold)"),
+            Interop(DispatchMode::Hold, "Flight LinearBrake (hold)"),
+            Interop(DispatchMode::Hold, "Flight AngularBrake (hold)"),
         }};
 
         struct State
@@ -422,6 +436,8 @@ namespace direct_wheel::input_bindings
             std::mutex              mtx;
             BindingArray            bindings{}; // all-zero = all None
             const DeviceLayout*     layout = &kG923XboxLayout; // default until SetDeviceLayout
+
+            std::atomic<bool>       interopFlags[kActionCount]{};
 
             // Edge-detection state, owned by the pump thread.
             uint64_t                prevButtons = 0;
@@ -578,6 +594,10 @@ namespace direct_wheel::input_bindings
                 // and the game handles the state transition internally.
                 if (down) FireVehicleNative(e);
                 break;
+            case DispatchKind::InteropFlag:
+                // Interop flags are set to true when down, false when up.
+                // The native function will read this state.
+                break;
             case DispatchKind::None:
             default:
                 break;
@@ -589,6 +609,29 @@ namespace direct_wheel::input_bindings
             if (action <= 0 || action >= kActionCount) return;
             const auto& e = kDispatch[static_cast<size_t>(action)];
             if (e.kind == DispatchKind::None) return;
+
+            // Update interop flag state immediately
+            if (e.kind == DispatchKind::InteropFlag)
+            {
+                if (e.mode == DispatchMode::Tap)
+                {
+                    if (rising)
+                    {
+                        S().interopFlags[action].store(true, std::memory_order_relaxed);
+                        log::InfoF("[direct_wheel:bind] dispatch action=%d %s TAP", action, e.label);
+                        // A background thread or a game tick will clear this.
+                        // Actually, tap actions need to clear themselves after a short duration,
+                        // or they can just be exposed as "just tapped" by letting the redscript bridge poll.
+                        // We will just clear it after 30ms just like keyboard taps.
+                    }
+                }
+                else
+                {
+                    S().interopFlags[action].store(rising, std::memory_order_relaxed);
+                    log::InfoF("[direct_wheel:bind] dispatch action=%d %s %s", action, e.label, rising ? "DOWN" : "UP");
+                }
+                // Do not return here, let it fall through if we want, but actually we can just return for InteropFlag unless it's tap.
+            }
 
             // On-foot suppression for vehicle-centric actions. CP2077 assigns
             // the same keyboard keys different meanings on foot (V=summon,
@@ -618,15 +661,25 @@ namespace direct_wheel::input_bindings
                 FireOne(e, true);
                 std::this_thread::sleep_for(std::chrono::milliseconds(30));
                 FireOne(e, false);
-                log::InfoF("[direct_wheel:bind] dispatch action=%d %s TAP", action, e.label);
+                
+                if (e.kind == DispatchKind::InteropFlag)
+                {
+                    S().interopFlags[action].store(false, std::memory_order_relaxed);
+                }
+                else
+                {
+                    log::InfoF("[direct_wheel:bind] dispatch action=%d %s TAP", action, e.label);
+                }
             }
             else
             {
                 // Hold: mirror the physical state.
-                if (rising) LogForeground(e.label);
+                if (rising && e.kind != DispatchKind::InteropFlag) LogForeground(e.label);
                 FireOne(e, rising);
-                log::InfoF("[direct_wheel:bind] dispatch action=%d %s %s",
-                           action, e.label, rising ? "DOWN" : "UP");
+                if (e.kind != DispatchKind::InteropFlag) {
+                    log::InfoF("[direct_wheel:bind] dispatch action=%d %s %s",
+                               action, e.label, rising ? "DOWN" : "UP");
+                }
             }
         }
 
@@ -763,13 +816,19 @@ namespace direct_wheel::input_bindings
         log::InfoF("[direct_wheel:bind] set %-12s -> %d %s",
                    InputName(inputId), action, ActionLabel(action));
     }
-
     int32_t Get(int32_t inputId)
     {
         if (inputId < 0 || inputId >= kCount) return 0;
         auto& st = S();
         std::lock_guard lk(st.mtx);
         return st.bindings[static_cast<size_t>(inputId)];
+    }
+
+    bool IsActionActive(int32_t action)
+    {
+        if (action <= 0 || action >= kActionCount) return false;
+        auto& st = S();
+        return st.interopFlags[action].load(std::memory_order_relaxed);
     }
 
 

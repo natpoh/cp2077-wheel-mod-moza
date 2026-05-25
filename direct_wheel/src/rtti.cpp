@@ -176,6 +176,26 @@ namespace direct_wheel::rtti
             if (aOut) *aOut = g_debugWheelSteer.load(std::memory_order_relaxed);
         }
 
+        void GetRawThrottle(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, float* aOut, int64_t)
+        {
+            aFrame->code++;
+            if (aOut) *aOut = sources::Current().axes.throttle;
+        }
+
+        void GetRawBrake(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, float* aOut, int64_t)
+        {
+            aFrame->code++;
+            if (aOut) *aOut = sources::Current().axes.brake;
+        }
+
+        void IsActionActive(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
+        {
+            int32_t action = 0;
+            RED4ext::GetParameter(aFrame, &action);
+            aFrame->code++;
+            if (aOut) *aOut = input_bindings::IsActionActive(action);
+        }
+
         void IsDebugLoggingEnabled(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
         {
             aFrame->code++;
@@ -528,6 +548,15 @@ namespace direct_wheel::rtti
             RegisterGlobal(rtti, "DirectWheel_GetDebugWheelSteer",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetDebugWheelSteer),
                            "Float", {});
+            RegisterGlobal(rtti, "DirectWheel_GetRawThrottle",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetRawThrottle),
+                           "Float", {});
+            RegisterGlobal(rtti, "DirectWheel_GetRawBrake",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetRawBrake),
+                           "Float", {});
+            RegisterGlobal(rtti, "DirectWheel_IsActionActive",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&IsActionActive),
+                           "Bool", {{ "Int32", "action" }});
             RegisterGlobal(rtti, "DirectWheel_DetectedHasRightCluster",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&DetectedHasRightCluster),
                            "Bool", {});

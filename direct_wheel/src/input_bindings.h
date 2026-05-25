@@ -135,6 +135,15 @@ namespace direct_wheel::input_bindings
         MenuLeft,
         MenuRight,
 
+        // --- Let There Be Flight ---
+        Flight_Toggle,
+        Flight_ModeSwitchForward,
+        Flight_ModeSwitchBackward,
+        Flight_LiftUp,
+        Flight_LiftDown,
+        Flight_LinearBrake,
+        Flight_AngularBrake,
+
         kActionCount
     };
 
@@ -150,6 +159,9 @@ namespace direct_wheel::input_bindings
 
     // Read current binding for an input. Returns 0 (None) if unset.
     int32_t Get(int32_t inputId);
+
+    // Read the current state of an action (primarily for InteropFlag actions).
+    bool IsActionActive(int32_t action);
 
     // Pick the per-device button/POV mapping based on the wheel's friendly
     // product name (from LogiGetFriendlyProductName). Call once at bind

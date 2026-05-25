@@ -10,7 +10,7 @@ namespace direct_wheel
     inline constexpr int kVersionMajor = 3;
     inline constexpr int kVersionMinor = 0;
     inline constexpr int kVersionPatch = 0;
-    inline constexpr const char* kVersionString = "3.0.1";
+    inline constexpr const char* kVersionString = "3.0.2";
 
     struct PluginContext
     {

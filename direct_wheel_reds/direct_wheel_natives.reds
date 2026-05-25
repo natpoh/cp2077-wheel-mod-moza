@@ -8,6 +8,9 @@ public static native func DirectWheel_HasFFB() -> Bool;
 public static native func DirectWheel_IsDebugLoggingEnabled() -> Bool;
 public static native func DirectWheel_GetDebugRawSteer() -> Float;
 public static native func DirectWheel_GetDebugWheelSteer() -> Float;
+public static native func DirectWheel_GetRawThrottle() -> Float;
+public static native func DirectWheel_GetRawBrake() -> Float;
+public static native func DirectWheel_IsActionActive(action: Int32) -> Bool;
 public static native func DirectWheel_ReadConfig() -> String;
 
 // Wheel-model auto-discovery. Read at OnGameAttached to populate dependency
