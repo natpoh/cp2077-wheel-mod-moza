@@ -62,8 +62,7 @@ $redsFiles = @(
   "direct_wheel_reds\direct_wheel_mount.reds",
   "direct_wheel_reds\direct_wheel_events.reds",
   "direct_wheel_reds\direct_wheel_surface.reds",
-  "direct_wheel_reds\direct_wheel_vehicle_signals.reds",
-  "direct_wheel_reds\direct_wheel_flight_bridge.reds"
+  "direct_wheel_reds\direct_wheel_vehicle_signals.reds"
 )
 foreach ($r in $redsFiles) {
   if (-not (Test-Path $r)) { Fail "Missing redscript source: $r" }
@@ -307,3 +306,23 @@ Write-Host ""
 Write-Host "For fast dev iteration, skip Vortex:" -ForegroundColor Cyan
 Write-Host "  .\deploy.ps1 -Game `"<path-to-cyberpunk-install>`""
 
+# ============================================================================
+# Flight bridge addon zip (optional, requires Let There Be Flight)
+# ============================================================================
+$bridgeFile = "direct_wheel_reds\direct_wheel_flight_bridge.reds"
+if (Test-Path $bridgeFile) {
+  $bridgeStagingDir = Join-Path $repoRoot "staging_flight_bridge"
+  $bridgeZipPath    = Join-Path $distDir "direct_wheel_flight_bridge-$version.zip"
+
+  if (Test-Path $bridgeStagingDir) { Remove-Item -Recurse -Force $bridgeStagingDir }
+  New-Item -ItemType Directory -Force -Path (Join-Path $bridgeStagingDir "r6\scripts\direct_wheel") | Out-Null
+
+  Copy-Item -Force $bridgeFile (Join-Path $bridgeStagingDir "r6\scripts\direct_wheel\direct_wheel_flight_bridge.reds")
+
+  if (Test-Path $bridgeZipPath) { Remove-Item -Force $bridgeZipPath }
+  Compress-Archive -Path (Join-Path $bridgeStagingDir "*") -DestinationPath $bridgeZipPath -Force
+
+  $bridgeZipSize = [Math]::Round((Get-Item $bridgeZipPath).Length / 1024, 1)
+  Ok "Flight bridge addon: $bridgeZipPath ($bridgeZipSize KB)"
+  Remove-Item -Recurse -Force $bridgeStagingDir
+}
