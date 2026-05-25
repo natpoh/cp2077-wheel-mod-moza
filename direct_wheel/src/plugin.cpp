@@ -11,6 +11,7 @@
 #include "audio_monitor.h"
 #include "led.h"
 #include "mod_settings_seed.h"
+#include <cmath>
 
 
 
@@ -47,14 +48,14 @@ namespace direct_wheel
 
             // Apply deadzone
             float deadzonePct = config::Current().input.steeringDeadzoneDegrees / 450.0f; // Assume 900 deg wheel
-            if (std::abs(f.axes.steer) <= deadzonePct)
+            if (std::fabs(f.axes.steer) <= deadzonePct)
             {
                 f.axes.steer = 0.0f;
             }
             else
             {
                 float sign = f.axes.steer > 0.0f ? 1.0f : -1.0f;
-                f.axes.steer = sign * ((std::abs(f.axes.steer) - deadzonePct) / (1.0f - deadzonePct));
+                f.axes.steer = sign * ((std::fabs(f.axes.steer) - deadzonePct) / (1.0f - deadzonePct));
             }
 
             // Invert pedal logic if configured. 
