@@ -100,10 +100,10 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Steering deadzone (degrees)")
-  @runtimeProperty("ModSettings.description", "Dead zone in the center of the wheel. Assuming a 900-degree wheel.")
+  @runtimeProperty("ModSettings.description", "Dead zone in the center of the wheel (0-45°). On a 900° wheel, 10° ≈ 2% deadzone, 45° ≈ 10%.")
   @runtimeProperty("ModSettings.min", "0.0")
-  @runtimeProperty("ModSettings.max", "5.0")
-  @runtimeProperty("ModSettings.step", "0.1")
+  @runtimeProperty("ModSettings.max", "45.0")
+  @runtimeProperty("ModSettings.step", "1.0")
   @runtimeProperty("ModSettings.dependency", "inputEnabled")
   let steeringDeadzoneDegrees: Float = 0.0;
 
