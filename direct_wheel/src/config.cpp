@@ -456,6 +456,7 @@ namespace direct_wheel::config
     void SetInvertSteering(bool v)          { Mutate([&](Config& c){ c.input.invertSteering = v; }); }
     void SetInvertThrottle(bool v)          { Mutate([&](Config& c){ c.input.invertThrottle = v; }); }
     void SetInvertBrake(bool v)             { Mutate([&](Config& c){ c.input.invertBrake = v; }); }
+    void SetSteeringDeadzoneDegrees(float v) { Mutate([&](Config& c){ c.input.steeringDeadzoneDegrees = std::clamp(v, 0.0f, 450.0f); }); }
 
     void SetResponseCurve(std::string_view v)
     {
