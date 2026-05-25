@@ -27,6 +27,7 @@ public static native func DirectWheel_SetClutchAsBrake(v: Bool) -> Bool;
 public static native func DirectWheel_SetInvertSteering(v: Bool) -> Bool;
 public static native func DirectWheel_SetInvertThrottle(v: Bool) -> Bool;
 public static native func DirectWheel_SetInvertBrake(v: Bool) -> Bool;
+public static native func DirectWheel_SetSteeringDeadzoneDegrees(v: Float) -> Bool;
 
 public static native func DirectWheel_SetFfbEnabled(v: Bool) -> Bool;
 public static native func DirectWheel_SetFfbDebugLogging(v: Bool) -> Bool;
@@ -40,6 +41,7 @@ public static native func DirectWheel_SetHandshakePlayOnStart(v: Bool) -> Bool;
 // Phase-1 physics FFB: speed-gated self-centering spring with yaw-rate bonus.
 public static native func DirectWheel_SetStationaryThresholdMps(mps: Float) -> Bool;
 public static native func DirectWheel_SetYawFeedbackPct(pct: Int32) -> Bool;
+public static native func DirectWheel_SetSpringNonLinearityPct(pct: Int32) -> Bool;
 public static native func DirectWheel_SetActiveTorqueStrengthPct(pct: Int32) -> Bool;
 public static native func DirectWheel_SetConstantForcePct(pct: Int32) -> Bool;
 public static native func DirectWheel_SetSpringForcePct(pct: Int32) -> Bool;

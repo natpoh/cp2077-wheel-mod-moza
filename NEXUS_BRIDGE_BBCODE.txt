@@ -1,0 +1,53 @@
+[size=5][b]Flight Bridge — Wheel Support for Let There Be Flight[/b][/size]
+
+[b]v3.2.0[/b] — Optional addon for the [url=https://www.nexusmods.com/cyberpunk2077/mods/29246]Direct Wheel Mod[/url].
+
+Fly any car in Cyberpunk 2077 using your racing wheel! This bridge connects the [url=https://www.nexusmods.com/cyberpunk2077/mods/29246]Direct Wheel Mod[/url] to the [url=https://www.nexusmods.com/cyberpunk2077/mods/5208]Let There Be Flight[/url] mod, giving you full analog control over flight from your steering wheel, pedals, paddles, and buttons.
+
+[size=4][b]What it does[/b][/size]
+
+When you activate flight mode, your wheel inputs are automatically routed to the flight controller:
+
+[list]
+[*][b]Steering wheel[/b] → Yaw (turn left/right in the air)
+[*][b]Throttle pedal[/b] → Forward thrust
+[*][b]Brake pedal[/b] → Reverse thrust
+[*][b]Right paddle[/b] → Ascend (lift up)
+[*][b]Left paddle[/b] → Descend (lift down)
+[*][b]D-pad Up[/b] → Pitch forward (nose down)
+[*][b]D-pad Down[/b] → Pitch backward (nose up)
+[*][b]D-pad Left[/b] → Roll left (bank left)
+[*][b]D-pad Right[/b] → Roll right (bank right)
+[/list]
+
+Additional actions available via extra buttons (Moza defaults):
+[list]
+[*][b]Flight Toggle[/b] — activate/deactivate flight mode
+[*][b]Mode Switch Forward/Backward[/b] — cycle flight modes
+[*][b]Linear Brake[/b] — stop forward/backward movement
+[*][b]Angular Brake[/b] — stop rotation
+[/list]
+
+All bindings are fully customizable in [b]Mod Settings → Wheel Mod → Button bindings[/b].
+
+[size=4][b]Required mods[/b][/size]
+[list=1]
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/29246][b]Direct Wheel Mod[/b][/url] v3.2.0 or later (the main wheel mod)
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/5208][b]Let There Be Flight[/b][/url] (flight physics mod)
+[/list]
+
+[size=4][b]Install[/b][/size]
+[list=1]
+[*]Install the main [b]Direct Wheel Mod[/b] first.
+[*]Install [b]Let There Be Flight[/b].
+[*]Download this addon and extract the zip into your Cyberpunk 2077 game folder (or install via Vortex).
+[/list]
+It adds a single file: [font=Courier New]r6/scripts/direct_wheel/direct_wheel_flight_bridge.reds[/font]
+
+[size=4][b]Uninstall[/b][/size]
+Delete [font=Courier New]r6/scripts/direct_wheel/direct_wheel_flight_bridge.reds[/font] from your game folder.
+
+[b]⚠️ Important:[/b] Do [b]NOT[/b] install this addon without Let There Be Flight! The bridge references flight classes that only exist when LTBF is installed. Without it, Redscript compilation will fail and [b]all[/b] script mods will stop working.
+
+[size=4][b]Source Code[/b][/size]
+[url=https://github.com/natpoh/cp2077-wheel-mod-moza]Source code is available on GitHub[/url].

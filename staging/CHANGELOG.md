@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.0 — 2026-05-25
+- **Steering Deadzone:** Added a new slider (0 to 5 degrees) to configure a deadzone in the center of the wheel.
+- **Spring Non-Linearity:** Added a new slider (0 to 100%) to make the centering spring force ramp up geometrically at small steering angles. Perfect for weaker wheels to feel the center better.
+
 ## 3.1.0 — 2026-05-25
 - **Let There Be Flight — full wheel support:** Built-in bridge for the [Let There Be Flight](https://www.nexusmods.com/cyberpunk2077/mods/5208) mod. Steer, throttle, brake, pitch, roll, lift, and toggle flight mode — all from your racing wheel. No extra mods needed.
 - **New flight actions:** Flight_PitchForward, Flight_PitchBackward, Flight_RollLeft, Flight_RollRight added to the bindable action list (total: 48 actions).

@@ -127,6 +127,7 @@ namespace direct_wheel::config
             out << "    \"torquePct\": "               << c.ffb.torquePct                              << ",\n";
             out << "    \"stationaryThresholdMps\": "  << c.ffb.stationaryThresholdMps                 << ",\n";
             out << "    \"yawFeedbackPct\": "          << c.ffb.yawFeedbackPct                         << ",\n";
+            out << "    \"springNonLinearityPct\": "   << c.ffb.springNonLinearityPct                  << ",\n";
             out << "    \"activeTorqueStrengthPct\": " << c.ffb.activeTorqueStrengthPct                << ",\n";
             out << "    \"constantForcePct\": "        << c.ffb.constantForcePct                       << ",\n";
             out << "    \"springForcePct\": "          << c.ffb.springForcePct                         << ",\n";
@@ -305,6 +306,7 @@ namespace direct_wheel::config
             ExtractInt   (text, "ffb",      "torquePct",              c.ffb.torquePct);
             ExtractFloat (text, "ffb",      "stationaryThresholdMps", c.ffb.stationaryThresholdMps);
             ExtractInt   (text, "ffb",      "yawFeedbackPct",         c.ffb.yawFeedbackPct);
+            ExtractInt   (text, "ffb",      "springNonLinearityPct",  c.ffb.springNonLinearityPct);
             ExtractInt   (text, "ffb",      "activeTorqueStrengthPct", c.ffb.activeTorqueStrengthPct);
             ExtractInt   (text, "ffb",      "constantForcePct",       c.ffb.constantForcePct);
             ExtractInt   (text, "ffb",      "springForcePct",         c.ffb.springForcePct);
@@ -468,6 +470,7 @@ namespace direct_wheel::config
 
     void SetStationaryThresholdMps(float v) { Mutate([&](Config& c){ c.ffb.stationaryThresholdMps = std::clamp(v, 0.f, 10.f); }); }
     void SetYawFeedbackPct(int32_t v)       { Mutate([&](Config& c){ c.ffb.yawFeedbackPct = std::clamp(v, 0, 100); }); }
+    void SetSpringNonLinearityPct(int32_t v){ Mutate([&](Config& c){ c.ffb.springNonLinearityPct = std::clamp(v, 0, 100); }); }
     void SetActiveTorqueStrengthPct(int32_t v) { Mutate([&](Config& c){ c.ffb.activeTorqueStrengthPct = std::clamp(v, 0, 100); }); }
     void SetConstantForcePct(int32_t v) { Mutate([&](Config& c){ c.ffb.constantForcePct = std::clamp(v, 0, 100); }); }
     void SetSpringForcePct(int32_t v)   { Mutate([&](Config& c){ c.ffb.springForcePct = std::clamp(v, 0, 100); }); }

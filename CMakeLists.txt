@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(direct_wheel
-  VERSION 3.1.0
+  VERSION 3.2.0
   DESCRIPTION "Logitech G-series steering wheel mod for Cyberpunk 2077"
   LANGUAGES CXX
 )

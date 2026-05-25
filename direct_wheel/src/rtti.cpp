@@ -609,6 +609,9 @@ namespace direct_wheel::rtti
             RegisterGlobal(rtti, "DirectWheel_SetYawFeedbackPct",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetYawFeedbackPct>),
                            "Bool", {{ "Int32", "pct" }});
+            RegisterGlobal(rtti, "DirectWheel_SetSpringNonLinearityPct",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetSpringNonLinearityPct>),
+                           "Bool", {{ "Int32", "pct" }});
             RegisterGlobal(rtti, "DirectWheel_SetActiveTorqueStrengthPct",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetInt<&config::SetActiveTorqueStrengthPct>),
                            "Bool", {{ "Int32", "pct" }});

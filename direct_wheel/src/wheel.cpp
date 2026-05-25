@@ -1103,12 +1103,20 @@ void UpdateCenteringSpring(float absSpeedMps, float angVelMagRad,
   //   3) Cornering feedback slider — yaw-based stiffness in turns
   auto cfg2 = config::Current();
   float constantPct = cfg2.ffb.constantForcePct / 100.0f;
+  float nonLinPct = cfg2.ffb.springNonLinearityPct / 100.0f;
 
   float springCoef = std::clamp(
       centeringBaseline * 1.0f * speedSq * gripFactor +
           speedRatio * 0.5f * constantPct // Constant Force: smooth centering
           + yawRamp * 0.5f * (yawFeedbackPct / 100.0f), // Cornering feedback
       0.f, 1.0f);
+
+  if (nonLinPct > 0.0f) {
+      float absSteer = std::abs(steer);
+      float p = 1.0f - (0.5f * nonLinPct); // 1.0 to 0.5
+      float boost = std::pow(std::max(absSteer, 0.01f), p - 1.0f); // x^(p-1)
+      springCoef = std::clamp(springCoef * boost, 0.0f, 1.0f);
+  }
   if (isReversing)
     springCoef *= 0.4f;
   PlaySpring(springCoef);

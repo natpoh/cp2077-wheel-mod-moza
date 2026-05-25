@@ -99,6 +99,17 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Steering deadzone (degrees)")
+  @runtimeProperty("ModSettings.description", "Dead zone in the center of the wheel. Assuming a 900-degree wheel.")
+  @runtimeProperty("ModSettings.min", "0.0")
+  @runtimeProperty("ModSettings.max", "5.0")
+  @runtimeProperty("ModSettings.step", "0.1")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let steeringDeadzoneDegrees: Float = 0.0;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Speed steering boost (%)")
   @runtimeProperty("ModSettings.description", "Compensates for reduced steering at high speed by acting on the Equalizer curve. 0 = off, 50 = 1.5x at 100 mph, 100 = 2x max.")
   @runtimeProperty("ModSettings.min", "0")
@@ -232,6 +243,17 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.step", "1")
   @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
   let yawFeedbackPct: Int32 = 15;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "FFB - Centering (Spring)")
+  @runtimeProperty("ModSettings.category.order", "210")
+  @runtimeProperty("ModSettings.displayName", "Spring Non-Linearity (%)")
+  @runtimeProperty("ModSettings.description", "Makes the spring force ramp up faster at small steering angles. Useful for weak wheels to feel the center better. 0 = linear, 100 = highly non-linear.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "1")
+  @runtimeProperty("ModSettings.dependency", "hasFfbHardware")
+  let springNonLinearityPct: Int32 = 0;
 
   // ---- FFB - Steering feel ------------------------------------------------
 
@@ -542,6 +564,7 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetInvertSteering(this.invertSteering);
     DirectWheel_SetInvertThrottle(this.invertThrottle);
     DirectWheel_SetInvertBrake(this.invertBrake);
+    DirectWheel_SetSteeringDeadzoneDegrees(this.steeringDeadzoneDegrees);
 
     DirectWheel_SetFfbEnabled(this.ffbEnabled);
     DirectWheel_SetFfbDebugLogging(this.ffbDebugLogging);
@@ -549,6 +572,7 @@ public class DirectWheelSettings extends IScriptable {
 
     DirectWheel_SetStationaryThresholdMps(this.stationaryThresholdMps);
     DirectWheel_SetYawFeedbackPct(this.yawFeedbackPct);
+    DirectWheel_SetSpringNonLinearityPct(this.springNonLinearityPct);
     DirectWheel_SetActiveTorqueStrengthPct(this.activeTorqueStrengthPct);
     DirectWheel_SetConstantForcePct(this.constantForcePct);
     DirectWheel_SetSpringForcePct(this.springForcePct);

@@ -16,6 +16,7 @@ namespace direct_wheel::config
         bool        invertSteering = false;
         bool        invertThrottle = false;
         bool        invertBrake = false;
+        float       steeringDeadzoneDegrees = 0.0f;
         std::string responseCurve = "default"; // default | subdued | sharp
         int32_t     speedSensitiveSteeringPct = 45; // 0=off, 50=1.5x at 100mph, 100=2x max
         int32_t     steeringCurve25 = 50;  // output at 25% input
@@ -54,6 +55,7 @@ namespace direct_wheel::config
         //   lateral-accel proxy, grip-factor lightening past the yaw limit).
         float   stationaryThresholdMps  = 0.5f;
         int32_t yawFeedbackPct          = 15;
+        int32_t springNonLinearityPct   = 0;
         int32_t activeTorqueStrengthPct = 45;
 
         // Per-effect strength sliders (0..100). Allow the user to
@@ -187,6 +189,7 @@ namespace direct_wheel::config
     void SetInvertSteering(bool v);
     void SetInvertThrottle(bool v);
     void SetInvertBrake(bool v);
+    void SetSteeringDeadzoneDegrees(float v);
     void SetResponseCurve(std::string_view v);
 
     void SetFfbEnabled(bool v);
@@ -195,6 +198,7 @@ namespace direct_wheel::config
 
     void SetStationaryThresholdMps(float v);
     void SetYawFeedbackPct(int32_t v);
+    void SetSpringNonLinearityPct(int32_t v);
     void SetActiveTorqueStrengthPct(int32_t v);
     void SetConstantForcePct(int32_t v);
     void SetSpringForcePct(int32_t v);

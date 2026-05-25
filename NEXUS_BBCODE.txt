@@ -1,6 +1,6 @@
 [size=5][b]Cyberpunk 2077 — Moza & Direct Drive Wheel Support[/b][/size]
 
-[b]v3.0.2[/b] for Cyberpunk 2077 game patch 2.31.
+[b]v3.2.0[/b] for Cyberpunk 2077 game patch 2.31.
 
 Full racing wheel support for Cyberpunk 2077. Drive with a [b]Moza[/b] or any other [b]Direct Drive[/b] steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
 
@@ -29,6 +29,8 @@ The mod auto-detects what hardware your Logitech wheel actually has (force feedb
 [size=4][b]New Features[/b][/size]
 [list]
 [*][b]Automatic Steering Linearization:[/b] The game applies a quadratic curve to steering (actual_steer ≈ input²), which kills small-angle precision — at 10° wheel turn you only get 3.6% of the expected response. The mod applies the mathematical inverse (√x) before the game processes it, so √x → game squares it → x. Your steering is perfectly linear across the full wheel range, no manual tuning needed.
+[*][b]Steering Deadzone:[/b] Added a slider to configure a deadzone (0 to 5 degrees) in the center of the wheel.
+[*][b]Spring Non-Linearity:[/b] Added a slider to make the centering spring force ramp up geometrically at small steering angles. Perfect for weaker wheels to feel the center better.
 [*][b]Speed Steering Boost:[/b] Compensates steering at speed by amplifying the linearized signal up to a 2x multiplier at 100 mph, so you can still turn perfectly at high speeds.
 [*][b]Invert Pedals:[/b] Separate settings to invert throttle and brake pedals directly in the mod menu. (Note: For Logitech pedals, you should check both boxes as they are physically inverted!)
 [*][b]Device & Axis Mapping:[/b] Select wheel and pedal devices independently (for split-device USB setups) and pick throttle/brake axes from an in-game dropdown — no more editing config.json!
@@ -36,9 +38,29 @@ The mod auto-detects what hardware your Logitech wheel actually has (force feedb
 
 [size=4][b]Recommended mods[/b][/size]
 [list]
+[*][url=https://www.nexusmods.com/cyberpunk2077/mods/5208]Let There Be Flight[/url] — fly any car in Cyberpunk 2077 (see flight support below)
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/29868]Steering Speed Configurator[/url]
 [*][url=https://www.nexusmods.com/cyberpunk2077/mods/29767]Cyberpunk 2077 Telemetry Mod SimHub[/url]
 [/list]
+
+[size=4][b]✈️ Let There Be Flight — Wheel Support[/b][/size]
+
+This mod supports the [url=https://www.nexusmods.com/cyberpunk2077/mods/5208]Let There Be Flight[/url] mod — fly any car using your racing wheel!
+
+[b]To enable flight support:[/b] download the [url=https://www.nexusmods.com/cyberpunk2077/mods/29993][b]Flight Bridge[/b][/url] addon and install it on top of the main mod. It requires [url=https://www.nexusmods.com/cyberpunk2077/mods/5208]Let There Be Flight[/url] to be installed.
+
+[b]Flight controls:[/b]
+[list]
+[*][b]Steering wheel[/b] → Yaw (turn left/right in flight)
+[*][b]Throttle & Brake pedals[/b] → Surge (forward/backward thrust)
+[*][b]Left paddle[/b] → Descend (lift down)
+[*][b]Right paddle[/b] → Ascend (lift up)
+[*][b]D-pad Up/Down[/b] → Pitch forward/backward (tilt the nose)
+[*][b]D-pad Left/Right[/b] → Roll left/right (bank the vehicle)
+[*][b]Extra buttons[/b] → Flight toggle, mode switch, linear/angular brakes
+[/list]
+All flight bindings are fully customizable in [b]Mod Settings → Wheel Mod → Button bindings[/b].
+When you release a button, the input resets to zero immediately — no stuck controls.
 
 [size=4][b]Required mods[/b][/size]
 [list=1]
