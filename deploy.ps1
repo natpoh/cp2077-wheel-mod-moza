@@ -45,7 +45,7 @@ function Fail($msg)    {
 
 # ---------- version ---------------------------------------------------------
 
-$version = "3.0.2"
+$version = "3.1.0"
 try {
   $modInfo = Get-Content -Raw "mod_info.json" | ConvertFrom-Json
   if ($modInfo.version) { $version = $modInfo.version }
@@ -62,7 +62,8 @@ $redsFiles = @(
   "direct_wheel_reds\direct_wheel_mount.reds",
   "direct_wheel_reds\direct_wheel_events.reds",
   "direct_wheel_reds\direct_wheel_surface.reds",
-  "direct_wheel_reds\direct_wheel_vehicle_signals.reds"
+  "direct_wheel_reds\direct_wheel_vehicle_signals.reds",
+  "direct_wheel_reds\direct_wheel_flight_bridge.reds"
 )
 foreach ($r in $redsFiles) {
   if (-not (Test-Path $r)) { Fail "Missing redscript source: $r" }

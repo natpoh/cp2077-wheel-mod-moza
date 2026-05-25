@@ -1,6 +1,6 @@
 # Cyberpunk 2077 — Moza & Direct Drive Wheel Support
 
-**v3.0.2** for Cyberpunk 2077 game patch 2.31.
+**v3.1.0** for Cyberpunk 2077 game patch 2.31.
 
 Full racing wheel support for Cyberpunk 2077. Drive with a **Moza** or any other **Direct Drive** steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
 
@@ -31,6 +31,29 @@ The mod auto-detects what hardware your Logitech wheel actually has (force feedb
 ## Recommended mods
 - [Steering Speed Configurator](https://www.nexusmods.com/cyberpunk2077/mods/29868)
 - [Cyberpunk 2077 Telemetry Mod SimHub](https://www.nexusmods.com/cyberpunk2077/mods/29767)
+- [Let There Be Flight](https://www.nexusmods.com/cyberpunk2077/mods/5208) — fly any car in Cyberpunk 2077
+
+## ✈️ Let There Be Flight — Wheel Support
+
+This mod includes a built-in bridge for [Let There Be Flight](https://www.nexusmods.com/cyberpunk2077/mods/5208). If you have Let There Be Flight installed, you can fly cars using your racing wheel with no extra setup.
+
+**How it works:**
+- **Steering wheel** controls yaw (turn left/right in flight)
+- **Throttle & Brake pedals** control surge (forward/backward thrust)
+- **Left paddle** — descend (lift down)
+- **Right paddle** — ascend (lift up)
+- **D-pad Up/Down** — pitch forward/backward (tilt the nose)
+- **D-pad Left/Right** — roll left/right (bank the vehicle)
+- **Moza FL button** — toggle flight mode on/off
+- **Moza S1/S2** — cycle flight modes forward/backward
+- **Moza BOX** — linear brake
+- **Moza PL** — angular brake
+
+All flight bindings are fully customizable in **Mod Settings → Wheel Mod → Button bindings**.
+
+When you release a button, the input resets to zero immediately — no stuck controls.
+
+**Just install both mods and go fly!**
 
 ## Required mods
 

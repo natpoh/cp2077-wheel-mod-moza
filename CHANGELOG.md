@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.0 — 2026-05-25
+- **Let There Be Flight — full wheel support:** Built-in bridge for the [Let There Be Flight](https://www.nexusmods.com/cyberpunk2077/mods/5208) mod. Steer, throttle, brake, pitch, roll, lift, and toggle flight mode — all from your racing wheel. No extra mods needed.
+- **New flight actions:** Flight_PitchForward, Flight_PitchBackward, Flight_RollLeft, Flight_RollRight added to the bindable action list (total: 48 actions).
+- **Sticky input fix:** All flight axis inputs (lift, pitch, roll, brakes) now properly reset to zero when the button is released. Previously they could get stuck at full deflection.
+- **Default bindings updated for Moza:** D-pad maps to pitch/roll, paddles to lift up/down, extra buttons to flight toggle/mode switch/brakes.
+
 ## 3.0.2 — 2026-05-23
 - Added native support for Let There Be Flight mode toggling and lift controls directly from the steering wheel.
 

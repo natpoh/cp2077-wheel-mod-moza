@@ -4,7 +4,7 @@ Full racing wheel support for Cyberpunk 2077 v2.31 with **force feedback**, **sp
 
 Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
-### 📥 [Download direct_wheel-3.0.2.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-3.0.2.zip)
+### 📥 [Download direct_wheel-3.1.0.zip](https://github.com/natpoh/cp2077-wheel-mod-moza/raw/main/dist/direct_wheel-3.1.0.zip)
 
 ---
 
@@ -30,6 +30,17 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 - Rev-strip LED bar (G29/G920/G923)
 - Optional WASAPI audio visualizer mode
 
+### ✈️ Let There Be Flight Support
+- Built-in bridge for the [Let There Be Flight](https://www.nexusmods.com/cyberpunk2077/mods/5208) mod — fly cars with your racing wheel!
+- **Steering wheel → Yaw** (turn left/right in flight)
+- **Throttle/Brake pedals → Surge** (forward/backward thrust)
+- **Paddle shifters → Lift** (ascend/descend)
+- **D-pad → Pitch & Roll** (tilt nose up/down, bank left/right)
+- **Buttons → Flight toggle, mode switch, linear/angular brakes**
+- All flight actions are fully rebindable in Mod Settings
+- Inputs properly release when buttons are released (no sticky controls)
+- Works automatically when Let There Be Flight is installed — no extra configuration needed
+
 ---
 
 ## Requirements
@@ -44,7 +55,7 @@ Tested with **Moza R5**. Should work with any DirectInput-compatible wheel.
 
 ### Quick Install (zip)
 
-1. Download `direct_wheel-3.0.2.zip`
+1. Download `direct_wheel-3.1.0.zip`
 2. Extract **directly into your Cyberpunk 2077 game folder**, for example:
    ```
    D:\SteamLibrary\steamapps\common\Cyberpunk 2077\

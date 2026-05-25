@@ -143,6 +143,10 @@ namespace direct_wheel::input_bindings
         Flight_LiftDown,
         Flight_LinearBrake,
         Flight_AngularBrake,
+        Flight_PitchForward,
+        Flight_PitchBackward,
+        Flight_RollLeft,
+        Flight_RollRight,
 
         kActionCount
     };

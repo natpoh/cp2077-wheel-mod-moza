@@ -327,37 +327,37 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "Left paddle shifter")
-  let bindPaddleLeft: DirectWheelAction = DirectWheelAction.ShootPrimary;
+  let bindPaddleLeft: DirectWheelAction = DirectWheelAction.Flight_LiftDown;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "Right paddle shifter")
-  let bindPaddleRight: DirectWheelAction = DirectWheelAction.ShootPrimary;
+  let bindPaddleRight: DirectWheelAction = DirectWheelAction.Flight_LiftUp;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "D-pad Up")
-  let bindDpadUp: DirectWheelAction = DirectWheelAction.MenuUp;
+  let bindDpadUp: DirectWheelAction = DirectWheelAction.Flight_PitchForward;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "D-pad Down")
-  let bindDpadDown: DirectWheelAction = DirectWheelAction.MenuDown;
+  let bindDpadDown: DirectWheelAction = DirectWheelAction.Flight_PitchBackward;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "D-pad Left")
-  let bindDpadLeft: DirectWheelAction = DirectWheelAction.MenuLeft;
+  let bindDpadLeft: DirectWheelAction = DirectWheelAction.Flight_RollLeft;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
   @runtimeProperty("ModSettings.category.order", "400")
   @runtimeProperty("ModSettings.displayName", "D-pad Right")
-  let bindDpadRight: DirectWheelAction = DirectWheelAction.MenuRight;
+  let bindDpadRight: DirectWheelAction = DirectWheelAction.Flight_RollRight;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Button bindings")
@@ -452,64 +452,64 @@ public class DirectWheelSettings extends IScriptable {
   // ---- Extra Generic Buttons (Moza, Fanatec, Simagic, etc) ---------------
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 1 (Moza N)")
   let bindExtra1: DirectWheelAction = DirectWheelAction.None;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 2 (Moza WIP)")
   let bindExtra2: DirectWheelAction = DirectWheelAction.None;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 3 (Moza FL)")
-  let bindExtra3: DirectWheelAction = DirectWheelAction.None;
+  let bindExtra3: DirectWheelAction = DirectWheelAction.Flight_Toggle;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 4 (Moza CAM)")
   let bindExtra4: DirectWheelAction = DirectWheelAction.None;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 5 (Moza S1)")
-  let bindExtra5: DirectWheelAction = DirectWheelAction.None;
+  let bindExtra5: DirectWheelAction = DirectWheelAction.Flight_ModeSwitchForward;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 6 (Moza S2)")
-  let bindExtra6: DirectWheelAction = DirectWheelAction.None;
+  let bindExtra6: DirectWheelAction = DirectWheelAction.Flight_ModeSwitchBackward;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 7 (Moza P)")
-  let bindExtra7: DirectWheelAction = DirectWheelAction.None;
+  let bindExtra7: DirectWheelAction = DirectWheelAction.Flight_PitchForward;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 8 (Moza BOX)")
-  let bindExtra8: DirectWheelAction = DirectWheelAction.None;
+  let bindExtra8: DirectWheelAction = DirectWheelAction.Flight_LinearBrake;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 9 (Moza PL)")
-  let bindExtra9: DirectWheelAction = DirectWheelAction.None;
+  let bindExtra9: DirectWheelAction = DirectWheelAction.Flight_AngularBrake;
 
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza N, WIP, etc)")
+  @runtimeProperty("ModSettings.category", "Extra Buttons (Moza)")
   @runtimeProperty("ModSettings.category.order", "550")
   @runtimeProperty("ModSettings.displayName", "Extra 10")
-  let bindExtra10: DirectWheelAction = DirectWheelAction.None;
+  let bindExtra10: DirectWheelAction = DirectWheelAction.Flight_PitchBackward;
 
 
   // ---- Startup ------------------------------------------------------------
@@ -717,6 +717,10 @@ enum DirectWheelAction {
   Flight_LiftDown = 41,
   Flight_LinearBrake = 42,
   Flight_AngularBrake = 43,
+  Flight_PitchForward = 44,
+  Flight_PitchBackward = 45,
+  Flight_RollLeft = 46,
+  Flight_RollRight = 47,
 }
 
 // Attach our settings instance to the player puppet so it lives for the

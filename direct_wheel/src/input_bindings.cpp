@@ -422,13 +422,17 @@ namespace direct_wheel::input_bindings
             /* 36 MenuRight           */ KA(VK_RIGHT,   "MenuRight (Right arrow)"),
 
             // --- Let There Be Flight ---
-            Interop(DispatchMode::Tap, "Flight Toggle"),
+            K(0x4F, "Flight Toggle"), // 'O' key, native toggle for Let There Be Flight
             Interop(DispatchMode::Tap, "Flight ModeSwitchForward"),
             Interop(DispatchMode::Tap, "Flight ModeSwitchBackward"),
             Interop(DispatchMode::Hold, "Flight LiftUp (hold)"),
             Interop(DispatchMode::Hold, "Flight LiftDown (hold)"),
             Interop(DispatchMode::Hold, "Flight LinearBrake (hold)"),
             Interop(DispatchMode::Hold, "Flight AngularBrake (hold)"),
+            Interop(DispatchMode::Hold, "Flight PitchForward (hold)"),
+            Interop(DispatchMode::Hold, "Flight PitchBackward (hold)"),
+            Interop(DispatchMode::Hold, "Flight RollLeft (hold)"),
+            Interop(DispatchMode::Hold, "Flight RollRight (hold)"),
         }};
 
         struct State
