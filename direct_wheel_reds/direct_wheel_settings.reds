@@ -127,16 +127,8 @@ public class DirectWheelSettings extends IScriptable {
   // steering response, making manual tuning unnecessary. Hidden from the UI
   // but kept for backward compat with saved user.ini files.
 
-  @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.hidden", "true")
   let steeringCurve25: Int32 = 50;
-
-  @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.hidden", "true")
   let steeringCurve50: Int32 = 71;
-
-  @runtimeProperty("ModSettings.mod", "Wheel Mod")
-  @runtimeProperty("ModSettings.hidden", "true")
   let steeringCurve75: Int32 = 86;
 
   // ---- Axis mapping -------------------------------------------------------
