@@ -696,7 +696,14 @@ namespace direct_wheel::input_bindings
             case Source::Button:
                 return (buttons & (1ull << m.value)) != 0;
             case Source::PovDirection:
+            {
+                if (pov >= 36000) return false;
+                if (m.value == 0) return pov == 31500 || pov == 0 || pov == 4500;
+                if (m.value == 9000) return pov == 4500 || pov == 9000 || pov == 13500;
+                if (m.value == 18000) return pov == 13500 || pov == 18000 || pov == 22500;
+                if (m.value == 27000) return pov == 22500 || pov == 27000 || pov == 31500;
                 return pov == m.value;
+            }
             case Source::Unmapped:
             default:
                 return false;

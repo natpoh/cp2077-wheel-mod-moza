@@ -188,6 +188,12 @@ namespace direct_wheel::rtti
             if (aOut) *aOut = sources::Current().axes.brake;
         }
 
+        void GetRawClutch(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, float* aOut, int64_t)
+        {
+            aFrame->code++;
+            if (aOut) *aOut = sources::Current().axes.clutch;
+        }
+
         void IsActionActive(RED4ext::IScriptable*, RED4ext::CStackFrame* aFrame, bool* aOut, int64_t)
         {
             int32_t action = 0;
@@ -553,6 +559,9 @@ namespace direct_wheel::rtti
                            "Float", {});
             RegisterGlobal(rtti, "DirectWheel_GetRawBrake",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetRawBrake),
+                           "Float", {});
+            RegisterGlobal(rtti, "DirectWheel_GetRawClutch",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&GetRawClutch),
                            "Float", {});
             RegisterGlobal(rtti, "DirectWheel_IsActionActive",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&IsActionActive),

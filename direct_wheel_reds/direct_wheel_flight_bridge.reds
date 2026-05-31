@@ -47,10 +47,15 @@ public class DirectWheelFlightPoller {
                 }
                 fc.lift.SetInput(liftInput);
 
-                // Brakes: default 0, override if held
+                // Brakes: default 0, override if held (button or clutch pedal)
                 let linBrake: Float = 0.0;
                 if DirectWheel_IsActionActive(42) { // Flight_LinearBrake
                     linBrake = 1.0;
+                }
+                // Clutch pedal as analog flight brake — take the stronger value
+                let clutchVal: Float = DirectWheel_GetRawClutch();
+                if clutchVal > linBrake {
+                    linBrake = clutchVal;
                 }
                 fc.linearBrake.SetInput(linBrake);
 
@@ -83,9 +88,18 @@ public class DirectWheelFlightPoller {
                 fc.yaw.SetInput(steer);
 
                 // Surge from pedals (throttle - brake)
+                // Note: clutchAsBrake merges clutch into brake via max().
+                // In flight, clutch is only for linear brake, NOT reverse.
+                // Strip out the clutch contribution: if brake <= clutch,
+                // the clutch is dominating and real brake isn't pressed.
                 let throttle: Float = DirectWheel_GetRawThrottle();
                 let brake: Float = DirectWheel_GetRawBrake();
-                fc.surge.SetInput(throttle - brake);
+                let clutch: Float = DirectWheel_GetRawClutch();
+                let pureBrake: Float = 0.0;
+                if brake > clutch + 0.05 {
+                    pureBrake = brake;
+                }
+                fc.surge.SetInput(throttle - pureBrake);
             }
         }
 
