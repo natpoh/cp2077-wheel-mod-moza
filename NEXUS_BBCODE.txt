@@ -1,6 +1,6 @@
 [size=5][b]Cyberpunk 2077 — Moza & Direct Drive Wheel Support[/b][/size]
 
-[b]v3.2.0[/b] for Cyberpunk 2077 game patch 2.31.
+[b]v3.3.0[/b] for Cyberpunk 2077 game patch 2.31.
 
 Full racing wheel support for Cyberpunk 2077. Drive with a [b]Moza[/b] or any other [b]Direct Drive[/b] steering wheel! Your wheel handles steering, throttle, brake, and clutch. Force feedback fires from in-game physics (centering as you turn, cornering load, surface texture, collision jolts, slip when you lose grip). 
 
@@ -33,6 +33,7 @@ The mod auto-detects what hardware your Logitech wheel actually has (force feedb
 [*][b]Spring Non-Linearity:[/b] Added a slider to make the centering spring force ramp up geometrically at small steering angles. Perfect for weaker wheels to feel the center better.
 [*][b]Speed Steering Boost:[/b] Compensates steering at speed by amplifying the linearized signal up to a 2x multiplier at 100 mph, so you can still turn perfectly at high speeds.
 [*][b]Invert Pedals:[/b] Separate settings to invert throttle and brake pedals directly in the mod menu. (Note: For Logitech pedals, you should check both boxes as they are physically inverted!)
+[*][b]Clutch Pedal as Flight Brake:[/b] In flight mode, the clutch pedal acts as an analog Flight Linear Brake (progressive braking, 0–100%). You can also bind Flight Linear Brake to any button in Mod Settings for on/off braking. Both work together — whichever input is stronger wins.
 [*][b]Device & Axis Mapping:[/b] Select wheel and pedal devices independently (for split-device USB setups) and pick throttle/brake axes from an in-game dropdown — no more editing config.json!
 [/list]
 
@@ -52,12 +53,15 @@ This mod supports the [url=https://www.nexusmods.com/cyberpunk2077/mods/5208]Let
 [b]Flight controls:[/b]
 [list]
 [*][b]Steering wheel[/b] → Yaw (turn left/right in flight)
-[*][b]Throttle & Brake pedals[/b] → Surge (forward/backward thrust)
+[*][b]Throttle pedal[/b] → Forward thrust
+[*][b]Brake pedal[/b] → Reverse thrust
+[*][b]Clutch pedal[/b] → Analog Flight Brake (progressive linear braking)
 [*][b]Left paddle[/b] → Descend (lift down)
 [*][b]Right paddle[/b] → Ascend (lift up)
 [*][b]D-pad Up/Down[/b] → Pitch forward/backward (tilt the nose)
 [*][b]D-pad Left/Right[/b] → Roll left/right (bank the vehicle)
-[*][b]Extra buttons[/b] → Flight toggle, mode switch, linear/angular brakes
+[*][b]Clutch pedal / button[/b] → Flight Linear Brake (clutch = analog 0–100%, button = on/off; bindable in Mod Settings)
+[*][b]Extra buttons[/b] → Flight toggle, mode switch, angular brake
 [/list]
 All flight bindings are fully customizable in [b]Mod Settings → Wheel Mod → Button bindings[/b].
 When you release a button, the input resets to zero immediately — no stuck controls.
