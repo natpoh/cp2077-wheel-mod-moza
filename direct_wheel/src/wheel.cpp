@@ -800,13 +800,25 @@ void Pump() {
       jsPedals = js; // on failure, fall back to wheel device
   }
 
-  const auto axes = config::Current().axes;
+  const auto cfg = config::Current();
+  const auto axes = cfg.axes;
 
   Snapshot s;
   s.connected = true;
-  s.steer = NormalizeSteer(config::AxisMap::Read(js, axes.steer));
-  s.throttle = NormalizePedal(config::AxisMap::Read(jsPedals, axes.throttle));
-  s.brake = NormalizePedal(config::AxisMap::Read(jsPedals, axes.brake));
+
+  float rawSteer = NormalizeSteer(config::AxisMap::Read(js, axes.steer));
+  if (cfg.input.invertSteering) rawSteer = -rawSteer;
+  s.steer = rawSteer;
+
+  float rawThrottle = NormalizePedal(config::AxisMap::Read(jsPedals, axes.throttle));
+  if (cfg.input.invertThrottle) rawThrottle = 1.0f - rawThrottle;
+  s.throttle = rawThrottle;
+
+  std::string brakeAxis = cfg.input.clutchAsBrake ? axes.clutch : axes.brake;
+  float rawBrake = NormalizePedal(config::AxisMap::Read(jsPedals, brakeAxis));
+  if (cfg.input.invertBrake) rawBrake = 1.0f - rawBrake;
+  s.brake = rawBrake;
+
   s.clutch = NormalizePedal(config::AxisMap::Read(jsPedals, axes.clutch));
   s.pov = static_cast<uint16_t>(js.rgdwPOV[0] & 0xFFFF);
 
