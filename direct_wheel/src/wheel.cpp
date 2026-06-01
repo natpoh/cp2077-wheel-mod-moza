@@ -814,13 +814,19 @@ void Pump() {
   if (cfg.input.invertThrottle) rawThrottle = 1.0f - rawThrottle;
   s.throttle = rawThrottle;
 
-  std::string brakeAxis = cfg.input.clutchAsBrake ? axes.clutch : axes.brake;
-  float rawBrake = NormalizePedal(config::AxisMap::Read(jsPedals, brakeAxis));
+  float rawBrake = NormalizePedal(config::AxisMap::Read(jsPedals, axes.brake));
   if (cfg.input.invertBrake) rawBrake = 1.0f - rawBrake;
-  s.brake = rawBrake;
 
   float rawClutch = NormalizePedal(config::AxisMap::Read(jsPedals, axes.clutch));
   if (cfg.input.invertClutch) rawClutch = 1.0f - rawClutch;
+
+  // clutchAsBrake: merge clutch into the brake channel so either pedal
+  // can brake. The raw clutch value is preserved separately for the
+  // flight module (GetRawClutch) which uses it as an analog air brake.
+  if (cfg.input.clutchAsBrake && rawClutch > rawBrake)
+      rawBrake = rawClutch;
+
+  s.brake = rawBrake;
   s.clutch = rawClutch;
   s.pov = static_cast<uint16_t>(js.rgdwPOV[0] & 0xFFFF);
 

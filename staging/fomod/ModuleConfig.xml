@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
+
+  <moduleName>Direct Wheel Mod</moduleName>
+
+  <!-- No top-level moduleDependencies. Vortex already enforces game
+       association before the FOMOD runs, and `state="Active"` checks
+       mod-tracked files, not base-game files. Real prerequisites
+       (RED4ext, ArchiveXL, Mod Settings, Logitech G HUB) are documented
+       on the Nexus mod page using Nexus's native dependency / required-
+       mods declarations rather than nagged through the FOMOD installer
+       (FOMOD steps are for install-time customization, not info dumps). -->
+
+  <!-- The only customization the user makes during install is the
+       startup handshake on/off. Everything else is fixed payload. -->
+
+  <requiredInstallFiles>
+    <file source="red4ext\plugins\direct_wheel\direct_wheel.dll"
+          destination="red4ext\plugins\direct_wheel\direct_wheel.dll"/>
+
+    <file source="r6\scripts\direct_wheel\direct_wheel_natives.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_natives.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_settings.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_settings.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_mount.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_mount.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_events.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_events.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_surface.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_surface.reds"/>
+    <file source="r6\scripts\direct_wheel\direct_wheel_vehicle_signals.reds"
+          destination="r6\scripts\direct_wheel\direct_wheel_vehicle_signals.reds"/>
+  </requiredInstallFiles>
+
+  <installSteps order="Explicit">
+
+    <installStep name="Startup handshake">
+      <optionalFileGroups order="Explicit">
+
+        <group name="Pon pon shi handshake" type="SelectExactlyOne">
+          <plugins order="Explicit">
+
+            <plugin name="Pon pon shi greeting (on)">
+              <description>On game start, briefly pulse the wheel's LEDs and force-feedback motors and run a centering spring to return the wheel to 0 degrees. Toggle anytime in the in-game Mod Settings menu.</description>
+              <files>
+                <file source="fomod_configs\config_handshake_on.json"
+                      destination="red4ext\plugins\direct_wheel\config.json"/>
+              </files>
+              <typeDescriptor>
+                <type name="Recommended"/>
+              </typeDescriptor>
+            </plugin>
+
+            <plugin name="Pon pon shi greeting (off)">
+              <description>Skip the startup pulses. The wheel stays silent on game start. Toggle anytime in the in-game Mod Settings menu.</description>
+              <files>
+                <file source="fomod_configs\config_handshake_off.json"
+                      destination="red4ext\plugins\direct_wheel\config.json"/>
+              </files>
+              <typeDescriptor>
+                <type name="Optional"/>
+              </typeDescriptor>
+            </plugin>
+
+          </plugins>
+        </group>
+
+      </optionalFileGroups>
+    </installStep>
+
+  </installSteps>
+
+</config>
