@@ -597,6 +597,9 @@ namespace direct_wheel::rtti
             RegisterGlobal(rtti, "DirectWheel_SetInvertBrake",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetBool<&config::SetInvertBrake>),
                            "Bool", {{ "Bool", "v" }});
+            RegisterGlobal(rtti, "DirectWheel_SetInvertClutch",
+                           reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetBool<&config::SetInvertClutch>),
+                           "Bool", {{ "Bool", "v" }});
             RegisterGlobal(rtti, "DirectWheel_SetSteeringDeadzoneDegrees",
                            reinterpret_cast<RED4ext::ScriptingFunction_t<void*>>(&SetFloat<&config::SetSteeringDeadzoneDegrees>),
                            "Bool", {{ "Float", "v" }});

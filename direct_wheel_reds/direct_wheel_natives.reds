@@ -28,6 +28,7 @@ public static native func DirectWheel_SetClutchAsBrake(v: Bool) -> Bool;
 public static native func DirectWheel_SetInvertSteering(v: Bool) -> Bool;
 public static native func DirectWheel_SetInvertThrottle(v: Bool) -> Bool;
 public static native func DirectWheel_SetInvertBrake(v: Bool) -> Bool;
+public static native func DirectWheel_SetInvertClutch(v: Bool) -> Bool;
 public static native func DirectWheel_SetSteeringDeadzoneDegrees(v: Float) -> Bool;
 
 public static native func DirectWheel_SetFfbEnabled(v: Bool) -> Bool;

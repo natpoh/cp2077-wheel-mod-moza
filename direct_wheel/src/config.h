@@ -16,6 +16,7 @@ namespace direct_wheel::config
         bool        invertSteering = false;
         bool        invertThrottle = false;
         bool        invertBrake = false;
+        bool        invertClutch = false;
         float       steeringDeadzoneDegrees = 0.0f;
         std::string responseCurve = "default"; // default | subdued | sharp
         int32_t     speedSensitiveSteeringPct = 45; // 0=off, 50=1.5x at 100mph, 100=2x max
@@ -189,6 +190,7 @@ namespace direct_wheel::config
     void SetInvertSteering(bool v);
     void SetInvertThrottle(bool v);
     void SetInvertBrake(bool v);
+    void SetInvertClutch(bool v);
     void SetSteeringDeadzoneDegrees(float v);
     void SetResponseCurve(std::string_view v);
 

@@ -819,7 +819,9 @@ void Pump() {
   if (cfg.input.invertBrake) rawBrake = 1.0f - rawBrake;
   s.brake = rawBrake;
 
-  s.clutch = NormalizePedal(config::AxisMap::Read(jsPedals, axes.clutch));
+  float rawClutch = NormalizePedal(config::AxisMap::Read(jsPedals, axes.clutch));
+  if (cfg.input.invertClutch) rawClutch = 1.0f - rawClutch;
+  s.clutch = rawClutch;
   s.pov = static_cast<uint16_t>(js.rgdwPOV[0] & 0xFFFF);
 
   uint64_t bits = 0;

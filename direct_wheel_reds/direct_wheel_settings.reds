@@ -99,6 +99,13 @@ public class DirectWheelSettings extends IScriptable {
   @runtimeProperty("ModSettings.mod", "Wheel Mod")
   @runtimeProperty("ModSettings.category", "Wheel input")
   @runtimeProperty("ModSettings.category.order", "100")
+  @runtimeProperty("ModSettings.displayName", "Invert clutch pedal")
+  @runtimeProperty("ModSettings.dependency", "inputEnabled")
+  let invertClutch: Bool = false;
+
+  @runtimeProperty("ModSettings.mod", "Wheel Mod")
+  @runtimeProperty("ModSettings.category", "Wheel input")
+  @runtimeProperty("ModSettings.category.order", "100")
   @runtimeProperty("ModSettings.displayName", "Steering deadzone (degrees)")
   @runtimeProperty("ModSettings.description", "Dead zone in the center of the wheel (0-45°). On a 900° wheel, 10° ≈ 2% deadzone, 45° ≈ 10%.")
   @runtimeProperty("ModSettings.min", "0.0")
@@ -556,6 +563,7 @@ public class DirectWheelSettings extends IScriptable {
     DirectWheel_SetInvertSteering(this.invertSteering);
     DirectWheel_SetInvertThrottle(this.invertThrottle);
     DirectWheel_SetInvertBrake(this.invertBrake);
+    DirectWheel_SetInvertClutch(this.invertClutch);
     DirectWheel_SetSteeringDeadzoneDegrees(this.steeringDeadzoneDegrees);
 
     DirectWheel_SetFfbEnabled(this.ffbEnabled);
