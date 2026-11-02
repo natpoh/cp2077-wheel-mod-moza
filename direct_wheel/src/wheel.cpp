@@ -473,6 +473,7 @@ BinderState g_binder;
 } // namespace
 
 static void DoResetDevices(); // forward declaration
+static bool g_axesLive = false; // pump thread only; cleared on every device reset
 
 void BeginAxisBinding(int target) {
   auto &st = S();
@@ -828,6 +829,38 @@ void Pump() {
 
   s.brake = rawBrake;
   s.clutch = rawClutch;
+  { // ChoomLink: a tester's G920 sent every axis as exactly 32767 for 80 s (Nov 2 17:35), i.e. no data, which became
+    // gas 0.50 + brake 0.50. Until steer, throttle or brake leaves 32767 once, the wheel adds no input.
+    const long rs = config::AxisMap::Read(js, axes.steer), rt = config::AxisMap::Read(jsPedals, axes.throttle),
+               rb = config::AxisMap::Read(jsPedals, axes.brake);
+    if (!g_axesLive && (rs != 32767 || rt != 32767 || rb != 32767)) {
+      g_axesLive = true;
+      log::InfoF("[direct_wheel] wheel axes live (steer=%ld thr=%ld brk=%ld)", rs, rt, rb);
+    }
+    if (!g_axesLive) {
+      static ULONGLONG sWarned = 0;
+      if (GetTickCount64() - sWarned >= 30000) {
+        sWarned = GetTickCount64();
+        log::Warn("[direct_wheel] wheel sends no data (every axis 32767): wheel input off until it moves");
+      }
+      s.steer = s.throttle = s.brake = s.clutch = 0.0f;
+    }
+  }
+  { // ChoomLink: raw pedal values once a second, to tell an idle-pressed pedal from a real press
+    static ULONGLONG sLast = 0;
+    static int sLines = 0;
+    const ULONGLONG now = GetTickCount64();
+    if (now - sLast >= 1000 && sLines < 600) { // ~10 min per game, not forever
+      sLast = now; ++sLines;
+      log::InfoF("[direct_wheel:pedal] raw thr=%ld brk=%ld clu=%ld -> thr=%.2f brk=%.2f clu=%.2f (inv %d/%d)",
+                 config::AxisMap::Read(jsPedals, axes.throttle), config::AxisMap::Read(jsPedals, axes.brake),
+                 config::AxisMap::Read(jsPedals, axes.clutch), s.throttle, s.brake, s.clutch,
+                 cfg.input.invertThrottle, cfg.input.invertBrake);
+      log::InfoF("[direct_wheel:pedal] all axes: lX=%ld lY=%ld lZ=%ld lRx=%ld lRy=%ld lRz=%ld slider0=%ld slider1=%ld",
+                 jsPedals.lX, jsPedals.lY, jsPedals.lZ, jsPedals.lRx, jsPedals.lRy, jsPedals.lRz,
+                 jsPedals.rglSlider[0], jsPedals.rglSlider[1]);
+    }
+  }
   s.pov = static_cast<uint16_t>(js.rgdwPOV[0] & 0xFFFF);
 
   uint64_t bits = 0;
@@ -928,6 +961,7 @@ static void DoResetDevices() {
   st.hasFFB.store(false, std::memory_order_release);
   st.deferredFFBAttempts.store(0, std::memory_order_release);
   centering_state::Reset();
+  g_axesLive = false;
   log::Info("[direct_wheel] DoResetDevices: devices released, will "
             "re-enumerate on next Pump()");
 }
